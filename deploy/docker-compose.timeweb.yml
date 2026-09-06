@@ -1,0 +1,69 @@
+# Развёртывание на облачном сервере Timeweb Cloud.
+# База данных — управляемый PostgreSQL Timeweb, поэтому контейнера с postgres здесь нет.
+#
+# Запуск:  docker compose -f deploy/docker-compose.timeweb.yml --env-file deploy/.env up -d --build
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    container_name: cloudco-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:?укажите DOMAIN в deploy/.env}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - frontend
+      - backend
+
+  backend:
+    build:
+      context: ..
+      dockerfile: server/Dockerfile
+    container_name: cloudco-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+
+      # Подключение к управляемой БД Timeweb: значения берутся из панели
+      DB_HOST: ${DB_HOST:?укажите DB_HOST в deploy/.env}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      # Управляемая БД принимает только TLS-подключения
+      DB_SSL: ${DB_SSL:-true}
+      DB_SSL_REJECT_UNAUTHORIZED: ${DB_SSL_REJECT_UNAUTHORIZED:-false}
+
+      JWT_SECRET: ${JWT_SECRET:?задайте JWT_SECRET в deploy/.env}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      CORS_ORIGIN: https://${DOMAIN}
+
+      # Сид пересоздаёт схему и стирает данные — запускается вручную, см. DEPLOY_TIMEWEB.md
+      SEED_ON_START: "false"
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+      args:
+        # NEXT_PUBLIC_* вшивается в бандл на этапе сборки, а не читается в рантайме:
+        # при смене домена образ нужно пересобрать
+        NEXT_PUBLIC_API_URL: https://${DOMAIN}/api
+    container_name: cloudco-frontend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+    depends_on:
+      - backend
+
+volumes:
+  caddy_data:
+  caddy_config:

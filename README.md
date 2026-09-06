@@ -126,6 +126,7 @@ cd server && npm run db:import-models
 ## 📖 Документация
 
 - [Docker Guide](docker-guide.md)
+- [Развёртывание на Timeweb Cloud](deploy/DEPLOY_TIMEWEB.md)
 - [Ассеты прототипа: что выгрузить из Figma](frontend/ASSETS_PROTOTYPE.md)
 - [Установка backend](server/INSTALLATION.md)
 - [API backend](server/README.md)
