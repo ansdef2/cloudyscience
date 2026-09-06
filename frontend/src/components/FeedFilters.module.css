@@ -1,0 +1,35 @@
+.filters {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.filters::-webkit-scrollbar {
+  display: none;
+}
+
+.chip {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 18px;
+  background: transparent;
+  color: var(--proto-text);
+  font-family: var(--proto-font-text);
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.chipActive {
+  background: var(--proto-field);
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+}

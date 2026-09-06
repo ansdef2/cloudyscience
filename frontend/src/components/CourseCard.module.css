@@ -1,0 +1,66 @@
+.card {
+  position: relative;
+  flex: 0 0 320px;
+  width: 320px;
+  height: 184px;
+  overflow: hidden;
+  border-radius: var(--proto-radius-card);
+  background-color: var(--proto-surface);
+  cursor: pointer;
+}
+
+.fill {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--proto-radius-card);
+  pointer-events: none;
+}
+
+.content {
+  position: absolute;
+  top: 24px;
+  left: 18px;
+  display: flex;
+  width: 283px;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  z-index: 2;
+}
+
+.title {
+  margin: 0;
+  width: 100%;
+  font-family: var(--proto-font-text);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: normal;
+  text-align: center;
+  color: var(--proto-text);
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--proto-text);
+}
+
+.dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.action {
+  position: absolute;
+  top: 137px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 220px;
+  height: 41px;
+  z-index: 2;
+}

@@ -1,0 +1,56 @@
+.cards {
+  display: flex;
+  gap: 10px;
+  height: 184px;
+  width: 100%;
+}
+
+.card {
+  position: relative;
+  flex: 1 0 0;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+  border-radius: var(--proto-radius-card);
+  background-color: var(--proto-surface);
+  cursor: pointer;
+}
+
+/* Свечение лежит отдельным слоем поверх фона карточки */
+.fill {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--proto-radius-card);
+  pointer-events: none;
+}
+
+.title {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 126px;
+  margin: 0;
+  font-family: var(--proto-font-display);
+  font-size: 16px;
+  line-height: normal;
+  text-align: center;
+  color: var(--proto-text);
+  z-index: 2;
+}
+
+.image {
+  position: absolute;
+  top: 61px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 173px;
+  height: 173px;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.imageBlue {
+  width: 159px;
+  height: 159px;
+}

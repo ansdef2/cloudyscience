@@ -10,6 +10,11 @@ interface ImageWithFallbackProps {
   className?: string
   width?: number
   height?: number
+  /**
+   * Для декоративных изображений: пока картинки нет, не рисовать заглушку,
+   * иначе непрозрачный блок перекрывает градиент карточки.
+   */
+  bare?: boolean
 }
 
 export default function ImageWithFallback({
@@ -19,6 +24,7 @@ export default function ImageWithFallback({
   className = '',
   width,
   height,
+  bare = false,
 }: ImageWithFallbackProps) {
   const [error, setError] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -33,6 +39,8 @@ export default function ImageWithFallback({
   }
 
   if (error) {
+    if (bare) return null
+
     return (
       <div 
         className={`${styles.placeholder} ${className}`}
@@ -50,7 +58,7 @@ export default function ImageWithFallback({
 
   return (
     <>
-      {loading && (
+      {loading && !bare && (
         <div 
           className={`${styles.loading} ${className}`}
           style={{ width, height }}

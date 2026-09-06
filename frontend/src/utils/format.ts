@@ -62,3 +62,17 @@ export const toIsoDate = (year: number, month: number, day: number | string): st
   const mm = String(month).padStart(2, '0')
   return `${year}-${mm}-${dd}`
 }
+
+/**
+ * Русское склонение по числу: pluralize(2, ['место', 'места', 'мест']) → 'места'
+ * Формы: 1 место, 2 места, 5 мест.
+ */
+export const pluralize = (count: number, forms: [string, string, string]): string => {
+  const abs = Math.abs(count) % 100
+  const tail = abs % 10
+
+  if (abs > 10 && abs < 20) return forms[2]
+  if (tail > 1 && tail < 5) return forms[1]
+  if (tail === 1) return forms[0]
+  return forms[2]
+}

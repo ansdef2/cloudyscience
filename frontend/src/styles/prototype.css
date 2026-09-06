@@ -91,30 +91,21 @@
     inset 0 -6px 14px 0 rgba(var(--glow), 0.2);
 }
 
-/* Радиальные заливки карточек — из макета, gradientUnits userSpaceOnUse */
-.protoFillPurple {
-  background-image: radial-gradient(
-    ellipse 120% 100% at 50% 100%,
-    #c100e8 0%,
-    #9605b3 20%,
-    #6a0a7e 40%,
-    #550c63 50%,
-    #3f0f49 60%,
-    #29112e 70%,
-    #141414 80%
-  );
+/*
+ * В макете радиальная заливка карточки перекрыта непрозрачным слоем #0e0e16,
+ * поэтому весь видимый цвет даёт нижнее внутреннее свечение (.protoGlow*).
+ * Эти классы задают только базовую поверхность и внешний ореол.
+ */
+.protoSurfacePurple {
+  --glow: var(--proto-glow-purple);
+  background-color: var(--proto-surface);
+  box-shadow: 0 15px 31.6px 0 rgba(99, 1, 136, 0.24);
 }
 
-.protoFillBlue {
-  background-image: radial-gradient(
-    ellipse 120% 100% at 50% 100%,
-    #0042e8 0%,
-    #0536b3 20%,
-    #0a2b7e 40%,
-    #0f1f49 60%,
-    #11192e 70%,
-    #141414 80%
-  );
+.protoSurfaceBlue {
+  --glow: var(--proto-glow-blue);
+  background-color: var(--proto-surface);
+  box-shadow: 0 15px 31.6px 0 rgba(1, 102, 124, 0.24);
 }
 
 /* Полупрозрачная «таблетка» под кнопки внутри карточек */
