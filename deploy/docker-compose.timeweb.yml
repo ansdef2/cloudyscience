@@ -43,7 +43,7 @@ services:
 
       JWT_SECRET: ${JWT_SECRET:?задайте JWT_SECRET в deploy/.env}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
-      CORS_ORIGIN: https://${DOMAIN}
+      CORS_ORIGIN: ${PUBLIC_URL:?укажите PUBLIC_URL в deploy/.env}
 
       # Сид пересоздаёт схему и стирает данные — запускается вручную, см. DEPLOY_TIMEWEB.md
       SEED_ON_START: "false"
@@ -55,7 +55,7 @@ services:
       args:
         # NEXT_PUBLIC_* вшивается в бандл на этапе сборки, а не читается в рантайме:
         # при смене домена образ нужно пересобрать
-        NEXT_PUBLIC_API_URL: https://${DOMAIN}/api
+        NEXT_PUBLIC_API_URL: ${PUBLIC_URL:?укажите PUBLIC_URL в deploy/.env}/api
     container_name: cloudco-frontend
     restart: unless-stopped
     environment:

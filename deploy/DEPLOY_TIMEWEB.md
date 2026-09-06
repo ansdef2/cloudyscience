@@ -74,10 +74,26 @@ cp deploy/.env.example deploy/.env
 nano deploy/.env
 ```
 
-Заполните `DOMAIN`, данные БД из шага 1 и сгенерируйте секрет:
+Заполните `DOMAIN`, `PUBLIC_URL`, данные БД из шага 1 и сгенерируйте секрет:
 
 ```bash
 openssl rand -base64 32
+```
+
+### Если DNS ещё не разошёлся
+
+Caddy не выпустит сертификат, пока домен не резолвится, и всё будет выглядеть
+сломанным. Чтобы не ждать — запуститесь по IP без HTTPS:
+
+```
+DOMAIN=:80
+PUBLIC_URL=http://IP-СЕРВЕРА
+```
+
+Когда домен заработает, поменяйте обе строки обратно и пересоберите фронтенд:
+
+```bash
+docker compose -f deploy/docker-compose.timeweb.yml --env-file deploy/.env up -d --build frontend
 ```
 
 ## 7. Запустить
@@ -128,7 +144,7 @@ docker compose -f deploy/docker-compose.timeweb.yml --env-file deploy/.env up -d
 ## Смена домена
 
 `NEXT_PUBLIC_API_URL` вшивается в бандл Next.js **на этапе сборки**. После смены
-`DOMAIN` в `deploy/.env` фронтенд нужно пересобрать:
+`DOMAIN` и `PUBLIC_URL` в `deploy/.env` фронтенд нужно пересобрать:
 
 ```bash
 docker compose -f deploy/docker-compose.timeweb.yml --env-file deploy/.env up -d --build frontend
@@ -141,7 +157,8 @@ docker compose -f deploy/docker-compose.timeweb.yml --env-file deploy/.env up -d
 | Caddy не выпускает сертификат | A-запись домена; порты 80 и 443 не заняты и открыты в файрволе |
 | Бэкенд падает на старте | Данные БД в `deploy/.env`; разрешён ли доступ с IP сервера; `DB_SSL=true` |
 | `self signed certificate in certificate chain` | Поставьте `DB_SSL_REJECT_UNAUTHORIZED=false` |
-| Фронтенд открывается, данных нет | Домен в `NEXT_PUBLIC_API_URL` — пересоберите фронтенд |
+| Фронтенд открывается, данных нет | `PUBLIC_URL` не совпадает с адресом в браузере — исправьте и пересоберите фронтенд |
+| Ошибки CORS в консоли | `PUBLIC_URL` должен точно совпадать с адресом, по которому открыт сайт |
 | Сборка фронтенда падает без ошибки | Не хватает памяти, нужен тариф от 2 ГБ или swap |
 
 Логи одного сервиса:
