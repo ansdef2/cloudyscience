@@ -5,7 +5,6 @@ import Equipment from './Equipment';
 import Booking from './Booking';
 import Post from './Post';
 import Specialist from './Specialist';
-import Promocode from './Promocode';
 
 // Define associations
 Institution.hasMany(Course, { foreignKey: 'institutionId', as: 'courses' });
@@ -19,7 +18,4 @@ User.hasMany(Post, { foreignKey: 'authorId', as: 'posts' });
 Institution.hasMany(Specialist, { foreignKey: 'institutionId', as: 'specialists' });
 Specialist.belongsTo(Institution, { foreignKey: 'institutionId' });
 
-Equipment.hasMany(Promocode, { foreignKey: 'equipmentId', as: 'promocodes' });
-Promocode.belongsTo(Equipment, { foreignKey: 'equipmentId' });
-
-export { User, Institution, Course, Equipment, Booking, Post, Specialist, Promocode };
+export { User, Institution, Course, Equipment, Booking, Post, Specialist };

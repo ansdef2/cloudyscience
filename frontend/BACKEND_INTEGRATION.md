@@ -482,5 +482,5 @@ try {
 
 ## 📚 Дополнительные ресурсы
 
-- [Документация бэкенд API](https://github.com/ansdef/cloudco) - проверьте README бэкенд репозитория
+- [Документация бэкенд API](../server/README.md)
 - [Next.js API Routes](https://nextjs.org/docs/app/building-your-application/routing/route-handlers) - если нужны proxy endpoints

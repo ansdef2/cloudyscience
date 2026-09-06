@@ -1,5 +1,7 @@
 import CourseDetail from '@/screens/CourseDetail'
 
-export default function CoursePage({ params }: { params: { id: string } }) {
-  return <CourseDetail courseId={params.id} />
+export default async function CoursePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+
+  return <CourseDetail courseId={id} />
 }

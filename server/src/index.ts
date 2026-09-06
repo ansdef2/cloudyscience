@@ -13,7 +13,6 @@ import userRoutes from './routes/users';
 import searchRoutes from './routes/search';
 import postRoutes from './routes/posts';
 import specialistRoutes from './routes/specialists';
-import promocodeRoutes from './routes/promocodes';
 
 dotenv.config();
 
@@ -36,7 +35,6 @@ app.use('/api/users', userRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/specialists', specialistRoutes);
-app.use('/api/promocodes', promocodeRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

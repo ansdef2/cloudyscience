@@ -6,7 +6,6 @@ import Course from '../models/Course';
 import Equipment from '../models/Equipment';
 import Post from '../models/Post';
 import Specialist from '../models/Specialist';
-import Promocode from '../models/Promocode';
 import { hashPassword } from '../utils/hashPassword';
 import { importEquipmentModels } from './importEquipmentModels';
 
@@ -237,31 +236,6 @@ const seedDatabase = async () => {
       avatar: '/avatars/dmitry.jpg',
     });
 
-    // Промокоды на оборудование — кнопка «Забрать промокод»
-    const oculus = await Equipment.findOne({ where: { name: 'Oculus Rift CV1' } });
-    if (oculus) {
-      await Promocode.create({
-        equipmentId: oculus.id,
-        code: 'VR-FIRST-HOUR',
-        title: 'Первый час аренды бесплатно',
-        description: 'Действует на первую бронь шлема виртуальной реальности',
-        discount: 100,
-        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
-      });
-    }
-
-    const printer = await Equipment.findOne({ where: { name: 'UNI-PRINT-3D' } });
-    if (printer) {
-      await Promocode.create({
-        equipmentId: printer.id,
-        code: 'PRINT-20',
-        title: 'Скидка 20% на печать',
-        description: 'На любую бронь 3D-принтера в этом месяце',
-        discount: 20,
-        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
-      });
-    }
-
     console.log('Seed data created successfully!');
     console.log(`Created ${await User.count()} users`);
     console.log(`Created ${await Institution.count()} institutions`);
@@ -269,7 +243,6 @@ const seedDatabase = async () => {
     console.log(`Created ${await Equipment.count()} equipment`);
     console.log(`Created ${await Post.count()} posts`);
     console.log(`Created ${await Specialist.count()} specialists`);
-    console.log(`Created ${await Promocode.count()} promocodes`);
 
     process.exit(0);
   } catch (error) {

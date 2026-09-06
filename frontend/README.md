@@ -8,7 +8,7 @@
 
 - **Figma**: https://www.figma.com/design/WVj3q2gsEAK6X38UIfBvGY/%D0%9E%D0%B1%D0%BB%D0%B0%D1%87%D0%BD%D1%8B%D0%B9-%D0%BA%D0%BE%D0%B2%D0%BE%D1%80%D0%BA%D0%B8%D0%BD%D0%B3?node-id=40-364&t=lm3QIuLGwrfabwE7-1
 - **Сайт**: https://cloudco.lovable.app
-- **Backend репозиторий**: https://github.com/ansdef/cloudco
+- **Бэкенд**: каталог `server/` в этом же репозитории
 
 ## 🚀 Быстрый запуск
 
@@ -48,7 +48,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3001/api
 
 ### Интеграция с бэкендом
 
-Этот фронтенд интегрируется с бэкенд репозиторием: [https://github.com/ansdef/cloudco](https://github.com/ansdef/cloudco)
+Фронтенд работает с бэкендом из каталога `server/` этого же репозитория.
 
 **Подробная инструкция:** [BACKEND_INTEGRATION.md](./BACKEND_INTEGRATION.md)
 
@@ -88,9 +88,7 @@ src/
 - [QUICK_START.md](./QUICK_START.md) - быстрый старт за 5 минут
 - [BACKEND_INTEGRATION.md](./BACKEND_INTEGRATION.md) - интеграция с бэкендом
 - [SETUP.md](./SETUP.md) - настройка проекта
-- [DEPLOYMENT.md](./DEPLOYMENT.md) - инструкция по загрузке в репозиторий
 - [ROUTES.md](./ROUTES.md) - описание маршрутов
-- [REPOSITORY_DESCRIPTION.md](./REPOSITORY_DESCRIPTION.md) - описание для GitHub репозитория
 
 ## 📤 Загрузка в репозиторий
 
@@ -114,24 +112,15 @@ git commit -m "Complete Cloud.co platform implementation"
 git push origin main
 ```
 
-**Подробная инструкция:** [DEPLOYMENT.md](./DEPLOYMENT.md)
-
-**Описание для репозитория:** [REPOSITORY_DESCRIPTION.md](./REPOSITORY_DESCRIPTION.md)
 
 ## 🔗 Связанные репозитории
 
-- **Backend API**: [https://github.com/ansdef/cloudco](https://github.com/ansdef/cloudco)
+- **Backend API**: [server/README.md](../server/README.md)
 - **Дизайн**: [Figma](https://www.figma.com/design/WVj3q2gsEAK6X38UIfBvGY/%D0%9E%D0%B1%D0%BB%D0%B0%D1%87%D0%BD%D1%8B%D0%B9-%D0%BA%D0%BE%D0%B2%D0%BE%D1%80%D0%BA%D0%B8%D0%BD%D0%B3?node-id=40-364&t=lm3QIuLGwrfabwE7-1)
 
 ## 📝 Лицензия
 
 См. LICENSE файл в репозитории
-
-
-
-
-
-
 
 
 UPD 1: # 📝 Описание для GitHub репозитория
@@ -175,7 +164,7 @@ npm run dev
 ```
 
 ### 🔗 Связанные репозитории:
-- **Backend:** [ansdef/cloudco](https://github.com/ansdef/cloudco)
+- **Backend:** каталог `server/`
 - **Дизайн:** [Figma](https://www.figma.com/design/WVj3q2gsEAK6X38UIfBvGY/%D0%9E%D0%B1%D0%BB%D0%B0%D1%87%D0%BD%D1%8B%D0%B9-%D0%BA%D0%BE%D0%B2%D0%BE%D1%80%D0%BA%D0%B8%D0%BD%D0%B3)
 
 ---

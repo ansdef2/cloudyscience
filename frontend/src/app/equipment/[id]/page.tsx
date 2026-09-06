@@ -1,5 +1,7 @@
 import EquipmentDetail from '@/screens/EquipmentDetail'
 
-export default function EquipmentDetailPage({ params }: { params: { id: string } }) {
-  return <EquipmentDetail equipmentId={params.id} />
+export default async function EquipmentDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+
+  return <EquipmentDetail equipmentId={id} />
 }

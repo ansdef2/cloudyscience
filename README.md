@@ -102,19 +102,14 @@ cd server && npm run db:import-models
 | POST | `/posts/:id/like` | публично |
 | POST/DELETE | `/posts` | пользователь |
 | GET | `/specialists`, `/specialists/:id` | публично |
-| GET | `/promocodes`, `/promocodes/:id` | публично |
-| POST | `/promocodes/claim` | публично |
 | GET/POST/PUT/DELETE | `/bookings` | пользователь |
 | GET/PUT/DELETE | `/users` | пользователь / админ |
-| POST/PUT/DELETE | `/institutions`, `/courses`, `/equipment`, `/specialists`, `/promocodes` | админ |
+| POST/PUT/DELETE | `/institutions`, `/courses`, `/equipment`, `/specialists` | админ |
 
 Фильтры: `/equipment?search=&type=&status=open|closed&institutionId=`,
 `/courses?search=&institutionId=`,
 `/search?q=&type=address|services|equipment|specialists`,
 `/posts?sort=popular|new&featured=true|false&search=`.
-
-> Промокоды реализованы в API и наполняются сидом, но ни один экран прототипа
-> их не использует — в макете такой кнопки нет.
 
 ## 📚 Технологии
 

@@ -1,18 +1,84 @@
 .container {
+  width: 100%;
+  max-width: var(--proto-width);
   min-height: 100vh;
-  background: var(--bg-primary);
+  margin: 0 auto;
+  background: var(--proto-bg);
+  font-family: var(--proto-font-text);
+  color: var(--proto-text);
 }
 
-.equipmentList {
-  padding: 16px;
+.content {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
+  padding: 22px var(--proto-gutter) 40px;
 }
 
-.emptyState {
-  padding: 40px;
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  padding: 20px 14px 6px;
+  border-radius: var(--proto-radius-image);
+  background: var(--proto-surface);
+  filter: drop-shadow(2px 2px 3.95px rgba(0, 0, 0, 0.66));
+  cursor: pointer;
+}
+
+.glow {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--proto-radius-image);
+  pointer-events: none;
+}
+
+.text {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 8px;
   text-align: center;
-  color: var(--text-muted);
+  z-index: 1;
+}
+
+.name {
+  margin: 0;
   font-size: 16px;
+  color: var(--proto-text);
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 12px;
+  color: var(--proto-text-60);
+}
+
+.address {
+  color: var(--proto-text);
+}
+
+.action {
+  width: 220px;
+  z-index: 1;
+}
+
+.empty,
+.loader {
+  padding: 24px 8px;
+  color: var(--proto-text-50);
+  font-size: 14px;
+  text-align: center;
 }

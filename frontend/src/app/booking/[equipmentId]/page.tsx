@@ -1,5 +1,7 @@
 import BookingPage from '@/screens/BookingPage'
 
-export default function Booking({ params }: { params: { equipmentId: string } }) {
-  return <BookingPage equipmentId={params.equipmentId} />
+export default async function Booking({ params }: { params: Promise<{ equipmentId: string }> }) {
+  const { equipmentId } = await params
+
+  return <BookingPage equipmentId={equipmentId} />
 }

@@ -35,7 +35,7 @@ npm run dev
 
 ### С бэкендом
 
-1. Запустите бэкенд из репозитория [ansdef/cloudco](https://github.com/ansdef/cloudco)
+1. Запустите бэкенд из каталога `server/` (`cd ../server && npm run dev`)
 2. Настройте `.env.local` с URL бэкенда
 3. См. [BACKEND_INTEGRATION.md](./BACKEND_INTEGRATION.md) для деталей
 

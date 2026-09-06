@@ -2,77 +2,105 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import Header from '@/components/Header'
-import SearchBar from '@/components/SearchBar'
-import EquipmentCard from '@/components/EquipmentCard'
-import styles from './EquipmentCatalog.module.css'
+import ProtoTopBar from '@/components/ProtoTopBar'
+import ProtoSearchField from '@/components/ProtoSearchField'
+import { useDebounce } from '@/hooks/useDebounce'
 import { Equipment } from '@/models/Equipment'
 import { getEquipmentList } from '@/services/equipmentService'
-import { useDebounce } from '@/hooks/useDebounce'
+import styles from './EquipmentCatalog.module.css'
+
+/** Свечения карточек чередуются, как в списках макета */
+const GLOW_CYCLE = [
+  'var(--proto-glow-violet)',
+  'var(--proto-glow-crimson)',
+  'var(--proto-glow-magenta)',
+  'var(--proto-glow-amber)',
+]
 
 export default function EquipmentCatalog() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const type = searchParams.get('type')
+
   const [searchQuery, setSearchQuery] = useState('')
-  const [equipmentItems, setEquipmentItems] = useState<Equipment[]>([])
+  const [items, setItems] = useState<Equipment[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   const debouncedSearchQuery = useDebounce(searchQuery, 300)
 
-  const handleEquipmentClick = (id: string) => {
-    router.push(`/equipment/${id}`)
-  }
-
   useEffect(() => {
     let cancelled = false
 
-    const getEquipment = async () => {
+    const load = async () => {
       setIsLoading(true)
-      const equipmentList = await getEquipmentList({
+      const list = await getEquipmentList({
         type: type || undefined,
         search: debouncedSearchQuery || undefined,
       })
 
       if (!cancelled) {
-        setEquipmentItems(equipmentList)
+        setItems(list)
         setIsLoading(false)
       }
     }
 
-    getEquipment()
+    load()
 
     return () => {
       cancelled = true
     }
-  }, [type, debouncedSearchQuery]);
+  }, [type, debouncedSearchQuery])
 
   return (
     <div className={styles.container}>
-      <Header showBack />
-      <SearchBar
-        placeholder="Поиск оборудования"
-        value={searchQuery}
-        onChange={setSearchQuery}
-      />
+      <ProtoTopBar />
 
-      <div className={styles.equipmentList}>
-        {isLoading ?
-          <div className="bigLoader"></div> :
-          equipmentItems.length > 0 ? (
-              equipmentItems.map(item => (
-                <EquipmentCard
-                  key={item.id}
-                  equipment={item}
-                  onClick={() => handleEquipmentClick(item.id)}
-                />
-              ))
-            ) : (
-              <div className={styles.emptyState}>
-                <p>Оборудование не найдено</p>
+      <div className={styles.content}>
+        <ProtoSearchField
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Поиск оборудования"
+        />
+
+        {isLoading ? (
+          <div className={`bigLoader ${styles.loader}`} />
+        ) : items.length > 0 ? (
+          <div className={styles.list}>
+            {items.map((item, index) => (
+              <div
+                key={item.id}
+                className={styles.card}
+                style={{ ['--glow' as string]: GLOW_CYCLE[index % GLOW_CYCLE.length] }}
+                onClick={() => router.push(`/equipment/${item.id}`)}
+              >
+                <div className={`${styles.glow} protoGlowTall`} />
+
+                <div className={styles.text}>
+                  <p className={styles.name}>{item.name}</p>
+                  <div className={styles.meta}>
+                    {item.address && <span className={styles.address}>{item.address}</span>}
+                    <span>
+                      {item.hours} {item.status === 'open' ? 'Открыто' : 'Закрыто'}
+                    </span>
+                    {item.distance && <span>{item.distance}</span>}
+                  </div>
+                </div>
+
+                <button
+                  className={`${styles.action} protoPill`}
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    router.push(`/booking/${item.id}`)
+                  }}
+                >
+                  Арендовать
+                </button>
               </div>
-            )
-        }
+            ))}
+          </div>
+        ) : (
+          <p className={styles.empty}>Оборудование не найдено</p>
+        )}
       </div>
     </div>
   )

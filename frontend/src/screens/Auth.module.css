@@ -1,0 +1,143 @@
+.container {
+  width: 100%;
+  max-width: var(--proto-width);
+  min-height: 100vh;
+  margin: 0 auto;
+  background: var(--proto-bg);
+  font-family: var(--proto-font-text);
+  color: var(--proto-text);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 40px var(--proto-gutter);
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--proto-font-display);
+  font-size: 28px;
+  font-weight: 400;
+  color: var(--proto-text);
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 14px;
+  color: var(--proto-text-50);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 13px;
+  color: var(--proto-text-60);
+}
+
+.input {
+  height: 46px;
+  padding: 0 16px;
+  border: none;
+  border-radius: var(--proto-radius-field);
+  background: var(--proto-field);
+  color: var(--proto-text);
+  font-family: var(--proto-font-text);
+  font-size: 14px;
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--proto-text-50);
+}
+
+.input:disabled {
+  opacity: 0.6;
+}
+
+.submit {
+  display: flex;
+  height: 54px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 8px;
+  border-radius: var(--proto-radius-pill);
+  background: #ffffff;
+  color: #000000;
+  font-family: var(--proto-font-text);
+  font-size: 14px;
+}
+
+.submit:disabled {
+  opacity: 0.6;
+}
+
+.switch {
+  font-size: 14px;
+  text-align: center;
+  color: var(--proto-text-50);
+}
+
+.link {
+  color: var(--proto-text);
+  text-decoration: underline;
+  background: none;
+  font-family: var(--proto-font-text);
+  font-size: 14px;
+}
+
+/* Подсказка с тестовым аккаунтом */
+.hint {
+  --glow: var(--proto-glow-violet);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px 20px;
+  border-radius: var(--proto-radius-card);
+  background: var(--proto-surface);
+}
+
+.hintGlow {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--proto-radius-card);
+  pointer-events: none;
+}
+
+.hintTitle {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.hintRow {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+.hintLabel {
+  color: var(--proto-text-50);
+}

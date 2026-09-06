@@ -1,125 +1,107 @@
 'use client'
 
-import Header from "@/components/Header";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { useRouter } from "next/navigation";
-import { useToast } from "@/hooks/useToast";
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import ProtoTopBar from '@/components/ProtoTopBar'
+import { useAuth } from '@/hooks/useAuth'
+import { useToast } from '@/hooks/useToast'
+import styles from './Auth.module.css'
 
-const Login = () => {
-  const router = useRouter();
+export default function Login() {
+  const router = useRouter()
+  const toast = useToast()
+  const { login } = useAuth()
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
-  const toast = useToast();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault()
 
     if (!email || !password) {
-      toast.error("Заполните все поля");
-      return;
+      toast.error('Заполните все поля')
+      return
     }
 
-    setIsLoading(true);
-    const result = await login(email, password);
-    setIsLoading(false);
+    setIsLoading(true)
+    const result = await login(email, password)
+    setIsLoading(false)
 
     if (result.success) {
-      toast.success("Добро пожаловать!");
-      router.push("/");
+      toast.success('Добро пожаловать!')
+      router.push('/')
     } else {
-      toast.error(result.error || "Ошибка входа");
+      toast.error(result.error || 'Ошибка входа')
     }
-  };
+  }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-[430px] mx-auto min-h-screen bg-background pb-8">
-        <Header />
+    <div className={styles.container}>
+      <ProtoTopBar />
 
-        <main className="px-6 space-y-8 mt-10">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Войти</h1>
-            <p className="text-muted-foreground text-sm">
-              Войдите в аккаунт для доступа ко всем функциям
-            </p>
-          </div>
+      <div className={styles.content}>
+        <div className={styles.head}>
+          <h1 className={styles.title}>Войти</h1>
+          <p className={styles.subtitle}>Войдите в аккаунт для доступа ко всем функциям</p>
+        </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-foreground">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="example@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="h-12 bg-card border-border"
-                disabled={isLoading}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-foreground">Пароль</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Введите пароль"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="h-12 bg-card border-border"
-                disabled={isLoading}
-              />
-            </div>
-
-            <Button
-              type="submit"
-              className="w-full bg-gradient-primary hover:opacity-90 text-foreground font-medium rounded-xl h-12"
+        <form className={styles.form} onSubmit={handleSubmit}>
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="email">
+              Email
+            </label>
+            <input
+              id="email"
+              className={styles.input}
+              type="email"
+              placeholder="example@email.com"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
               disabled={isLoading}
-            >
-              {isLoading ? "Вход..." : "Войти"}
-            </Button>
-
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground">
-                Нет аккаунта?{" "}
-                <button
-                  type="button"
-                  onClick={() => router.push("/register")}
-                  className="text-primary hover:underline"
-                >
-                  Зарегистрироваться
-                </button>
-              </p>
-            </div>
-          </form>
-
-          <div className="pt-8">
-            <div className="bg-card/30 rounded-2xl p-4 space-y-3">
-              <h3 className="font-semibold text-foreground">Тестовый аккаунт</h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Email:</span>
-                  <span className="text-foreground">user@cloudco.ru</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Пароль:</span>
-                  <span className="text-foreground">user123</span>
-                </div>
-              </div>
-            </div>
+            />
           </div>
-        </main>
+
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="password">
+              Пароль
+            </label>
+            <input
+              id="password"
+              className={styles.input}
+              type="password"
+              placeholder="Введите пароль"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              disabled={isLoading}
+            />
+          </div>
+
+          <button className={styles.submit} type="submit" disabled={isLoading}>
+            {isLoading ? 'Вход...' : 'Войти'}
+          </button>
+
+          <p className={styles.switch}>
+            Нет аккаунта?{' '}
+            <button className={styles.link} type="button" onClick={() => router.push('/register')}>
+              Зарегистрироваться
+            </button>
+          </p>
+        </form>
+
+        <div className={styles.hint}>
+          <div className={`${styles.hintGlow} protoGlowCard`} />
+          <p className={styles.hintTitle}>Тестовый аккаунт</p>
+          <div className={styles.hintRow}>
+            <span className={styles.hintLabel}>Email</span>
+            <span>user@cloudco.ru</span>
+          </div>
+          <div className={styles.hintRow}>
+            <span className={styles.hintLabel}>Пароль</span>
+            <span>user123</span>
+          </div>
+        </div>
       </div>
     </div>
-  );
-};
-
-export default Login;
+  )
+}
