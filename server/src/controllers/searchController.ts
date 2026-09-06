@@ -4,25 +4,30 @@ import Institution from '../models/Institution';
 import Equipment from '../models/Equipment';
 import Course from '../models/Course';
 import Booking from '../models/Booking';
+import Specialist from '../models/Specialist';
 
 type SearchResult = {
   id: string;
-  type: 'equipment' | 'institution' | 'course';
+  type: 'equipment' | 'institution' | 'course' | 'specialist';
   name: string;
   address?: string;
   hours?: string;
   status?: 'open' | 'closed';
   distance?: string;
+  avatar?: string;
 };
 
 // Вкладки поиска на фронте («по адресу» / «по услугам» / «по специалистам»)
 // отображаются на сущности бэкенда
-const TYPE_TO_ENTITIES: Record<string, Array<'institution' | 'equipment' | 'course'>> = {
+const TYPE_TO_ENTITIES: Record<
+  string,
+  Array<'institution' | 'equipment' | 'course' | 'specialist'>
+> = {
   address: ['institution'],
   services: ['course'],
   equipment: ['equipment'],
-  specialists: [],
-  all: ['institution', 'equipment', 'course'],
+  specialists: ['specialist'],
+  all: ['institution', 'equipment', 'course', 'specialist'],
 };
 
 export const search = async (req: Request, res: Response) => {
@@ -94,6 +99,23 @@ export const search = async (req: Request, res: Response) => {
           name: c.title,
           address: (c as any).Institution?.address,
           hours: (c as any).Institution?.workingHours,
+        }))
+      );
+    }
+
+    if (entities.includes('specialist')) {
+      const specialists = await Specialist.findAll({
+        where: { [Op.or]: [{ name: like }, { position: like }] },
+        include: [Institution],
+        order: [['name', 'ASC']],
+      });
+      results.push(
+        ...specialists.map((s) => ({
+          id: s.id,
+          type: 'specialist' as const,
+          name: s.name,
+          address: (s as any).Institution?.address,
+          avatar: s.avatar,
         }))
       );
     }

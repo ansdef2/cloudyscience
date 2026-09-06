@@ -4,6 +4,9 @@ import User from '../models/User';
 import Institution from '../models/Institution';
 import Course from '../models/Course';
 import Equipment from '../models/Equipment';
+import Post from '../models/Post';
+import Specialist from '../models/Specialist';
+import Promocode from '../models/Promocode';
 import { hashPassword } from '../utils/hashPassword';
 import { importEquipmentModels } from './importEquipmentModels';
 
@@ -131,11 +134,127 @@ const seedDatabase = async () => {
     const importedModels = await importEquipmentModels();
     console.log(`Импортировано из справочника: ${importedModels}`);
 
+    // Авторы ленты
+    const authorPassword = await hashPassword('anton123');
+    const anton = await User.create({
+      email: 'anton@cloudco.ru',
+      password: authorPassword,
+      name: 'Антон',
+      avatar: '/avatars/anton.jpg',
+      role: 'user',
+    });
+
+    const masha = await User.create({
+      email: 'masha@cloudco.ru',
+      password: await hashPassword('masha123'),
+      name: 'Маша',
+      avatar: '/avatars/masha.jpg',
+      role: 'user',
+    });
+
+    // Лента на главной: обычные посты и «Актуальное» (isFeatured)
+    await Post.create({
+      authorId: anton.id,
+      title: 'Apple выпустила научную работу The Illusion of Thinking',
+      text: 'В ней двигают мысль, что большие модели — не такие уж и умные.',
+      image: '/posts/illusion-of-thinking.jpg',
+      likes: 224,
+      publishedAt: new Date(),
+    });
+
+    await Post.create({
+      authorId: anton.id,
+      title: 'В Кванториуме обновили парк 3D-принтеров',
+      text: 'Три новых Wanhao Duplicator уже доступны для брони через приложение.',
+      image: '/posts/printers-update.jpg',
+      likes: 142,
+      publishedAt: new Date(Date.now() - 1000 * 60 * 60 * 24),
+    });
+
+    await Post.create({
+      authorId: masha.id,
+      title: 'Как собрать первую VR-сцену за вечер',
+      text: 'Короткий гайд для тех, кто впервые берёт шлем в аренду.',
+      image: '/posts/vr-guide.jpg',
+      likes: 318,
+      publishedAt: new Date(Date.now() - 1000 * 60 * 60 * 48),
+    });
+
+    await Post.create({
+      authorId: masha.id,
+      title: 'Маша',
+      text: 'Актуальное с занятий VR/AR Квантума',
+      image: '/highlights/masha.jpg',
+      likes: 12,
+      isFeatured: true,
+      publishedAt: new Date(),
+    });
+
+    await Post.create({
+      authorId: anton.id,
+      title: 'Антон',
+      text: 'Актуальное из мастерской',
+      image: '/highlights/anton.jpg',
+      likes: 34,
+      isFeatured: true,
+      publishedAt: new Date(),
+    });
+
+    // Специалисты — вкладка «По специалистам» в поиске
+    await Specialist.create({
+      institutionId: institution1.id,
+      name: 'Антон Кузнецов',
+      position: 'Наставник VR/AR Квантума',
+      avatar: '/avatars/anton.jpg',
+    });
+
+    await Specialist.create({
+      institutionId: institution1.id,
+      name: 'Мария Орлова',
+      position: 'Наставник IT Квантума',
+      avatar: '/avatars/masha.jpg',
+    });
+
+    await Specialist.create({
+      institutionId: institution2.id,
+      name: 'Дмитрий Соколов',
+      position: 'Инженер по 3D-печати',
+      avatar: '/avatars/dmitry.jpg',
+    });
+
+    // Промокоды на оборудование — кнопка «Забрать промокод»
+    const oculus = await Equipment.findOne({ where: { name: 'Oculus Rift CV1' } });
+    if (oculus) {
+      await Promocode.create({
+        equipmentId: oculus.id,
+        code: 'VR-FIRST-HOUR',
+        title: 'Первый час аренды бесплатно',
+        description: 'Действует на первую бронь шлема виртуальной реальности',
+        discount: 100,
+        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+      });
+    }
+
+    const printer = await Equipment.findOne({ where: { name: 'UNI-PRINT-3D' } });
+    if (printer) {
+      await Promocode.create({
+        equipmentId: printer.id,
+        code: 'PRINT-20',
+        title: 'Скидка 20% на печать',
+        description: 'На любую бронь 3D-принтера в этом месяце',
+        discount: 20,
+        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+      });
+    }
+
     console.log('Seed data created successfully!');
     console.log(`Created ${await User.count()} users`);
     console.log(`Created ${await Institution.count()} institutions`);
     console.log(`Created ${await Course.count()} courses`);
     console.log(`Created ${await Equipment.count()} equipment`);
+    console.log(`Created ${await Post.count()} posts`);
+    console.log(`Created ${await Specialist.count()} specialists`);
+    console.log(`Created ${await Promocode.count()} promocodes`);
 
     process.exit(0);
   } catch (error) {

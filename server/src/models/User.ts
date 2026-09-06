@@ -6,6 +6,7 @@ class User extends Model {
   public email!: string;
   public password!: string;
   public name!: string;
+  public avatar?: string;
   public role!: 'user' | 'admin';
   public createdAt!: Date;
   public updatedAt!: Date;
@@ -33,6 +34,9 @@ User.init(
     name: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    avatar: {
+      type: DataTypes.STRING,
     },
     role: {
       type: DataTypes.ENUM('user', 'admin'),
