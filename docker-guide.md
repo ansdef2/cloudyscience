@@ -34,6 +34,13 @@ docker-compose down -v
 docker-compose exec backend node dist/config/seed.js
 ```
 
+Справочник оборудования из `server/data/models.db` заливается вместе с seed.
+Перезалить только его, не трогая остальное:
+
+```bash
+docker-compose exec backend node dist/config/importEquipmentModels.js
+```
+
 > ⚠️ Seed выполняет `sequelize.sync({ force: true })` — таблицы пересоздаются,
 > существующие данные теряются. Запускайте его только на пустой базе.
 > Переменная `SEED_ON_START=true` делает то же самое при каждом старте

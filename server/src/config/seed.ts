@@ -5,6 +5,7 @@ import Institution from '../models/Institution';
 import Course from '../models/Course';
 import Equipment from '../models/Equipment';
 import { hashPassword } from '../utils/hashPassword';
+import { importEquipmentModels } from './importEquipmentModels';
 
 const seedDatabase = async () => {
   try {
@@ -125,6 +126,10 @@ const seedDatabase = async () => {
         'ПО': 'CAD, Unity, Blender',
       },
     });
+
+    // Реальный парк оборудования из data/models.db — поверх демо-позиций выше
+    const importedModels = await importEquipmentModels();
+    console.log(`Импортировано из справочника: ${importedModels}`);
 
     console.log('Seed data created successfully!');
     console.log(`Created ${await User.count()} users`);

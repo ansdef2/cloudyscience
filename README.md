@@ -4,8 +4,9 @@
 
 ```
 cloudco/
-├── frontend/   # Next.js 14 (App Router), TypeScript, Tailwind
-├── server/     # Express + Sequelize + PostgreSQL, JWT-авторизация
+├── frontend/        # Next.js 14 (App Router), TypeScript, Tailwind
+├── server/          # Express + Sequelize + PostgreSQL, JWT-авторизация
+│   └── data/        # models.db — справочник парка оборудования (SQLite)
 └── docker-compose.yml
 ```
 
@@ -55,6 +56,24 @@ npm install
 cp env.example .env.local  # NEXT_PUBLIC_API_URL=http://localhost:3001/api
 npm run dev                # http://localhost:3000
 ```
+
+## 🛠 Справочник оборудования
+
+Реальный парк лежит в `server/data/models.db` (SQLite): 8 единиц — VR-шлем,
+шесть 3D-принтеров и 3D-сканер, с техническими характеристиками под каждый тип.
+
+`npm run db:seed` импортирует его автоматически, поверх демо-позиций. Отдельно
+справочник можно перезалить в любой момент:
+
+```bash
+cd server && npm run db:import-models
+```
+
+Импорт идемпотентный: повторный запуск обновляет уже загруженные позиции по
+названию, а не создаёт дубликаты. Раскладка при импорте — `model_group`
+попадает в поле `type`, характеристики в `characteristics` (JSONB), VR и
+сканеры привязываются к Кванториуму, принтеры — к центру дополнительного
+образования (в самом справочнике привязки к учреждениям нет).
 
 ## ⚙️ Переменные окружения
 

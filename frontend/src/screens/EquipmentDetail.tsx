@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
 import Model3D from '@/components/Model3D'
@@ -49,6 +49,9 @@ export default function EquipmentDetail({ equipmentId }: EquipmentDetailProps) {
     )
   }
 
+  // Состав характеристик зависит от типа оборудования, поэтому рендерим что пришло
+  const characteristicEntries = Object.entries(equipment.characteristics ?? {})
+
   return (
     <div className={styles.container}>
       <Header showBack />
@@ -85,65 +88,34 @@ export default function EquipmentDetail({ equipmentId }: EquipmentDetailProps) {
         )}
       </div>
 
-    {equipment.characteristics && (
-      <div>
-        <div className={styles.content}>
-          <h1 className={styles.title}>{equipment.name}</h1>
-          
+      <div className={styles.content}>
+        <h1 className={styles.title}>{equipment.name}</h1>
+
+        {characteristicEntries.length > 0 && (
           <div className={styles.characteristics}>
             <h2 className={styles.sectionTitle}>Характеристики</h2>
-            
-            {equipment.characteristics.manufacturer && (
-              <div className={styles.characteristic}>
-                <span className={styles.label}>Производитель:</span>
-                <span className={styles.value}>{equipment.characteristics.manufacturer}</span>
-              </div>
-            )}
-            
-            {equipment.characteristics.class && (
-              <div className={styles.characteristic}>
-                <span className={styles.label}>Класс/тип оборудования:</span>
-                <span className={styles.value}>{equipment.characteristics.class}</span>
-              </div>
-            )}
-            
-            {equipment.characteristics.materials && (
-              <div className={styles.characteristic}>
-                <span className={styles.label}>Материалы:</span>
-                <span className={styles.value}>{equipment.characteristics.materials}</span>
-              </div>
-            )}
-            
-            {equipment.characteristics.tooling && (
-              <div className={styles.characteristic}>
-                <span className={styles.label}>Оснастка:</span>
-                <span className={styles.value}>{equipment.characteristics.tooling}</span>
-              </div>
-            )}
-            
-            {equipment.characteristics.software && (
-              <div className={styles.characteristic}>
-                <span className={styles.label}>Софт:</span>
-                <span className={styles.value}>{equipment.characteristics.software}</span>
-              </div>
-            )}
 
-            {/* Для Oculus Rift - детальные характеристики */}
-            {equipment.characteristics.display && (
-              <>
-                <h3 className={styles.subsectionTitle}>Дисплей и оптика</h3>
-                {Object.entries(equipment.characteristics.display).map(([key, value]) => (
-                  <div key={key} className={styles.characteristic}>
-                    <span className={styles.label}>{key}:</span>
-                    <span className={styles.value}>{value as string}</span>
-                  </div>
-                ))}
-              </>
+            {characteristicEntries.map(([key, value]) =>
+              value && typeof value === 'object' ? (
+                <Fragment key={key}>
+                  <h3 className={styles.subsectionTitle}>{key}</h3>
+                  {Object.entries(value as Record<string, unknown>).map(([nested, nestedValue]) => (
+                    <div key={`${key}.${nested}`} className={styles.characteristic}>
+                      <span className={styles.label}>{nested}:</span>
+                      <span className={styles.value}>{String(nestedValue)}</span>
+                    </div>
+                  ))}
+                </Fragment>
+              ) : (
+                <div key={key} className={styles.characteristic}>
+                  <span className={styles.label}>{key}:</span>
+                  <span className={styles.value}>{String(value)}</span>
+                </div>
+              )
             )}
           </div>
-        </div>
+        )}
       </div>
-    )}
 
 
       <button 
