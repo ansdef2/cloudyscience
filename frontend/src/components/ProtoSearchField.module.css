@@ -1,0 +1,32 @@
+.field {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 46px;
+  width: 100%;
+  padding: 0 16px;
+  border-radius: var(--proto-radius-field);
+  background: var(--proto-field);
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  color: var(--proto-text-50);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--proto-text);
+  font-family: var(--proto-font-text);
+  font-size: 14px;
+}
+
+.input::placeholder {
+  color: var(--proto-text-50);
+}

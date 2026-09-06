@@ -1,0 +1,59 @@
+.calendar {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.month {
+  margin: 0;
+  font-size: 14px;
+  text-align: center;
+  color: var(--proto-text);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 5px;
+  width: 100%;
+  justify-items: center;
+}
+
+.day {
+  display: flex;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid transparent;
+  border-radius: 27px;
+  background: none;
+  font-family: var(--proto-font-text);
+  font-size: 14px;
+  color: var(--proto-text);
+}
+
+.weekend {
+  color: var(--proto-weekend);
+}
+
+.unavailable {
+  color: var(--proto-text-50);
+  cursor: default;
+}
+
+.unavailableWeekend {
+  color: rgba(232, 69, 69, 0.5);
+  cursor: default;
+}
+
+.today {
+  border-color: #ffffff;
+}
+
+.selected {
+  background: #ffffff;
+  color: #000000;
+}

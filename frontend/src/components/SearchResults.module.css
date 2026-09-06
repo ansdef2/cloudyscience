@@ -1,0 +1,199 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+/* Узкая строка: учреждение или курс */
+.row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  height: 78px;
+  width: 100%;
+  padding: 10px 10px 10px 16px;
+  border-radius: var(--proto-radius-image);
+  background: var(--proto-surface);
+  filter: drop-shadow(2px 2px 3.95px rgba(0, 0, 0, 0.66));
+  cursor: pointer;
+  text-align: left;
+}
+
+.glow {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--proto-radius-image);
+  pointer-events: none;
+}
+
+.logo {
+  width: 31px;
+  height: 31px;
+  flex: 0 0 auto;
+  object-fit: contain;
+  z-index: 1;
+}
+
+.logoFallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 31px;
+  height: 31px;
+  flex: 0 0 auto;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 13px;
+  color: var(--proto-text-60);
+  z-index: 1;
+}
+
+.rowText {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  z-index: 1;
+}
+
+.rowTitle {
+  overflow: hidden;
+  font-size: 14px;
+  color: var(--proto-text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rowMeta {
+  overflow: hidden;
+  font-size: 12px;
+  color: #9d9d9d;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.statusOpen,
+.statusClosed {
+  color: var(--proto-text);
+}
+
+/* Высокая карточка: оборудование */
+.tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  padding: 20px 14px 6px;
+  border-radius: var(--proto-radius-image);
+  background: var(--proto-surface);
+  filter: drop-shadow(2px 2px 3.95px rgba(0, 0, 0, 0.66));
+  cursor: pointer;
+}
+
+.tileText {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 8px;
+  text-align: center;
+  z-index: 1;
+}
+
+.tileTitle {
+  margin: 0;
+  font-size: 16px;
+  color: var(--proto-text);
+}
+
+.tileMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 12px;
+  color: var(--proto-text-60);
+}
+
+.tileAddress {
+  color: var(--proto-text);
+}
+
+.tileAction {
+  width: 220px;
+  z-index: 1;
+}
+
+/* Строка специалиста */
+.specialist {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  cursor: pointer;
+}
+
+.specialistLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  border: 1px solid #8c8c8c;
+  border-radius: var(--proto-radius-avatar);
+  object-fit: cover;
+  box-shadow: 4px 4px 10.3px -1px rgba(0, 0, 0, 0.2);
+}
+
+.avatarFallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  border: 1px solid #8c8c8c;
+  border-radius: var(--proto-radius-avatar);
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 14px;
+  color: var(--proto-text-60);
+}
+
+.specialistName {
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 500;
+  color: #dadada;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.specialistPosition {
+  overflow: hidden;
+  font-size: 12px;
+  color: #9d9d9d;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chatIcon {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+  color: var(--proto-text);
+}

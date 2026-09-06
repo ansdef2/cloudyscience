@@ -1,35 +1,39 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import Header from '@/components/Header'
-import SearchBar from '@/components/SearchBar'
-import SearchResultCard from '@/components/SearchResultCard'
+import ProtoTopBar from '@/components/ProtoTopBar'
+import ProtoSearchField from '@/components/ProtoSearchField'
+import ActionCards from '@/components/ActionCards'
+import SearchResults from '@/components/SearchResults'
 import { useDebounce } from '@/hooks/useDebounce'
+import { search as searchApi, SearchResult } from '@/services/searchService'
 import styles from './SearchPage.module.css'
-import { search as searchApi, SearchResult, SearchType } from '@/services/searchService'
 
+/**
+ * Поиск из нового прототипа: одно поле, смешанная выдача.
+ * Пока запрос пустой — показываются карточки действий (экран «Поиск» в макете),
+ * с запросом появляются результаты (экраны «Поиск 2» и «Поиск 3»).
+ */
 export default function SearchPage() {
   const searchParams = useSearchParams()
-  const query = searchParams.get('q') || ''
-  const [searchQuery, setSearchQuery] = useState(query)
+  const [query, setQuery] = useState(searchParams.get('q') || '')
   const [results, setResults] = useState<SearchResult[]>([])
-  const [searchType, setSearchType] = useState<SearchType>('address')
   const [isLoading, setIsLoading] = useState(false)
 
-  const debouncedSearchQuery = useDebounce(searchQuery, 300)
+  const debouncedQuery = useDebounce(query, 300)
 
   useEffect(() => {
-    if (!debouncedSearchQuery) {
+    if (!debouncedQuery.trim()) {
       setResults([])
       return
     }
 
     let cancelled = false
 
-    const doSearch = async () => {
+    const run = async () => {
       setIsLoading(true)
-      const items = await searchApi({ query: debouncedSearchQuery, type: searchType })
+      const items = await searchApi({ query: debouncedQuery, type: 'all' })
 
       if (!cancelled) {
         setResults(items)
@@ -37,61 +41,30 @@ export default function SearchPage() {
       }
     }
 
-    doSearch()
+    run()
 
     return () => {
       cancelled = true
     }
-  }, [debouncedSearchQuery, searchType])
+  }, [debouncedQuery])
+
+  const hasQuery = Boolean(debouncedQuery.trim())
 
   return (
     <div className={styles.container}>
-      <Header showBack />
-      <SearchBar
-        placeholder="Поиск"
-        value={searchQuery}
-        onChange={setSearchQuery}
-      />
+      <ProtoTopBar />
 
-      <div className={styles.searchTabs}>
-        <button
-          className={`${styles.tab} ${searchType === 'address' ? styles.active : ''}`}
-          onClick={() => setSearchType('address')}
-        >
-          По адресу
-        </button>
-        <button
-          className={`${styles.tab} ${searchType === 'specialists' ? styles.active : ''}`}
-          onClick={() => setSearchType('specialists')}
-        >
-          По специалистам
-        </button>
-        <button
-          className={`${styles.tab} ${searchType === 'services' ? styles.active : ''}`}
-          onClick={() => setSearchType('services')}
-        >
-          По услугам
-        </button>
-      </div>
+      <div className={styles.content}>
+        <ProtoSearchField value={query} onChange={setQuery} autoFocus />
 
-      <div className={styles.results}>
-        {isLoading ? (
-          <div className="bigLoader"></div>
-        ) : results.length > 0 ? (
-          results.map(result => (
-            <SearchResultCard key={result.id} result={result} />
-          ))
-        ) : searchQuery ? (
-          <div className={styles.emptyState}>
-            <div className={styles.emptyIcon}>🔍</div>
-            <p>Ничего не найдено</p>
-            <p className={styles.emptyHint}>Попробуйте изменить параметры поиска</p>
-          </div>
-        ) : (
-          <div className={styles.emptyState}>
-            <div className={styles.emptyIcon}>💡</div>
-            <p>Введите запрос для поиска</p>
-          </div>
+        {!hasQuery && <ActionCards />}
+
+        {hasQuery && isLoading && <div className={`bigLoader ${styles.loader}`} />}
+
+        {hasQuery && !isLoading && results.length > 0 && <SearchResults results={results} />}
+
+        {hasQuery && !isLoading && results.length === 0 && (
+          <p className={styles.empty}>Ничего не найдено</p>
         )}
       </div>
     </div>

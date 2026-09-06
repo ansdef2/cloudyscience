@@ -13,7 +13,8 @@ class Equipment extends Model {
   public distance?: string;
   public image?: string;
   public image3d?: string;
-  public characteristics?: Record<string, unknown>;
+  /** Разделы характеристик: [{ section, rows: [{ label, value }] }] */
+  public characteristics?: unknown;
   public createdAt!: Date;
   public updatedAt!: Date;
 
@@ -65,7 +66,7 @@ Equipment.init(
     },
     characteristics: {
       type: DataTypes.JSONB,
-      defaultValue: {},
+      defaultValue: [],
     },
   },
   {

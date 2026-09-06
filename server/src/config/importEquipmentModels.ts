@@ -18,86 +18,98 @@ import Institution from '../models/Institution';
 
 const DB_PATH = path.resolve(__dirname, '../../data/models.db');
 
-// Подписи характеристик для UI: в SQLite колонки названы по-английски
-const PRINTER_LABELS: Record<string, string> = {
-  printing_technology: 'Технология печати',
-  build_volume: 'Область печати',
-  layer_resolution: 'Разрешение слоя',
-  positional_precision: 'Точность позиционирования',
-  materials: 'Материалы',
-  filament_diameter: 'Диаметр прутка',
-  nozzle_diameter: 'Диаметр сопла',
-  print_speed: 'Скорость печати',
-  travel_speed: 'Скорость перемещения',
-  notes: 'Примечания',
+/**
+ * Подписи и группировка характеристик под таблицу на карточке оборудования.
+ * Колонка SQLite -> [раздел, подпись]. Названия разделов и подписи взяты
+ * из макета, порядок колонок задаёт порядок строк в разделе.
+ */
+type LabelMap = Record<string, [string, string]>;
+
+const PRINTER_LABELS: LabelMap = {
+  printing_technology: ['Характеристики печати', 'Технология печати'],
+  build_volume: ['Характеристики печати', 'Область печати'],
+  layer_resolution: ['Характеристики печати', 'Разрешение слоя'],
+  positional_precision: ['Характеристики печати', 'Точность позиционирования'],
+  print_speed: ['Характеристики печати', 'Скорость печати'],
+  travel_speed: ['Характеристики печати', 'Скорость перемещения'],
+  materials: ['Расходные материалы', 'Материалы'],
+  filament_diameter: ['Расходные материалы', 'Диаметр прутка'],
+  nozzle_diameter: ['Расходные материалы', 'Диаметр сопла'],
+  notes: ['Дополнительно', 'Примечания'],
 };
 
-const SCANNER_LABELS: Record<string, string> = {
-  manufacturer: 'Производитель',
-  technology: 'Технология',
-  dimensions: 'Габариты',
-  max_size: 'Максимальный размер объекта',
-  weight: 'Вес',
-  resolution: 'Разрешение',
-  precision: 'Точность',
-  color_scanning: 'Цветное сканирование',
-  export_formats: 'Форматы экспорта',
-  software: 'Программное обеспечение',
-  os_compatibility: 'Совместимость с ОС',
-  power: 'Потребляемая мощность',
-  notes: 'Примечания',
+const SCANNER_LABELS: LabelMap = {
+  manufacturer: ['Общие сведения', 'Производитель'],
+  technology: ['Общие сведения', 'Технология'],
+  resolution: ['Характеристики сканирования', 'Разрешение'],
+  precision: ['Характеристики сканирования', 'Точность'],
+  max_size: ['Характеристики сканирования', 'Максимальный размер объекта'],
+  color_scanning: ['Характеристики сканирования', 'Цветное сканирование'],
+  dimensions: ['Физические характеристики', 'Габариты'],
+  weight: ['Физические характеристики', 'Вес'],
+  power: ['Физические характеристики', 'Потребляемая мощность'],
+  export_formats: ['Программное обеспечение', 'Форматы экспорта'],
+  software: ['Программное обеспечение', 'Программное обеспечение'],
+  os_compatibility: ['Программное обеспечение', 'Совместимость с ОС'],
+  notes: ['Дополнительно', 'Примечания'],
 };
 
-const VR_LABELS: Record<string, string> = {
-  display_type: 'Тип дисплея',
-  resolution_per_eye: 'Разрешение на глаз',
-  total_resolution: 'Общее разрешение',
-  pixel_density: 'Плотность пикселей',
-  screen_size: 'Диагональ экрана',
-  refresh_rate: 'Частота обновления',
-  supported_refresh_rates: 'Поддерживаемые частоты',
-  response_time: 'Время отклика',
-  fov: 'Угол обзора',
-  gyroscope: 'Гироскоп',
-  accelerometer: 'Акселерометр',
-  magnetometer: 'Магнитометр',
-  infrared_tracking: 'Инфракрасный трекинг',
-  tracker_camera_rate: 'Частота камеры трекинга',
-  audio_type: 'Тип аудио',
-  audio_output: 'Аудиовыход',
-  video_input: 'Видеовход',
-  usb_ports: 'USB-порты',
-  power: 'Питание',
-  shell_weight: 'Вес корпуса',
-  total_weight: 'Общий вес',
-  fit: 'Посадка',
-  controller: 'Контроллер',
-  tracking_type: 'Тип трекинга',
-  dof: 'Степени свободы',
-  max_distance: 'Максимальная дистанция',
-  os_required: 'ОС (минимум)',
-  cpu_required: 'Процессор (минимум)',
-  ram_required: 'Оперативная память (минимум)',
-  gpu_required: 'Видеокарта (минимум)',
-  recommended_os: 'ОС (рекомендуется)',
-  recommended_cpu: 'Процессор (рекомендуется)',
-  recommended_ram: 'Оперативная память (рекомендуется)',
-  recommended_gpu: 'Видеокарта (рекомендуется)',
-  recommended_usb_ports: 'USB-порты (рекомендуется)',
+const VR_LABELS: LabelMap = {
+  display_type: ['Дисплей и оптика', 'Тип матрицы'],
+  resolution_per_eye: ['Дисплей и оптика', 'Разрешение на каждый глаз'],
+  total_resolution: ['Дисплей и оптика', 'Общее разрешение'],
+  pixel_density: ['Дисплей и оптика', 'Плотность пикселей'],
+  screen_size: ['Дисплей и оптика', 'Диагональ дисплея'],
+  refresh_rate: ['Дисплей и оптика', 'Частота обновления'],
+  supported_refresh_rates: ['Дисплей и оптика', 'Поддерживаемые частоты'],
+  response_time: ['Дисплей и оптика', 'Время отклика'],
+  fov: ['Дисплей и оптика', 'Угол обзора (FOV)'],
+  gyroscope: ['Датчики', 'Гироскоп'],
+  accelerometer: ['Датчики', 'Акселерометр'],
+  magnetometer: ['Датчики', 'Магнитометр'],
+  infrared_tracking: ['Датчики', 'Инфракрасные датчики'],
+  tracker_camera_rate: ['Датчики', 'Частота опроса камеры трекера'],
+  audio_type: ['Аудио', 'Тип наушников'],
+  audio_output: ['Аудио', 'Аудиовыход'],
+  video_input: ['Подключение', 'Видеовыход'],
+  usb_ports: ['Подключение', 'USB порты'],
+  power: ['Подключение', 'Питание'],
+  shell_weight: ['Физические характеристики', 'Вес шлема'],
+  total_weight: ['Физические характеристики', 'Вес (общий вариант)'],
+  fit: ['Физические характеристики', 'Регулировка'],
+  controller: ['Комплектация', 'Контроллер'],
+  tracking_type: ['Система отслеживания', 'Тип отслеживания'],
+  dof: ['Система отслеживания', 'Степени свободы (DoF)'],
+  max_distance: ['Система отслеживания', 'Максимальное расстояние'],
+  os_required: ['Минимальные системные требования', 'ОС'],
+  cpu_required: ['Минимальные системные требования', 'Процессор'],
+  ram_required: ['Минимальные системные требования', 'Оперативная память'],
+  gpu_required: ['Минимальные системные требования', 'Видеокарта'],
+  recommended_os: ['Рекомендуемые системные требования', 'ОС'],
+  recommended_cpu: ['Рекомендуемые системные требования', 'Процессор'],
+  recommended_ram: ['Рекомендуемые системные требования', 'Оперативная память'],
+  recommended_gpu: ['Рекомендуемые системные требования', 'Видеокарта'],
+  recommended_usb_ports: ['Рекомендуемые системные требования', 'USB порты'],
 };
 
-const SPEC_TABLES: Array<{ table: string; labels: Record<string, string> }> = [
+const SPEC_TABLES: Array<{ table: string; labels: LabelMap }> = [
   { table: 'model_printers', labels: PRINTER_LABELS },
   { table: 'model_scanners', labels: SCANNER_LABELS },
   { table: 'model_vr', labels: VR_LABELS },
 ];
+
+/** Раздел характеристик; массив, а не объект, чтобы JSONB сохранил порядок */
+type SpecSection = {
+  section: string;
+  rows: Array<{ label: string; value: string }>;
+};
 
 type CatalogEntry = {
   id: number;
   group: string;
   name: string;
   notes: string;
-  characteristics: Record<string, string>;
+  characteristics: SpecSection[];
 };
 
 /** Читает справочник из SQLite-файла */
@@ -119,7 +131,7 @@ export const readCatalog = async (): Promise<CatalogEntry[]> => {
       group: String(row[1] ?? '').trim(),
       name: String(row[2] ?? '').trim(),
       notes: String(row[3] ?? '').trim(),
-      characteristics: {},
+      characteristics: [],
     });
   }
 
@@ -134,11 +146,18 @@ export const readCatalog = async (): Promise<CatalogEntry[]> => {
       const entry = entries.get(Number(record.id));
       if (!entry) continue;
 
-      for (const [column, label] of Object.entries(labels)) {
+      // Порядок разделов и строк повторяет порядок колонок в LabelMap
+      for (const [column, [section, label]] of Object.entries(labels)) {
         const value = record[column];
         // Пустые ячейки в характеристики не попадают
         if (value === null || value === undefined || String(value).trim() === '') continue;
-        entry.characteristics[label] = String(value).trim();
+
+        let target = entry.characteristics.find((item) => item.section === section);
+        if (!target) {
+          target = { section, rows: [] };
+          entry.characteristics.push(target);
+        }
+        target.rows.push({ label, value: String(value).trim() });
       }
     }
   }

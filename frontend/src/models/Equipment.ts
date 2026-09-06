@@ -1,3 +1,13 @@
+export interface SpecRow {
+  label: string
+  value: string
+}
+
+export interface SpecSection {
+  section: string
+  rows: SpecRow[]
+}
+
 export interface Equipment {
   id: string
   name: string
@@ -8,5 +18,9 @@ export interface Equipment {
   distance?: string
   image?: string
   image3d?: string
-  characteristics?: Record<string, any>
+  /**
+   * Массив разделов из справочника оборудования; у демо-позиций может
+   * встретиться плоский объект «подпись -> значение».
+   */
+  characteristics?: SpecSection[] | Record<string, unknown>
 }

@@ -1,135 +1,182 @@
 .container {
-  min-height: 100vh;
-  background: var(--bg-primary);
-  padding-bottom: 80px;
-}
-
-.viewMode {
-  display: flex;
-  gap: 8px;
-  padding: 16px;
-  justify-content: flex-end;
-}
-
-.modeButton {
-  padding: 6px 16px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 20px;
-  color: var(--text-secondary);
-  font-size: 14px;
-  transition: all 0.2s;
-}
-
-.modeButton.active {
-  background: var(--accent-purple);
-  border-color: var(--accent-purple);
-  color: var(--text-primary);
-}
-
-.imageContainer {
   width: 100%;
-  height: 300px;
-  background: var(--bg-card);
+  max-width: var(--proto-width);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding-bottom: 40px;
+  background: var(--proto-bg);
+  font-family: var(--proto-font-text);
+  color: var(--proto-text);
+}
+
+/* Карточка-герой: название, переключатель вида, фото и бронь */
+.hero {
+  --glow: var(--proto-glow-violet);
+  position: relative;
+  width: 100%;
+  margin-top: 22px;
+  padding: 32px 20px 32px;
+  border-radius: var(--proto-radius-hero);
+  background: var(--proto-surface);
+}
+
+.heroGlow {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--proto-radius-hero);
+  pointer-events: none;
+}
+
+.heroHead {
+  position: relative;
+  z-index: 1;
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--proto-text);
+}
+
+.address {
+  margin: 0;
+  font-size: 14px;
+  color: var(--proto-text-50);
+}
+
+.viewToggle {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 26px;
+}
+
+.viewButton {
+  display: flex;
+  height: 36px;
   align-items: center;
   justify-content: center;
-  margin-bottom: 24px;
+  padding: 0 12px;
+  border-radius: 40px;
+  background: rgba(0, 0, 0, 0.5);
+  color: var(--proto-text);
+  font-family: var(--proto-font-text);
+  font-size: 14px;
 }
 
-.image,
-.fallbackImage {
+.viewButtonActive {
+  background: #ffffff;
+  color: #000000;
+}
+
+.photo {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 197px;
+  margin-top: 60px;
+  overflow: hidden;
+}
+
+.photoImage {
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
 
-.model3d {
-  width: 100%;
-  height: 100%;
+.bookButton {
+  position: relative;
+  z-index: 1;
   display: flex;
-  flex-direction: column;
+  height: 54px;
+  width: 100%;
   align-items: center;
   justify-content: center;
-  color: var(--text-secondary);
+  margin-top: 60px;
+  border-radius: var(--proto-radius-pill);
+  background: #ffffff;
+  color: #000000;
+  font-family: var(--proto-font-text);
+  font-size: 14px;
 }
 
-.content {
-  padding: 0 16px;
+/* Таблица характеристик */
+.specs {
+  padding: 0 24px;
+  margin-top: 40px;
 }
 
-.title {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 24px;
+.specsTitle {
+  margin: 0 0 42px;
+  font-family: var(--proto-font-display);
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--proto-text);
 }
 
-.characteristics {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.section {
+  margin-bottom: 16px;
 }
 
 .sectionTitle {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--accent-purple);
-  font-style: italic;
-  margin-bottom: 8px;
-}
-
-.subsectionTitle {
+  margin: 0 0 30px;
   font-size: 16px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-top: 16px;
-  margin-bottom: 8px;
+  font-weight: 500;
+  color: var(--proto-text);
 }
 
-.characteristic {
+.rows {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 12px;
+}
+
+.row {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
 }
 
 .label {
+  width: 150px;
+  flex: 0 0 150px;
   font-size: 14px;
-  color: var(--text-secondary);
-  font-weight: 500;
+  line-height: 18px;
+  color: var(--proto-text-50);
 }
 
 .value {
+  width: 130px;
+  flex: 0 0 130px;
   font-size: 14px;
-  color: var(--text-primary);
+  line-height: 18px;
+  color: var(--proto-text);
 }
 
-.bookButton {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 16px;
-  background: var(--gradient-primary);
-  color: var(--text-primary);
-  font-size: 18px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  z-index: 10;
-}
-
-.bookButton:hover {
-  opacity: 0.9;
+.footerButton {
+  display: flex;
+  height: 54px;
+  width: calc(100% - 48px);
+  align-items: center;
+  justify-content: center;
+  margin: 30px 24px 0;
+  border-radius: var(--proto-radius-pill);
+  background: #ffffff;
+  color: #000000;
+  font-family: var(--proto-font-text);
+  font-size: 14px;
 }
 
 .notFound {
-  padding: 40px;
+  padding: 60px 20px;
   text-align: center;
-  color: var(--text-muted);
-  font-size: 16px;
-}
-
-.loader {
-  margin: 20px auto;
+  color: var(--proto-text-50);
 }

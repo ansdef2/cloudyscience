@@ -93,11 +93,16 @@ const seedDatabase = async () => {
       isOpen: true,
       distance: '1.26 км от вас',
       image: '/equipment/milling-machine.jpg',
-      characteristics: {
-        'Рабочее поле': '400 x 300 x 100 мм',
-        'Материалы': 'Дерево, пластик, алюминий',
-        'Точность': '0.01 мм',
-      },
+      characteristics: [
+        {
+          section: 'Характеристики',
+          rows: [
+            { label: 'Рабочее поле', value: '400 x 300 x 100 мм' },
+            { label: 'Материалы', value: 'Дерево, пластик, алюминий' },
+            { label: 'Точность', value: '0.01 мм' },
+          ],
+        },
+      ],
     });
 
     const equipment2 = await Equipment.create({
@@ -109,11 +114,16 @@ const seedDatabase = async () => {
       isOpen: false,
       distance: '1.26 км от вас',
       image: '/equipment/oculus-rift.jpg',
-      characteristics: {
-        'Область печати': '220 x 220 x 250 мм',
-        'Технология': 'FDM',
-        'Материалы': 'PLA, ABS, PETG',
-      },
+      characteristics: [
+        {
+          section: 'Характеристики',
+          rows: [
+            { label: 'Область печати', value: '220 x 220 x 250 мм' },
+            { label: 'Технология', value: 'FDM' },
+            { label: 'Материалы', value: 'PLA, ABS, PETG' },
+          ],
+        },
+      ],
     });
 
     const equipment3 = await Equipment.create({
@@ -124,10 +134,15 @@ const seedDatabase = async () => {
       workingHours: '9:00-19:00',
       isOpen: true,
       image: '/computer.jpg',
-      characteristics: {
-        'Рабочих мест': '12',
-        'ПО': 'CAD, Unity, Blender',
-      },
+      characteristics: [
+        {
+          section: 'Характеристики',
+          rows: [
+            { label: 'Рабочих мест', value: '12' },
+            { label: 'ПО', value: 'CAD, Unity, Blender' },
+          ],
+        },
+      ],
     });
 
     // Реальный парк оборудования из data/models.db — поверх демо-позиций выше

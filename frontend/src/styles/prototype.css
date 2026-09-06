@@ -44,16 +44,36 @@
   --proto-glow-green: 0, 179, 125;
   --proto-glow-lime: 32, 194, 0;
 
+  /* Палитра свечений для списков — в макете карточки подсвечены по-разному */
+  --proto-glow-magenta: 128, 0, 74;
+  --proto-glow-amber: 128, 106, 0;
+  --proto-glow-violet: 87, 0, 128;
+  --proto-glow-crimson: 128, 0, 32;
+
   /* Радиусы */
   --proto-radius-card: 28px;
   --proto-radius-field: 10px;
   --proto-radius-image: 12px;
   --proto-radius-pill: 35px;
   --proto-radius-avatar: 20px;
+  --proto-radius-hero: 50px;
 
   /* Ширина макета */
   --proto-width: 360px;
   --proto-gutter: 20px;
+
+  /* Фирменный градиент для акцентного текста */
+  --proto-brand-gradient: linear-gradient(
+    176.978deg,
+    #4e91fa 27.71%,
+    #a0adfb 40.129%,
+    #fdddf0 76.392%,
+    #feeef3 83.975%,
+    #ffffff 87.009%
+  );
+
+  /* Красный для выходных в календаре */
+  --proto-weekend: #e84545;
 
   /* Шрифты: акцидентный для заголовков карточек, Onest для всего остального */
   --proto-font-display: 'Advaken Sans', var(--font-onest), system-ui, sans-serif;
@@ -106,6 +126,54 @@
   --glow: var(--proto-glow-blue);
   background-color: var(--proto-surface);
   box-shadow: 0 15px 31.6px 0 rgba(1, 102, 124, 0.24);
+}
+
+/* Свечение для узкой строки списка (высота ~78px) */
+.protoGlowRow {
+  box-shadow:
+    inset 0 -17px 5px 0 rgba(var(--glow), 0.02),
+    inset 0 -11px 4px 0 rgba(var(--glow), 0.15),
+    inset 0 -6px 4px 0 rgba(var(--glow), 0.5),
+    inset 0 -3px 3px 0 rgba(var(--glow), 0.85),
+    inset 0 -1px 1px 0 rgba(var(--glow), 0.98);
+}
+
+/* Свечение для высокой карточки списка (~200px) */
+.protoGlowTall {
+  box-shadow:
+    inset 0 -173px 49px 0 rgba(var(--glow), 0.02),
+    inset 0 -111px 44px 0 rgba(var(--glow), 0.15),
+    inset 0 -62px 37px 0 rgba(var(--glow), 0.5),
+    inset 0 -28px 28px 0 rgba(var(--glow), 0.85),
+    inset 0 -7px 15px 0 rgba(var(--glow), 0.98);
+}
+
+/* Свечение большой карточки-героя (радиус 50px) */
+.protoGlowHero {
+  box-shadow:
+    inset 0 -402px 113px 0 rgba(var(--glow), 0.02),
+    inset 0 -257px 103px 0 rgba(var(--glow), 0.15),
+    inset 0 -145px 87px 0 rgba(var(--glow), 0.5),
+    inset 0 -64px 64px 0 rgba(var(--glow), 0.85),
+    inset 0 -16px 35px 0 rgba(var(--glow), 0.98);
+}
+
+/* Белая подсветка снизу у фотографии в карточке-герое */
+.protoPhotoGlow {
+  box-shadow:
+    inset 0 -70px 20px 0 rgba(255, 255, 255, 0.01),
+    inset 0 -45px 18px 0 rgba(255, 255, 255, 0.07),
+    inset 0 -25px 15px 0 rgba(255, 255, 255, 0.23),
+    inset 0 -11px 11px 0 rgba(255, 255, 255, 0.38),
+    inset 0 -3px 6px 0 rgba(255, 255, 255, 0.44);
+}
+
+/* Текст, залитый фирменным градиентом */
+.protoBrandText {
+  background-image: var(--proto-brand-gradient);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
 }
 
 /* Полупрозрачная «таблетка» под кнопки внутри карточек */

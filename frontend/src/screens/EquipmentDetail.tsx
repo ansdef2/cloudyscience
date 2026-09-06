@@ -1,13 +1,32 @@
 'use client'
 
-import { Fragment, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Header from '@/components/Header'
-import Model3D from '@/components/Model3D'
+import ProtoTopBar from '@/components/ProtoTopBar'
 import ImageWithFallback from '@/components/ImageWithFallback'
-import styles from './EquipmentDetail.module.css'
+import Model3D from '@/components/Model3D'
 import { getEquipmentById } from '@/services/equipmentService'
-import { Equipment } from '@/models/Equipment'
+import { Equipment, SpecSection } from '@/models/Equipment'
+import styles from './EquipmentDetail.module.css'
+
+/**
+ * Характеристики приходят массивом разделов (порядок задан импортом справочника),
+ * но у демо-позиций может остаться плоский объект — поддерживаем оба вида.
+ */
+function toSections(characteristics: Equipment['characteristics']): SpecSection[] {
+  if (!characteristics) return []
+  if (Array.isArray(characteristics)) return characteristics
+
+  return [
+    {
+      section: 'Характеристики',
+      rows: Object.entries(characteristics).map(([label, value]) => ({
+        label,
+        value: String(value),
+      })),
+    },
+  ]
+}
 
 interface EquipmentDetailProps {
   equipmentId: string
@@ -15,27 +34,18 @@ interface EquipmentDetailProps {
 
 export default function EquipmentDetail({ equipmentId }: EquipmentDetailProps) {
   const router = useRouter()
+  const [equipment, setEquipment] = useState<Equipment | 'loading' | null>('loading')
   const [viewMode, setViewMode] = useState<'3d' | 'jpg'>('jpg')
-  const [equipment, setEquipment] = useState<Equipment | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const getEquipment = async () => {
-      setIsLoading(true)
-      const equipment = await getEquipmentById(equipmentId)
+    getEquipmentById(equipmentId).then((found) => setEquipment(found || null))
+  }, [equipmentId])
 
-      setIsLoading(false)
-      setEquipment(equipment)
-    }
-
-    getEquipment()
-  }, [])
-
-  if (isLoading) {
+  if (equipment === 'loading') {
     return (
       <div className={styles.container}>
-        <Header showBack />
-        <div className={`bigLoader ${styles.loader}`}></div>
+        <ProtoTopBar />
+        <div className="bigLoader" style={{ marginTop: 60 }} />
       </div>
     )
   }
@@ -43,85 +53,81 @@ export default function EquipmentDetail({ equipmentId }: EquipmentDetailProps) {
   if (!equipment) {
     return (
       <div className={styles.container}>
-        <Header showBack />
+        <ProtoTopBar />
         <div className={styles.notFound}>Оборудование не найдено</div>
       </div>
     )
   }
 
-  // Состав характеристик зависит от типа оборудования, поэтому рендерим что пришло
-  const characteristicEntries = Object.entries(equipment.characteristics ?? {})
+  const sections = toSections(equipment.characteristics)
+  const book = () => router.push(`/booking/${equipmentId}`)
 
   return (
     <div className={styles.container}>
-      <Header showBack />
-      
-      <div className={styles.viewMode}>
-        <button
-          className={`${styles.modeButton} ${viewMode === '3d' ? styles.active : ''}`}
-          onClick={() => setViewMode('3d')}
-        >
-          3D
+      <ProtoTopBar />
+
+      <div className={styles.hero}>
+        <div className={`${styles.heroGlow} protoGlowHero`} />
+
+        <div className={styles.heroHead}>
+          <h1 className={styles.title}>{equipment.name}</h1>
+          {equipment.address && <p className={styles.address}>{equipment.address}</p>}
+        </div>
+
+        <div className={styles.viewToggle}>
+          <button
+            className={`${styles.viewButton} ${viewMode === '3d' ? styles.viewButtonActive : ''}`}
+            onClick={() => setViewMode('3d')}
+          >
+            3D
+          </button>
+          <button
+            className={`${styles.viewButton} ${viewMode === 'jpg' ? styles.viewButtonActive : ''}`}
+            onClick={() => setViewMode('jpg')}
+          >
+            JPG
+          </button>
+        </div>
+
+        <div className={styles.photo}>
+          {viewMode === '3d' && equipment.image3d ? (
+            <Model3D src={equipment.image3d} fallbackImage={equipment.image} alt={equipment.name} />
+          ) : (
+            <ImageWithFallback
+              src={equipment.image ?? ''}
+              alt={equipment.name}
+              className={styles.photoImage}
+              fallbackText={equipment.name}
+            />
+          )}
+        </div>
+
+        <button className={styles.bookButton} onClick={book}>
+          Забронировать
         </button>
-        <button
-          className={`${styles.modeButton} ${viewMode === 'jpg' ? styles.active : ''}`}
-          onClick={() => setViewMode('jpg')}
-        >
-          JPG
-        </button>
       </div>
 
-      <div className={styles.imageContainer}>
-        {viewMode === '3d' && equipment.image3d ? (
-          <Model3D 
-            src={equipment.image3d} 
-            fallbackImage={equipment.image}
-            alt={equipment.name}
-          />
-        ) : (
-          <ImageWithFallback 
-            src={equipment.image ?? '/equipment/oculus.jpg'}
-            alt={equipment.name} 
-            className={styles.image}
-            fallbackText={equipment.name}
-          />
-        )}
-      </div>
+      {sections.length > 0 && (
+        <div className={styles.specs}>
+          <h2 className={styles.specsTitle}>Характеристики</h2>
 
-      <div className={styles.content}>
-        <h1 className={styles.title}>{equipment.name}</h1>
+          {sections.map((section) => (
+            <section key={section.section} className={styles.section}>
+              <h3 className={styles.sectionTitle}>{section.section}</h3>
+              <div className={styles.rows}>
+                {section.rows.map((row) => (
+                  <div key={`${section.section}-${row.label}`} className={styles.row}>
+                    <span className={styles.label}>{row.label}</span>
+                    <span className={styles.value}>{row.value}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      )}
 
-        {characteristicEntries.length > 0 && (
-          <div className={styles.characteristics}>
-            <h2 className={styles.sectionTitle}>Характеристики</h2>
-
-            {characteristicEntries.map(([key, value]) =>
-              value && typeof value === 'object' ? (
-                <Fragment key={key}>
-                  <h3 className={styles.subsectionTitle}>{key}</h3>
-                  {Object.entries(value as Record<string, unknown>).map(([nested, nestedValue]) => (
-                    <div key={`${key}.${nested}`} className={styles.characteristic}>
-                      <span className={styles.label}>{nested}:</span>
-                      <span className={styles.value}>{String(nestedValue)}</span>
-                    </div>
-                  ))}
-                </Fragment>
-              ) : (
-                <div key={key} className={styles.characteristic}>
-                  <span className={styles.label}>{key}:</span>
-                  <span className={styles.value}>{String(value)}</span>
-                </div>
-              )
-            )}
-          </div>
-        )}
-      </div>
-
-
-      <button 
-        className={styles.bookButton}
-        onClick={() => router.push(`/booking/${equipmentId}`)}
-      >
+      <button className={styles.footerButton} onClick={book}>
         Забронировать
       </button>
     </div>

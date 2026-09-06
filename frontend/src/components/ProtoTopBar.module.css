@@ -1,0 +1,17 @@
+.bar {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 45px var(--proto-gutter) 0;
+}
+
+.button {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  color: var(--proto-text);
+  background: none;
+  flex: 0 0 auto;
+}
