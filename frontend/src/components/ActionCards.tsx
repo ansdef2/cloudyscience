@@ -15,7 +15,7 @@ export default function ActionCards() {
     <div className={styles.cards}>
       <div
         className={`${styles.card} protoSurfacePurple`}
-        onClick={() => router.push('/equipment?type=Компьютеры')}
+        onClick={() => router.push('/equipment?type=Компьютер')}
       >
         <div className={`${styles.fill} protoGlowTile`} />
         <ImageWithFallback

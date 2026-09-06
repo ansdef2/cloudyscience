@@ -46,8 +46,8 @@ const seedDatabase = async () => {
       workingHours: '9:00-19:00',
       phone: '+7 (8162) 63-79-55',
       website: 'https://kvantorium53.ru',
-      logo: '/placeholder.svg',
-      images: ['/placeholder.svg', '/placeholder.svg', '/placeholder.svg'],
+      logo: '/institution/kvantorium-1.jpg',
+      images: ['/institution/kvantorium-1.jpg'],
       isOpen: true,
     });
 
@@ -57,8 +57,8 @@ const seedDatabase = async () => {
       workingHours: '10:00-17:00',
       phone: '+7 (8162) 12-34-56',
       website: 'https://example.ru',
-      logo: '/placeholder.svg',
-      images: ['/placeholder.svg'],
+      logo: '/institution/center-1.jpg',
+      images: ['/institution/center-1.jpg'],
       isOpen: true,
     });
 
@@ -68,7 +68,7 @@ const seedDatabase = async () => {
       title: 'Информационные технологии и проектная деятельность',
       direction: 'IT Квантум',
       description: 'Интересуетесь наукой и техникой? Собираетесь стать великим создателем игр? Мечтаете освоить новейшие информационные технологии, игровые движки, хотите собрать собственные VR очки, создать свою первую 3D-модель или научиться обрабатывать панорамные видеоролики? Всё это у нас!',
-      images: ['/placeholder.svg'],
+      images: ['/courses/it-cube.jpg'],
       totalSpots: 20,
       availableSpots: 2,
     });
@@ -78,7 +78,7 @@ const seedDatabase = async () => {
       title: 'Виртуальная и дополненная реальность',
       direction: 'VR/AR Квантум',
       description: 'Освойте технологии виртуальной и дополненной реальности, создавайте immersive-приложения и изучайте работу с современными VR/AR-платформами.',
-      images: ['/placeholder.svg'],
+      images: ['/courses/vr-ar.jpg'],
       totalSpots: 15,
       availableSpots: 3,
     });
@@ -87,7 +87,7 @@ const seedDatabase = async () => {
     const equipment1 = await Equipment.create({
       institutionId: institution2.id,
       name: 'Фрезерный станок',
-      type: 'Станки',
+      type: 'Фрезерный станок',
       description: 'Современный фрезерный станок для обработки различных материалов',
       workingHours: '10:00-17:00',
       isOpen: true,
@@ -108,12 +108,12 @@ const seedDatabase = async () => {
     const equipment2 = await Equipment.create({
       institutionId: institution2.id,
       name: '3D принтер',
-      type: 'Принтеры',
+      type: '3D - Принтер',
       description: 'Профессиональный 3D принтер для создания объемных объектов',
       workingHours: '10:00-17:00',
       isOpen: false,
       distance: '1.26 км от вас',
-      image: '/equipment/oculus-rift.jpg',
+      image: '/equipment/3d-printer.jpg',
       characteristics: [
         {
           section: 'Характеристики',
@@ -129,11 +129,11 @@ const seedDatabase = async () => {
     const equipment3 = await Equipment.create({
       institutionId: institution1.id,
       name: 'Компьютерный класс',
-      type: 'Компьютеры',
+      type: 'Компьютер',
       description: 'Оснащенный современным оборудованием компьютерный класс',
       workingHours: '9:00-19:00',
       isOpen: true,
-      image: '/computer.jpg',
+      image: '/equipment/computer-class.jpg',
       characteristics: [
         {
           section: 'Характеристики',

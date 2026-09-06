@@ -167,6 +167,19 @@ export const readCatalog = async (): Promise<CatalogEntry[]> => {
 };
 
 /**
+ * Изображения по типу оборудования: в справочнике их нет.
+ * Пути соответствуют файлам из frontend/public.
+ */
+const IMAGE_BY_GROUP: Array<{ match: string; image: string }> = [
+  { match: 'принтер', image: '/equipment/3d-printer.jpg' },
+  { match: 'сканер', image: '/equipment/3d-scanner.jpg' },
+  { match: 'шлем', image: '/equipment/oculus-rift.jpg' },
+];
+
+const imageForGroup = (group: string): string | undefined =>
+  IMAGE_BY_GROUP.find((item) => group.toLowerCase().includes(item.match))?.image;
+
+/**
  * Раскладка по учреждениям: в самом справочнике привязки нет.
  * VR и сканеры — в Кванториум, печать — в центр дополнительного образования.
  */
@@ -203,6 +216,7 @@ export const importEquipmentModels = async (): Promise<number> => {
       description: entry.notes,
       workingHours: institution.workingHours,
       isOpen: true,
+      image: imageForGroup(entry.group),
       characteristics: entry.characteristics,
     };
 

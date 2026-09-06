@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import styles from './ImageWithFallback.module.css'
 
 interface ImageWithFallbackProps {
@@ -28,6 +28,22 @@ export default function ImageWithFallback({
 }: ImageWithFallbackProps) {
   const [error, setError] = useState(false)
   const [loading, setLoading] = useState(true)
+  const imageRef = useRef<HTMLImageElement>(null)
+
+  /**
+   * Картинка из кэша успевает догрузиться до того, как React навесит onLoad,
+   * и тогда событие не приходит — изображение так и остаётся скрытым.
+   * Поэтому состояние сверяется с img.complete после монтирования.
+   */
+  useEffect(() => {
+    const image = imageRef.current
+    if (!image) return
+
+    if (image.complete) {
+      if (image.naturalWidth > 0) setLoading(false)
+      else setError(true)
+    }
+  }, [src])
 
   const handleError = () => {
     setError(true)
@@ -67,9 +83,11 @@ export default function ImageWithFallback({
         </div>
       )}
       <img
+        ref={imageRef}
         src={src}
         alt={alt}
-        className={`${styles.image} ${className} ${loading ? styles.hidden : ''}`}
+        // В режиме bare прятать нечем и незачем: заглушки под картинкой нет
+        className={`${styles.image} ${className} ${loading && !bare ? styles.hidden : ''}`}
         onError={handleError}
         onLoad={handleLoad}
         style={{ width, height }}
