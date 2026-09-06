@@ -120,6 +120,7 @@ cd server && npm run db:import-models
 ## 📖 Документация
 
 - [Docker Guide](docker-guide.md)
+- [Ассеты прототипа: что выгрузить из Figma](frontend/ASSETS_PROTOTYPE.md)
 - [Установка backend](server/INSTALLATION.md)
 - [API backend](server/README.md)
 - [Интеграция фронтенда с API](frontend/BACKEND_INTEGRATION.md)
