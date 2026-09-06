@@ -1,0 +1,133 @@
+/**
+ * Токены нового прототипа (секция «New» в Figma).
+ * Значения сняты из design context, не подобраны на глаз.
+ */
+
+/**
+ * Advaken Sans Expanded — заголовки карточек действий в макете.
+ * Шрифт не гугловый (free for commercial use, см. public/fonts/LICENSE.txt),
+ * поэтому лежит в public/fonts. Объявлен через @font-face, а не
+ * next/font/local, чтобы сборка не зависела от наличия файла.
+ */
+@font-face {
+  font-family: 'Advaken Sans';
+  src:
+    url('/fonts/AdvakenSans-Expanded.woff2') format('woff2'),
+    url('/fonts/AdvakenSans-Expanded.woff') format('woff'),
+    url('/fonts/AdvakenSans-Expanded.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Фон экрана: вертикальный градиент с переломом на 23% */
+  --proto-bg-top: #0c0020;
+  --proto-bg-bottom: #070709;
+  --proto-bg: linear-gradient(180deg, var(--proto-bg-top) 0%, var(--proto-bg-bottom) 23.181%);
+
+  /* Поверхности */
+  --proto-surface: #0e0e16;
+  --proto-surface-black: #000000;
+  --proto-field: rgba(107, 107, 107, 0.1);
+  --proto-pill: rgba(0, 0, 0, 0.5);
+
+  /* Текст */
+  --proto-text: #ffffff;
+  --proto-text-70: rgba(255, 255, 255, 0.7);
+  --proto-text-60: rgba(255, 255, 255, 0.6);
+  --proto-text-50: rgba(255, 255, 255, 0.5);
+
+  /* Акцентные свечения карточек */
+  --proto-glow-purple: 105, 0, 143;
+  --proto-glow-blue: 0, 106, 128;
+  --proto-glow-green: 0, 179, 125;
+  --proto-glow-lime: 32, 194, 0;
+
+  /* Радиусы */
+  --proto-radius-card: 28px;
+  --proto-radius-field: 10px;
+  --proto-radius-image: 12px;
+  --proto-radius-pill: 35px;
+  --proto-radius-avatar: 20px;
+
+  /* Ширина макета */
+  --proto-width: 360px;
+  --proto-gutter: 20px;
+
+  /* Шрифты: акцидентный для заголовков карточек, Onest для всего остального */
+  --proto-font-display: 'Advaken Sans', var(--font-onest), system-ui, sans-serif;
+  --proto-font-text: var(--font-onest), system-ui, sans-serif;
+}
+
+/**
+ * Свечение снизу у карточек. Цвет задаётся через --glow (r, g, b),
+ * набор смещений повторяет тени из макета.
+ */
+.protoGlowTile {
+  box-shadow:
+    inset 0 -100px 28px 0 rgba(var(--glow), 0.02),
+    inset 0 -64px 26px 0 rgba(var(--glow), 0.15),
+    inset 0 -36px 22px 0 rgba(var(--glow), 0.5),
+    inset 0 -16px 16px 0 rgba(var(--glow), 0.85),
+    inset 0 -4px 9px 0 rgba(var(--glow), 0.98);
+}
+
+.protoGlowCard {
+  box-shadow:
+    inset 0 -161px 45px 0 rgba(var(--glow), 0.02),
+    inset 0 -103px 41px 0 rgba(var(--glow), 0.15),
+    inset 0 -58px 35px 0 rgba(var(--glow), 0.5),
+    inset 0 -26px 26px 0 rgba(var(--glow), 0.85),
+    inset 0 -6px 14px 0 rgba(var(--glow), 0.98);
+}
+
+.protoGlowSoft {
+  box-shadow:
+    inset 0 -161px 45px 0 rgba(var(--glow), 0),
+    inset 0 -103px 41px 0 rgba(var(--glow), 0.03),
+    inset 0 -58px 35px 0 rgba(var(--glow), 0.1),
+    inset 0 -26px 26px 0 rgba(var(--glow), 0.17),
+    inset 0 -6px 14px 0 rgba(var(--glow), 0.2);
+}
+
+/* Радиальные заливки карточек — из макета, gradientUnits userSpaceOnUse */
+.protoFillPurple {
+  background-image: radial-gradient(
+    ellipse 120% 100% at 50% 100%,
+    #c100e8 0%,
+    #9605b3 20%,
+    #6a0a7e 40%,
+    #550c63 50%,
+    #3f0f49 60%,
+    #29112e 70%,
+    #141414 80%
+  );
+}
+
+.protoFillBlue {
+  background-image: radial-gradient(
+    ellipse 120% 100% at 50% 100%,
+    #0042e8 0%,
+    #0536b3 20%,
+    #0a2b7e 40%,
+    #0f1f49 60%,
+    #11192e 70%,
+    #141414 80%
+  );
+}
+
+/* Полупрозрачная «таблетка» под кнопки внутри карточек */
+.protoPill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 13px 12px;
+  border-radius: var(--proto-radius-pill);
+  background: var(--proto-pill);
+  backdrop-filter: blur(10px);
+  color: var(--proto-text);
+  font-size: 12px;
+  line-height: normal;
+}

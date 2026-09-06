@@ -1,3 +1,6 @@
+/* @import обязан быть первым правилом в файле */
+@import './prototype.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
