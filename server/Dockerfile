@@ -2,8 +2,8 @@ FROM node:18-alpine
 WORKDIR /app
 COPY server/package*.json ./
 RUN npm install
-RUN npm install -g typescript
 COPY server/ .
 RUN npm run build
-EXPOSE 8080
-CMD ["sh", "-c", "node dist/config/seed.js && node dist/index.js"]
+EXPOSE 3001
+# Сид пересоздаёт схему (sync force) и стирает данные, поэтому запускается только по SEED_ON_START
+CMD ["sh", "-c", "if [ \"$SEED_ON_START\" = \"true\" ]; then node dist/config/seed.js; fi; node dist/index.js"]

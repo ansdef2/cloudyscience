@@ -55,7 +55,8 @@ export const getBookingById = async (req: Request, res: Response) => {
 export const createBooking = async (req: any, res: Response) => {
   try {
     const userId = req.user.id;
-    const { courseId, equipmentId, date, time, notes } = req.body;
+    const { courseId, equipmentId, date, time, endTime, rentalType, files, location, notes } =
+      req.body;
 
     // Validate that either courseId or equipmentId is provided
     if (!courseId && !equipmentId) {
@@ -79,6 +80,10 @@ export const createBooking = async (req: any, res: Response) => {
       equipmentId,
       date,
       time,
+      endTime,
+      rentalType: rentalType || 'remote',
+      files: files || [],
+      location,
       notes,
       status: 'pending',
     });

@@ -11,7 +11,11 @@ class Booking extends Model {
   public equipmentId?: string;
   public date!: Date;
   public time!: string;
-  public status!: 'pending' | 'confirmed' | 'cancelled';
+  public endTime?: string;
+  public rentalType!: 'remote' | 'in-person';
+  public status!: 'pending' | 'confirmed' | 'active' | 'completed' | 'cancelled';
+  public files?: string[];
+  public location?: string;
   public notes?: string;
   public createdAt!: Date;
   public updatedAt!: Date;
@@ -58,9 +62,23 @@ Booking.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    endTime: {
+      type: DataTypes.STRING,
+    },
+    rentalType: {
+      type: DataTypes.ENUM('remote', 'in-person'),
+      defaultValue: 'remote',
+    },
     status: {
-      type: DataTypes.ENUM('pending', 'confirmed', 'cancelled'),
+      type: DataTypes.ENUM('pending', 'confirmed', 'active', 'completed', 'cancelled'),
       defaultValue: 'pending',
+    },
+    files: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      defaultValue: [],
+    },
+    location: {
+      type: DataTypes.STRING,
     },
     notes: {
       type: DataTypes.TEXT,

@@ -1,0 +1,82 @@
+.calendar {
+  background: var(--bg-card);
+  border-radius: var(--border-radius);
+  padding: 16px;
+}
+
+.header {
+  margin-bottom: 16px;
+}
+
+.monthTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.weekDays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.weekDay {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  padding: 8px;
+}
+
+.days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.emptyDay {
+  aspect-ratio: 1;
+}
+
+.day {
+  aspect-ratio: 1;
+  padding: 8px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.day:hover:not(:disabled) {
+  background: var(--bg-button);
+  border-color: var(--accent-purple);
+}
+
+.day.selected {
+  background: var(--accent-purple);
+  border-color: var(--accent-purple);
+  color: var(--text-primary);
+}
+
+.day.unavailable {
+  color: var(--text-muted);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.day.weekend {
+  color: #ef4444;
+}
+
+.day.weekend.unavailable {
+  color: var(--text-muted);
+}
+
+.day:disabled {
+  cursor: not-allowed;
+}

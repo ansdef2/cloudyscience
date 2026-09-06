@@ -51,6 +51,26 @@ export const getInstitutionById = async (req: Request, res: Response) => {
   }
 };
 
+export const getInstitutionCourses = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const institution = await Institution.findByPk(id);
+    if (!institution) {
+      return res.status(404).json({ error: 'Institution not found' });
+    }
+
+    const courses = await Course.findAll({
+      where: { institutionId: id },
+      order: [['createdAt', 'DESC']],
+    });
+
+    res.json(courses);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 export const createInstitution = async (req: Request, res: Response) => {
   try {
     const institution = await Institution.create(req.body);

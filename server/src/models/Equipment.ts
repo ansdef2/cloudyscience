@@ -6,10 +6,14 @@ class Equipment extends Model {
   public id!: string;
   public institutionId!: string;
   public name!: string;
+  public type!: string;
   public description!: string;
   public workingHours!: string;
   public isOpen!: boolean;
   public distance?: string;
+  public image?: string;
+  public image3d?: string;
+  public characteristics?: Record<string, unknown>;
   public createdAt!: Date;
   public updatedAt!: Date;
 
@@ -35,6 +39,10 @@ Equipment.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    type: {
+      type: DataTypes.STRING,
+      defaultValue: '',
+    },
     description: {
       type: DataTypes.TEXT,
     },
@@ -48,6 +56,16 @@ Equipment.init(
     },
     distance: {
       type: DataTypes.STRING,
+    },
+    image: {
+      type: DataTypes.STRING,
+    },
+    image3d: {
+      type: DataTypes.STRING,
+    },
+    characteristics: {
+      type: DataTypes.JSONB,
+      defaultValue: {},
     },
   },
   {

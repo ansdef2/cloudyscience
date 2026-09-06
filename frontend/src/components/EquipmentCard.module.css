@@ -1,0 +1,86 @@
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 16px;
+  cursor: pointer;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-purple);
+}
+
+.content {
+  margin-bottom: 12px;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.name {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.address {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.hours {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.status {
+  font-size: 14px;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.status.open {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.status.closed {
+  color: var(--text-muted);
+  background: rgba(107, 107, 107, 0.1);
+}
+
+.distance {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.rentButton {
+  width: 100%;
+  padding: 12px;
+  background: var(--bg-button);
+  color: var(--text-primary);
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.rentButton:hover {
+  background: var(--accent-purple);
+}

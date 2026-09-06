@@ -1,0 +1,360 @@
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  padding-bottom: 40px;
+}
+
+.content {
+  padding: 16px;
+}
+
+.steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 32px;
+  gap: 8px;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.stepNumber {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+}
+
+.step.active .stepNumber {
+  background: var(--accent-purple);
+  border-color: var(--accent-purple);
+  color: var(--text-primary);
+}
+
+.stepLabel {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.step.active .stepLabel {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.stepLine {
+  flex: 1;
+  height: 2px;
+  background: var(--border-color);
+  max-width: 60px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 24px;
+}
+
+.stepContent {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.sectionTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.sectionDescription {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.fileSelector {
+  background: var(--bg-card);
+  border-radius: var(--border-radius);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.fileList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.fileItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--bg-primary);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.fileItem:hover {
+  background: var(--bg-button);
+}
+
+.fileItem input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.fileName {
+  flex: 1;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.fileSize {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.uploadButton {
+  width: 100%;
+  padding: 12px;
+  background: var(--bg-button);
+  border: 1px dashed var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.uploadButton:hover {
+  background: var(--bg-card);
+  border-color: var(--accent-purple);
+}
+
+.rentalType {
+  margin-bottom: 24px;
+}
+
+.rentalTypeTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.rentalTypeOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rentalTypeButton {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.rentalTypeButton:hover {
+  border-color: var(--accent-purple);
+}
+
+.rentalTypeButton.active {
+  border-color: var(--accent-purple);
+  background: rgba(139, 92, 246, 0.1);
+}
+
+.rentalTypeIcon {
+  font-size: 24px;
+}
+
+.rentalTypeLabel {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.rentalTypeDesc {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.calendarSection {
+  margin-bottom: 24px;
+}
+
+.locationInfo {
+  background: var(--bg-card);
+  border-radius: var(--border-radius);
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.locationText {
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.timeSection {
+  margin-bottom: 24px;
+}
+
+.timeTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.timeSlots {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 12px;
+}
+
+.timeSlot {
+  padding: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.timeSlot:hover {
+  background: var(--bg-button);
+  border-color: var(--accent-purple);
+}
+
+.timeSlot.selected {
+  background: var(--accent-purple);
+  border-color: var(--accent-purple);
+  color: var(--text-primary);
+}
+
+.infoBox {
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid var(--accent-purple);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 24px;
+}
+
+.infoText {
+  color: var(--text-primary);
+  font-size: 14px;
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+}
+
+.backButton {
+  flex: 1;
+  padding: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.backButton:hover {
+  background: var(--bg-button);
+  border-color: var(--accent-purple);
+}
+
+.nextButton {
+  flex: 1;
+  padding: 14px;
+  background: var(--gradient-primary);
+  border: none;
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.nextButton:hover {
+  opacity: 0.9;
+}
+
+.confirmInfo {
+  background: var(--bg-card);
+  border-radius: var(--border-radius);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.confirmItem {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.confirmItem:last-child {
+  border-bottom: none;
+}
+
+.confirmLabel {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.confirmValue {
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.confirmButton {
+  flex: 1;
+  padding: 14px;
+  background: var(--gradient-primary);
+  border: none;
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.confirmButton:hover {
+  opacity: 0.9;
+}

@@ -1,0 +1,18 @@
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+}
+
+.equipmentList {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.emptyState {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 16px;
+}

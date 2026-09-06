@@ -1,126 +1,107 @@
-# CloudCo - Сервис бронирования оборудования и курсов
+# CloudCo — сервис бронирования оборудования и курсов
 
-Современный веб-приложение для бронирования оборудования и записи на курсы в образовательных учреждениях.
+Монорепозиторий: Next.js-фронтенд и Express/PostgreSQL-бэкенд в одном дереве.
+
+```
+cloudco/
+├── frontend/   # Next.js 14 (App Router), TypeScript, Tailwind
+├── server/     # Express + Sequelize + PostgreSQL, JWT-авторизация
+└── docker-compose.yml
+```
 
 ## 🚀 Быстрый старт
 
-### Вариант 1: Docker (Рекомендуется)
+### Вариант 1: Docker (рекомендуется)
 
-1. Клонируйте репозиторий:
 ```bash
-git clone <YOUR_GIT_URL>
-cd cloudco
+cp .env.example .env      # отредактируйте при необходимости
+docker-compose up -d --build
 ```
 
-2. Создайте файл `.env`:
+Залить демо-данные (только на пустую базу — seed пересоздаёт таблицы):
+
 ```bash
-cp .env.example .env
-# Отредактируйте .env при необходимости
+docker-compose exec backend node dist/config/seed.js
 ```
 
-3. Запустите все сервисы:
-```bash
-docker-compose up -d
-```
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:3001/api
 
-4. Инициализируйте базу данных:
-```bash
-docker-compose exec backend npm run db:seed
-```
+Подробнее: [docker-guide.md](docker-guide.md)
 
-5. Откройте приложение:
-- Frontend: http://localhost:5173
-- Backend: http://localhost:3001/api
+### Вариант 2: Локальный запуск
 
-**Подробнее**: См. [docker-guide.md](docker-guide.md)
+1. Поднимите PostgreSQL и создайте базу:
 
-### Вариант 2: Локальная установка
-
-1. Клонируйте репозиторий:
-```bash
-git clone <YOUR_GIT_URL>
-cd cloudco
-```
-
-2. Установите зависимости:
-```bash
-# Frontend
-npm install
-
-# Backend
-cd server
-npm install
-cd ..
-```
-
-3. Создайте базу данных PostgreSQL:
 ```bash
 createdb cloudco
 ```
 
-4. Настройте backend:
+2. Бэкенд:
+
 ```bash
 cd server
-cp .env.example .env
-# Отредактируйте .env
-npm run db:seed
-cd ..
+npm install
+cp .env.example .env       # настройте подключение к БД
+npm run db:seed            # демо-данные
+npm run dev                # http://localhost:3001
 ```
 
-5. Запустите сервисы:
+3. Фронтенд (во втором терминале):
 
-Терминал 1 (Backend):
 ```bash
-cd server && npm run dev
+cd frontend
+npm install
+cp env.example .env.local  # NEXT_PUBLIC_API_URL=http://localhost:3001/api
+npm run dev                # http://localhost:3000
 ```
 
-Терминал 2 (Frontend):
-```bash
-npm run dev
-```
+## ⚙️ Переменные окружения
+
+| Переменная | Где | Назначение |
+|---|---|---|
+| `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` | backend | подключение к PostgreSQL |
+| `JWT_SECRET`, `JWT_EXPIRES_IN` | backend | подпись и срок жизни токена |
+| `CORS_ORIGIN` | backend | разрешённый origin; `*` — разрешить всем |
+| `DB_SYNC` | backend | `false` отключает автосинхронизацию схемы при старте |
+| `SEED_ON_START` | backend | `true` заливает демо-данные при старте, **стирая базу** |
+| `NEXT_PUBLIC_API_URL` | frontend | адрес API; вшивается в бандл **на этапе сборки** |
+
+## 📡 API
+
+Базовый префикс — `/api`.
+
+| Метод | Путь | Доступ |
+|---|---|---|
+| POST | `/auth/register`, `/auth/login` | публично |
+| GET | `/auth/profile` | пользователь |
+| GET | `/institutions`, `/institutions/:id`, `/institutions/:id/courses` | публично |
+| GET | `/courses`, `/courses/:id` | публично |
+| GET | `/equipment`, `/equipment/:id` | публично |
+| GET | `/search`, `/search/popular` | публично |
+| GET/POST/PUT/DELETE | `/bookings` | пользователь |
+| GET/PUT/DELETE | `/users` | пользователь / админ |
+| POST/PUT/DELETE | `/institutions`, `/courses`, `/equipment` | админ |
+
+Фильтры: `/equipment?search=&type=&status=open|closed&institutionId=`,
+`/courses?search=&institutionId=`, `/search?q=&type=address|services|equipment`.
 
 ## 📚 Технологии
 
-### Frontend
-- Vite
-- TypeScript
-- React 18
-- shadcn-ui
-- Tailwind CSS
-- React Query
-- React Router
-
-### Backend
-- Node.js
-- TypeScript
-- Express.js
-- PostgreSQL
-- Sequelize ORM
-- JWT Authentication
-- bcryptjs
+**Frontend** — Next.js 14, React 18, TypeScript, Tailwind CSS, CSS Modules
+**Backend** — Node.js, Express, TypeScript, PostgreSQL, Sequelize, JWT, bcryptjs
 
 ## 🔑 Тестовые данные
 
-После запуска seed скрипта будут созданы:
+После seed доступны два аккаунта:
 
-**Администратор:**
-- Email: `admin@cloudco.ru`
-- Password: `admin123`
-
-**Тестовый пользователь:**
-- Email: `user@cloudco.ru`
-- Password: `user123`
+- Администратор — `admin@cloudco.ru` / `admin123`
+- Пользователь — `user@cloudco.ru` / `user123`
 
 ## 📖 Документация
 
-- [Инструкция по установке backend](server/INSTALLATION.md)
-- [API Документация](server/README.md)
 - [Docker Guide](docker-guide.md)
-
-## 🐳 Docker Services
-
-Проект включает:
-
-- **frontend** - React приложение (порт 5173)
-- **backend** - Express API (порт 3001)
-- **postgres** - PostgreSQL база данных (порт 5432)
+- [Установка backend](server/INSTALLATION.md)
+- [API backend](server/README.md)
+- [Интеграция фронтенда с API](frontend/BACKEND_INTEGRATION.md)
+- [Маршруты фронтенда](frontend/ROUTES.md)

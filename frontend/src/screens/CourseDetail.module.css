@@ -1,0 +1,236 @@
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  padding-bottom: 40px;
+}
+
+.imageCarousel {
+  position: relative;
+  width: 100%;
+  height: 250px;
+  background: var(--bg-card);
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.carouselDots {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.dot:first-child {
+  background: var(--text-primary);
+}
+
+.content {
+  padding: 16px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.address {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.spotsLeft {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+.description {
+  margin-bottom: 32px;
+}
+
+.description p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+.consultationSection {
+  margin-top: 32px;
+}
+
+.sectionTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.sectionSubtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+.calendarSection {
+  margin-bottom: 24px;
+}
+
+.calendarTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.calendarDay {
+  aspect-ratio: 1;
+  padding: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.calendarDay:hover:not(:disabled) {
+  background: var(--bg-button);
+  border-color: var(--accent-purple);
+}
+
+.calendarDay.selected {
+  background: var(--accent-purple);
+  border-color: var(--accent-purple);
+  color: var(--text-primary);
+}
+
+.calendarDay.unavailable {
+  color: var(--text-muted);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.calendarDay.weekend {
+  color: #ef4444;
+}
+
+.calendarDay.weekend.unavailable {
+  color: var(--text-muted);
+}
+
+.timeSection {
+  margin-bottom: 24px;
+}
+
+.timeTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.timeSlots {
+  display: flex;
+  gap: 12px;
+}
+
+.timeSlot {
+  padding: 12px 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.timeSlot:hover {
+  background: var(--bg-button);
+  border-color: var(--accent-purple);
+}
+
+.timeSlot.selected {
+  background: var(--accent-purple);
+  border-color: var(--accent-purple);
+  color: var(--text-primary);
+}
+
+.bookButton {
+  width: 100%;
+  padding: 16px;
+  background: var(--gradient-primary);
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  margin-bottom: 24px;
+  transition: opacity 0.2s;
+}
+
+.bookButton:hover {
+  opacity: 0.9;
+}
+
+.checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.checkbox span {
+  line-height: 1.5;
+}
+
+.checkbox u {
+  text-decoration: underline;
+}
+
+.notFound {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 16px;
+}

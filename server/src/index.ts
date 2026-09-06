@@ -2,12 +2,15 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import sequelize from './config/database';
+// Регистрирует ассоциации моделей (в т.ч. алиас Institution.courses) — без этого include падает
+import './models';
 import authRoutes from './routes/auth';
 import institutionRoutes from './routes/institutions';
 import courseRoutes from './routes/courses';
 import equipmentRoutes from './routes/equipment';
 import bookingRoutes from './routes/bookings';
 import userRoutes from './routes/users';
+import searchRoutes from './routes/search';
 
 dotenv.config();
 
@@ -15,7 +18,8 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Middleware
-app.use(cors());
+const corsOrigin = process.env.CORS_ORIGIN;
+app.use(cors(corsOrigin && corsOrigin !== '*' ? { origin: corsOrigin.split(',') } : {}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -26,6 +30,7 @@ app.use('/api/courses', courseRoutes);
 app.use('/api/equipment', equipmentRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/search', searchRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -47,7 +52,7 @@ const startServer = async () => {
     console.log('Database connection established successfully.');
     
     // Sync database (use with caution in production)
-    if (true) {
+    if (process.env.DB_SYNC !== 'false') {
       await sequelize.sync({ alter: true });
       console.log('Database models synchronized.');
     }

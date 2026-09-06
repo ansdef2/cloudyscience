@@ -1,4 +1,5 @@
 import sequelize from './database';
+import '../models';
 import User from '../models/User';
 import Institution from '../models/Institution';
 import Course from '../models/Course';
@@ -82,27 +83,47 @@ const seedDatabase = async () => {
     const equipment1 = await Equipment.create({
       institutionId: institution2.id,
       name: 'Фрезерный станок',
+      type: 'Станки',
       description: 'Современный фрезерный станок для обработки различных материалов',
       workingHours: '10:00-17:00',
       isOpen: true,
       distance: '1.26 км от вас',
+      image: '/equipment/milling-machine.jpg',
+      characteristics: {
+        'Рабочее поле': '400 x 300 x 100 мм',
+        'Материалы': 'Дерево, пластик, алюминий',
+        'Точность': '0.01 мм',
+      },
     });
 
     const equipment2 = await Equipment.create({
       institutionId: institution2.id,
       name: '3D принтер',
+      type: 'Принтеры',
       description: 'Профессиональный 3D принтер для создания объемных объектов',
       workingHours: '10:00-17:00',
       isOpen: false,
       distance: '1.26 км от вас',
+      image: '/equipment/oculus-rift.jpg',
+      characteristics: {
+        'Область печати': '220 x 220 x 250 мм',
+        'Технология': 'FDM',
+        'Материалы': 'PLA, ABS, PETG',
+      },
     });
 
     const equipment3 = await Equipment.create({
       institutionId: institution1.id,
       name: 'Компьютерный класс',
+      type: 'Компьютеры',
       description: 'Оснащенный современным оборудованием компьютерный класс',
       workingHours: '9:00-19:00',
       isOpen: true,
+      image: '/computer.jpg',
+      characteristics: {
+        'Рабочих мест': '12',
+        'ПО': 'CAD, Unity, Blender',
+      },
     });
 
     console.log('Seed data created successfully!');

@@ -22,11 +22,11 @@ services:
   # Backend API
   backend:
     build:
-      context: ./server
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: server/Dockerfile
     container_name: cloudco-backend
     environment:
-      NODE_ENV: development
+      NODE_ENV: ${NODE_ENV:-production}
       PORT: 3001
       JWT_SECRET: ${JWT_SECRET:-cloudco-secret-key-change-in-production}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
@@ -35,10 +35,11 @@ services:
       DB_NAME: ${DB_NAME:-cloudco}
       DB_USER: ${DB_USER:-postgres}
       DB_PASSWORD: ${DB_PASSWORD:-postgres}
-      CORS_ORIGIN: https://cloudco.senip.fun
-    volumes:
-      - ./server:/app
-      - /app/node_modules
+      CORS_ORIGIN: ${CORS_ORIGIN:-https://cloudco.senip.fun}
+      # Пересоздаёт схему и заливает демо-данные при старте — стирает существующую БД.
+      # Держите false; для ручного наполнения:
+      #   docker compose exec backend node dist/config/seed.js
+      SEED_ON_START: ${SEED_ON_START:-false}
     depends_on:
       postgres:
         condition: service_healthy
@@ -56,17 +57,18 @@ services:
       - "traefik.http.routers.cloudco-backend.entryPoints=http,https"
       - "traefik.docker.network=traefik"
 
-  # Frontend
+  # Frontend (Next.js)
   frontend:
     build:
-      context: .
+      context: ./frontend
       dockerfile: Dockerfile
+      args:
+        # NEXT_PUBLIC_* вшивается в бандл на этапе сборки, а не читается в рантайме
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://cloudco.senip.fun/api}
     container_name: cloudco-frontend
     environment:
-      VITE_API_URL: https://cloudco.senip.fun/api
-    volumes:
-      - .:/app
-      - /app/node_modules
+      NODE_ENV: production
+      PORT: 3000
     depends_on:
       - backend
     restart: unless-stopped
@@ -79,7 +81,7 @@ services:
       - "traefik.http.routers.cloudco-frontend.tls.options=default"
       - "traefik.http.routers.cloudco-frontend.tls.certresolver=letsEncrypt"
       - "traefik.http.routers.cloudco-frontend.rule=Host(`cloudco.senip.fun`) || Host(`www.cloudco.senip.fun`)"
-      - "traefik.http.services.cloudco-frontend.loadbalancer.server.port=5173"
+      - "traefik.http.services.cloudco-frontend.loadbalancer.server.port=3000"
       - "traefik.http.routers.cloudco-frontend.entryPoints=http,https"
       - "traefik.docker.network=traefik"
 

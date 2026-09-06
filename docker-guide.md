@@ -28,15 +28,20 @@ docker-compose down -v
 
 ### 3. Инициализация базы данных
 
-После первого запуска выполните seed скрипт:
+Схема создаётся автоматически при старте бэкенда. Демо-данные заливаются отдельно:
 
 ```bash
-docker-compose exec backend npm run db:seed
+docker-compose exec backend node dist/config/seed.js
 ```
+
+> ⚠️ Seed выполняет `sequelize.sync({ force: true })` — таблицы пересоздаются,
+> существующие данные теряются. Запускайте его только на пустой базе.
+> Переменная `SEED_ON_START=true` делает то же самое при каждом старте
+> контейнера, поэтому в проде её держат выключенной.
 
 ### 4. Доступ к приложению
 
-- **Frontend**: http://localhost:5173
+- **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:3001/api
 - **PostgreSQL**: localhost:5432
 
@@ -59,6 +64,9 @@ docker-compose up -d postgres backend
 ```bash
 docker-compose up -d frontend
 ```
+
+> `NEXT_PUBLIC_API_URL` вшивается в бандл Next.js **на этапе сборки образа**,
+> а не читается в рантайме. После смены адреса API нужен `docker-compose build frontend`.
 
 ## Полезные команды
 
@@ -108,22 +116,25 @@ docker system prune           # Очистить неиспользуемые д
 ```
 cloudco/
 ├── docker-compose.yml       # Оркестрация всех сервисов
-├── Dockerfile               # Frontend образ
-├── .dockerignore           # Исключения для frontend
 │
-└── server/
-    ├── Dockerfile          # Backend образ
-    └── .dockerignore       # Исключения для backend
+├── frontend/                # Next.js приложение
+│   ├── Dockerfile           # Frontend образ
+│   └── .dockerignore        # Исключения для frontend
+│
+└── server/                  # Express API
+    ├── Dockerfile           # Backend образ
+    └── .dockerignore        # Исключения для backend
 ```
 
 ## Production Build
 
-Для production использования измените docker-compose.yml:
+Оба образа собираются в production-режиме по умолчанию: фронтенд выполняет
+`next build` и стартует через `next start`, бэкенд компилируется в `dist/` и
+запускается как `node dist/index.js`.
 
-1. Измените CMD в Dockerfile на:
-   - Frontend: `npm run build && npm run preview`
-   - Backend: `npm run build && npm start`
+Что стоит проверить перед деплоем:
 
-2. Используйте production .env переменные
-
-3. Используйте nginx для статики или cloud-решение для деплоя
+1. `JWT_SECRET` — заменить значение по умолчанию.
+2. `CORS_ORIGIN` — указать реальный домен фронтенда (можно перечислить через запятую).
+3. `NEXT_PUBLIC_API_URL` — публичный адрес API; менять до сборки образа.
+4. `SEED_ON_START` — оставить `false`, иначе база будет пересоздаваться при рестарте.

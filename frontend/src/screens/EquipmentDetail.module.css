@@ -1,0 +1,135 @@
+.container {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  padding-bottom: 80px;
+}
+
+.viewMode {
+  display: flex;
+  gap: 8px;
+  padding: 16px;
+  justify-content: flex-end;
+}
+
+.modeButton {
+  padding: 6px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.modeButton.active {
+  background: var(--accent-purple);
+  border-color: var(--accent-purple);
+  color: var(--text-primary);
+}
+
+.imageContainer {
+  width: 100%;
+  height: 300px;
+  background: var(--bg-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.image,
+.fallbackImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.model3d {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+}
+
+.content {
+  padding: 0 16px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 24px;
+}
+
+.characteristics {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sectionTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--accent-purple);
+  font-style: italic;
+  margin-bottom: 8px;
+}
+
+.subsectionTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-top: 16px;
+  margin-bottom: 8px;
+}
+
+.characteristic {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.label {
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.value {
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.bookButton {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px;
+  background: var(--gradient-primary);
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.bookButton:hover {
+  opacity: 0.9;
+}
+
+.notFound {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 16px;
+}
+
+.loader {
+  margin: 20px auto;
+}

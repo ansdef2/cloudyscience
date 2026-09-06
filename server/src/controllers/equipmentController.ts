@@ -5,19 +5,24 @@ import { Op } from 'sequelize';
 
 export const getAllEquipment = async (req: Request, res: Response) => {
   try {
-    const { search, institutionId } = req.query;
-    
-    let whereClause: any = {};
+    const { search, institutionId, type, status } = req.query;
+
+    const whereClause: any = {};
     if (search) {
-      whereClause = {
-        [Op.or]: [
-          { name: { [Op.iLike]: `%${search}%` } },
-          { description: { [Op.iLike]: `%${search}%` } },
-        ],
-      };
+      whereClause[Op.or] = [
+        { name: { [Op.iLike]: `%${search}%` } },
+        { description: { [Op.iLike]: `%${search}%` } },
+        { type: { [Op.iLike]: `%${search}%` } },
+      ];
     }
     if (institutionId) {
       whereClause.institutionId = institutionId;
+    }
+    if (type) {
+      whereClause.type = { [Op.iLike]: String(type) };
+    }
+    if (status === 'open' || status === 'closed') {
+      whereClause.isOpen = status === 'open';
     }
 
     const equipment = await Equipment.findAll({
