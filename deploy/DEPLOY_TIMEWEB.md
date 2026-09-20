@@ -55,7 +55,28 @@ curl -o /root/cloudco/deploy/certs/root.crt https://st.timeweb.com/cloud-static/
 ## 2. Создать облачный сервер
 
 «Облачные серверы» → создать, **Ubuntu 22.04 или 24.04**.
-Минимум для этого проекта — 2 ГБ RAM (сборка Next.js на 1 ГБ может не уложиться в память).
+
+**2 ГБ RAM** — вариант без сюрпризов. Памяти требует только сборка фронтенда;
+само приложение потом обходится куда меньшим.
+
+**1 ГБ + swap** — дешевле, но сборка идёт дольше и без гарантии. Если берёте
+такой тариф, сразу после подключения по SSH добавьте подкачку:
+
+```bash
+fallocate -l 2G /swapfile && chmod 600 /swapfile && mkswap /swapfile && swapon /swapfile
+echo '/swapfile none swap sw 0 0' >> /etc/fstab
+free -h            # в строке Swap должно появиться 2.0Gi
+```
+
+Если сборка всё равно падает, ограничьте кучу Node на время сборки:
+
+```bash
+NODE_OPTIONS=--max-old-space-size=768 docker compose -f deploy/docker-compose.single.yml \
+  --env-file deploy/.env build frontend
+```
+
+Не помогло — поднимите тариф на время сборки и верните обратно: тарификация
+почасовая, пересборка нужна редко.
 
 Добавьте свой SSH-ключ при создании — дальше всё делается по SSH.
 
