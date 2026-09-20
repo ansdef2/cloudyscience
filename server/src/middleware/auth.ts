@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import User from '../models/User';
+import { JWT_SECRET } from '../config/jwt';
 
 export interface AuthRequest extends Request {
   user?: any;
@@ -14,7 +15,7 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
       return res.status(401).json({ error: 'Authentication required' });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as any;
+    const decoded = jwt.verify(token, JWT_SECRET) as any;
     const user = await User.findByPk(decoded.userId);
     
     if (!user) {

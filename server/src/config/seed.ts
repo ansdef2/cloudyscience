@@ -19,7 +19,16 @@ const seedDatabase = async () => {
     console.log('Database synced.');
 
     // Create admin user
-    const hashedPassword = await hashPassword('admin123');
+    // Пароль берётся из окружения: значение в исходниках публично,
+    // а учётная запись администратора смотрит в интернет.
+    const adminPassword = process.env.SEED_ADMIN_PASSWORD;
+    if (!adminPassword && process.env.NODE_ENV === 'production') {
+      throw new Error(
+        'SEED_ADMIN_PASSWORD не задан. Запустите сид так: ' +
+          'dc exec -e SEED_ADMIN_PASSWORD=<пароль> backend node dist/config/seed.js'
+      );
+    }
+    const hashedPassword = await hashPassword(adminPassword || 'admin123');
     const adminUser = await User.create({
       email: 'admin@cloudco.ru',
       password: hashedPassword,
