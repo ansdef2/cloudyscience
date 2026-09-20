@@ -1,0 +1,86 @@
+# Развёртывание на одном облачном сервере: база данных тоже в контейнере.
+# Дешевле варианта с управляемой БД — платите только за сервер.
+# Взамен бэкапы и обновления PostgreSQL на вас (см. DEPLOY_TIMEWEB.md).
+#
+# Запуск:  docker compose -f deploy/docker-compose.single.yml --env-file deploy/.env up -d --build
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    container_name: cloudco-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:?укажите DOMAIN в deploy/.env}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - frontend
+      - backend
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: cloudco-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-cloudco}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?задайте DB_PASSWORD в deploy/.env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ..
+      dockerfile: server/Dockerfile
+    container_name: cloudco-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+
+      # База в соседнем контейнере: адрес — имя сервиса, шифрование не нужно
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-cloudco}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_SSL: "false"
+
+      JWT_SECRET: ${JWT_SECRET:?задайте JWT_SECRET в deploy/.env}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      CORS_ORIGIN: ${PUBLIC_URL:?укажите PUBLIC_URL в deploy/.env}
+
+      # Сид пересоздаёт схему и стирает данные — запускается вручную
+      SEED_ON_START: "false"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${PUBLIC_URL:?укажите PUBLIC_URL в deploy/.env}/api
+    container_name: cloudco-frontend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+    depends_on:
+      - backend
+
+volumes:
+  caddy_data:
+  caddy_config:
+  postgres_data:

@@ -1,7 +1,18 @@
 # Развёртывание на Timeweb Cloud
 
-Схема: **облачный сервер** с Docker + **управляемая БД PostgreSQL**.
-Caddy на сервере сам выпускает и продлевает сертификат Let's Encrypt.
+Есть два варианта, файлы конфигурации разные, остальные шаги одинаковые.
+
+| | Что платите | Файл | Кому |
+|---|---|---|---|
+| **Один сервер** | только сервер | `docker-compose.single.yml` | дешевле; бэкапы БД на вас |
+| **Сервер + управляемая БД** | сервер и БД | `docker-compose.timeweb.yml` | бэкапы и мониторинг базы делает провайдер |
+
+База в контейнере — нормальный выбор для запуска и небольшой нагрузки.
+Данные лежат в docker-томе и переживают перезапуски, но снимки надо делать
+самому (см. «Бэкапы» ниже). Перейти с одного варианта на другой можно потом,
+перенеся дамп.
+
+Caddy в обоих случаях сам выпускает и продлевает сертификат Let's Encrypt.
 
 ```
               ┌── https://ВАШ-ДОМЕН ──┐
@@ -15,7 +26,12 @@ Caddy на сервере сам выпускает и продлевает се
 
 ---
 
-## 1. Создать управляемую БД
+## 1. Создать управляемую БД — только для варианта с управляемой БД
+
+> Вариант «один сервер» этот шаг пропускает: база поднимется контейнером.
+> В `deploy/.env` тогда достаточно придумать `DB_PASSWORD`, а `DB_HOST`,
+> `DB_SSL` и сертификат не нужны.
+
 
 Панель Timeweb → «Базы данных» → создать **PostgreSQL 15** (или новее).
 
@@ -113,9 +129,14 @@ docker compose -f deploy/docker-compose.timeweb.yml --env-file deploy/.env up -d
 ## 7. Запустить
 
 ```bash
+# вариант «один сервер»
+docker compose -f deploy/docker-compose.single.yml --env-file deploy/.env up -d --build
+
+# вариант с управляемой БД
 docker compose -f deploy/docker-compose.timeweb.yml --env-file deploy/.env up -d --build
 ```
 
+Дальше в командах подставляйте тот файл, который выбрали.
 Первая сборка занимает несколько минут. Логи:
 
 ```bash
@@ -146,6 +167,28 @@ curl -I https://ВАШ-ДОМЕН              # 200, сертификат ва�
 **Смените пароли или удалите этих пользователей, если сервер смотрит в интернет.**
 
 ---
+
+## Бэкапы — для варианта «один сервер»
+
+Провайдер вашу контейнерную базу не бэкапит. Снимок вручную:
+
+```bash
+docker compose -f deploy/docker-compose.single.yml --env-file deploy/.env \
+  exec -T postgres pg_dump -U postgres cloudco | gzip > ~/cloudco-$(date +%F).sql.gz
+```
+
+Ежедневно в 4 утра — добавьте в `crontab -e`:
+
+```
+0 4 * * * cd /root/cloudco && docker compose -f deploy/docker-compose.single.yml --env-file deploy/.env exec -T postgres pg_dump -U postgres cloudco | gzip > /root/backup-$(date +\%F).sql.gz
+```
+
+Восстановление:
+
+```bash
+gunzip -c ~/cloudco-2026-09-20.sql.gz | docker compose -f deploy/docker-compose.single.yml \
+  --env-file deploy/.env exec -T postgres psql -U postgres cloudco
+```
 
 ## Обновление
 
