@@ -1,16 +1,42 @@
+import fs from 'fs';
 import { Sequelize } from 'sequelize';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
 /**
- * Управляемые БД (в том числе Timeweb Cloud) принимают только TLS-подключения
- * и часто отдают сертификат собственного центра сертификации. DB_SSL=true
- * включает шифрование, DB_SSL_REJECT_UNAUTHORIZED=false разрешает такой
- * сертификат — понадобится, если корневой сертификат провайдера не установлен.
+ * TLS до базы. Управляемые БД (в том числе Timeweb Cloud) принимают только
+ * шифрованные подключения и отдают сертификат собственного центра сертификации.
+ *
+ * DB_SSL=true                       — включить шифрование
+ * DB_SSL_CA=/путь/до/root.crt       — корневой сертификат провайдера;
+ *                                     с ним сертификат сервера проверяется
+ *                                     по-настоящему (аналог sslmode=verify-full)
+ * DB_SSL_REJECT_UNAUTHORIZED=false  — принять сертификат без проверки;
+ *                                     запасной вариант, если файла CA нет
  */
-const useSsl = process.env.DB_SSL === 'true';
-const rejectUnauthorized = process.env.DB_SSL_REJECT_UNAUTHORIZED !== 'false';
+const buildSslOptions = () => {
+  if (process.env.DB_SSL !== 'true') {
+    return {};
+  }
+
+  const caPath = process.env.DB_SSL_CA;
+
+  if (caPath) {
+    if (!fs.existsSync(caPath)) {
+      throw new Error(
+        `DB_SSL_CA указывает на несуществующий файл: ${caPath}. ` +
+          'Скачайте корневой сертификат провайдера или уберите переменную.'
+      );
+    }
+
+    return { ssl: { require: true, rejectUnauthorized: true, ca: fs.readFileSync(caPath, 'utf8') } };
+  }
+
+  return {
+    ssl: { require: true, rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED !== 'false' },
+  };
+};
 
 const sequelize = new Sequelize({
   dialect: 'postgres',
@@ -20,7 +46,7 @@ const sequelize = new Sequelize({
   username: process.env.DB_USER || 'postgres',
   password: process.env.DB_PASSWORD || 'postgres',
   logging: process.env.NODE_ENV === 'development' ? console.log : false,
-  dialectOptions: useSsl ? { ssl: { require: true, rejectUnauthorized } } : {},
+  dialectOptions: buildSslOptions(),
 });
 
 export default sequelize;

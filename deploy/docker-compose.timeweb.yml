@@ -39,6 +39,9 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       # Управляемая БД принимает только TLS-подключения
       DB_SSL: ${DB_SSL:-true}
+      # Путь к корневому сертификату провайдера внутри контейнера.
+      # Пусто — шифрование без проверки сертификата (см. deploy/.env.example)
+      DB_SSL_CA: ${DB_SSL_CA:-}
       DB_SSL_REJECT_UNAUTHORIZED: ${DB_SSL_REJECT_UNAUTHORIZED:-false}
 
       JWT_SECRET: ${JWT_SECRET:?задайте JWT_SECRET в deploy/.env}
@@ -47,6 +50,9 @@ services:
 
       # Сид пересоздаёт схему и стирает данные — запускается вручную, см. DEPLOY_TIMEWEB.md
       SEED_ON_START: "false"
+    volumes:
+      # Сертификаты БД: deploy/certs на сервере -> /certs в контейнере
+      - ./certs:/certs:ro
 
   frontend:
     build:
