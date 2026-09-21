@@ -8,8 +8,8 @@ const onest = Onest({ subsets: ['latin', 'cyrillic'], variable: '--font-onest' }
 const playfair = Playfair_Display({ subsets: ['latin', 'cyrillic'], variable: '--font-playfair' })
 
 export const metadata: Metadata = {
-  title: 'Cloud.co - Облачный коворкинг',
-  description: 'Платформа для аренды оборудования и компьютеров с удаленным управлением',
+  title: 'Облако науки',
+  description: 'Оборудование и курсы образовательных учреждений: каталог, запись и бронирование',
 }
 
 export default function RootLayout({
