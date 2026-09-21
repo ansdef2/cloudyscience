@@ -6,7 +6,11 @@ import Course from '../models/Course';
 import Equipment from '../models/Equipment';
 import Post from '../models/Post';
 import Specialist from '../models/Specialist';
+import { randomBytes } from 'crypto';
 import { hashPassword } from '../utils/hashPassword';
+
+/** Демо-авторы нужны только как подписи под постами, входить ими незачем. */
+const randomPassword = () => randomBytes(24).toString('base64url');
 import { importEquipmentModels } from './importEquipmentModels';
 
 const seedDatabase = async () => {
@@ -30,22 +34,12 @@ const seedDatabase = async () => {
     }
     const hashedPassword = await hashPassword(adminPassword || 'admin123');
     const adminUser = await User.create({
-      email: 'admin@cloudco.ru',
+      email: 'admin@cloudyscience.ru',
       password: hashedPassword,
       name: 'Администратор',
       role: 'admin',
     });
     console.log('Admin user created:', adminUser.email);
-
-    // Create test user
-    const testUserPassword = await hashPassword('user123');
-    const testUser = await User.create({
-      email: 'user@cloudco.ru',
-      password: testUserPassword,
-      name: 'Тестовый Пользователь',
-      role: 'user',
-    });
-    console.log('Test user created:', testUser.email);
 
     // Create institutions
     const institution1 = await Institution.create({
@@ -158,9 +152,9 @@ const seedDatabase = async () => {
     console.log(`Импортировано из справочника: ${importedModels}`);
 
     // Авторы ленты
-    const authorPassword = await hashPassword('anton123');
+    const authorPassword = await hashPassword(randomPassword());
     const anton = await User.create({
-      email: 'anton@cloudco.ru',
+      email: 'anton@cloudyscience.ru',
       password: authorPassword,
       name: 'Антон',
       avatar: '/avatars/anton.jpg',
@@ -168,8 +162,8 @@ const seedDatabase = async () => {
     });
 
     const masha = await User.create({
-      email: 'masha@cloudco.ru',
-      password: await hashPassword('masha123'),
+      email: 'masha@cloudyscience.ru',
+      password: await hashPassword(randomPassword()),
       name: 'Маша',
       avatar: '/avatars/masha.jpg',
       role: 'user',

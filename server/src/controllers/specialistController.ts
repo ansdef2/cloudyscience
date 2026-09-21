@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { Op } from 'sequelize';
 import Specialist from '../models/Specialist';
 import Institution from '../models/Institution';
+import { sendError } from '../utils/sendError';
 
 export const getAllSpecialists = async (req: Request, res: Response) => {
   try {
@@ -26,7 +27,7 @@ export const getAllSpecialists = async (req: Request, res: Response) => {
 
     res.json(specialists);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -42,7 +43,7 @@ export const getSpecialistById = async (req: Request, res: Response) => {
 
     res.json(specialist);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -51,7 +52,7 @@ export const createSpecialist = async (req: Request, res: Response) => {
     const specialist = await Specialist.create(req.body);
     res.status(201).json(await Specialist.findByPk(specialist.id, { include: [Institution] }));
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -66,7 +67,7 @@ export const updateSpecialist = async (req: Request, res: Response) => {
     await specialist.update(req.body);
     res.json(await Specialist.findByPk(specialist.id, { include: [Institution] }));
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -81,6 +82,6 @@ export const deleteSpecialist = async (req: Request, res: Response) => {
     await specialist.destroy();
     res.json({ message: 'Specialist deleted successfully' });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };

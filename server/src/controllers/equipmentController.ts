@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import Equipment from '../models/Equipment';
 import Institution from '../models/Institution';
 import { Op } from 'sequelize';
+import { sendError } from '../utils/sendError';
 
 export const getAllEquipment = async (req: Request, res: Response) => {
   try {
@@ -33,7 +34,7 @@ export const getAllEquipment = async (req: Request, res: Response) => {
 
     res.json(equipment);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -51,7 +52,7 @@ export const getEquipmentById = async (req: Request, res: Response) => {
 
     res.json(equipment);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -63,7 +64,7 @@ export const createEquipment = async (req: Request, res: Response) => {
     });
     res.status(201).json(equipmentWithInstitution);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -82,7 +83,7 @@ export const updateEquipment = async (req: Request, res: Response) => {
     });
     res.json(updatedEquipment);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -98,6 +99,6 @@ export const deleteEquipment = async (req: Request, res: Response) => {
     await equipment.destroy();
     res.json({ message: 'Equipment deleted successfully' });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };

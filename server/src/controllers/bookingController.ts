@@ -3,6 +3,7 @@ import Booking from '../models/Booking';
 import Course from '../models/Course';
 import Equipment from '../models/Equipment';
 import { Op } from 'sequelize';
+import { sendError } from '../utils/sendError';
 
 export const getAllBookings = async (req: any, res: Response) => {
   try {
@@ -27,7 +28,7 @@ export const getAllBookings = async (req: any, res: Response) => {
 
     res.json(bookings);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -48,7 +49,7 @@ export const getBookingById = async (req: Request, res: Response) => {
 
     res.json(booking);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -105,7 +106,7 @@ export const createBooking = async (req: any, res: Response) => {
 
     res.status(201).json(bookingWithDetails);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -129,7 +130,7 @@ export const updateBooking = async (req: Request, res: Response) => {
 
     res.json(updatedBooking);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -153,6 +154,6 @@ export const deleteBooking = async (req: Request, res: Response) => {
     await booking.destroy();
     res.json({ message: 'Booking deleted successfully' });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };

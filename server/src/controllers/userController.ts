@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import User from '../models/User';
 import { AuthRequest } from '../middleware/auth';
 import { hashPassword } from '../utils/hashPassword';
+import { sendError } from '../utils/sendError';
 
 /** Свой профиль правит владелец, чужой — только администратор. */
 const canManage = (req: AuthRequest, id: string) =>
@@ -21,7 +22,7 @@ export const getAllUsers = async (req: any, res: Response) => {
 
     res.json(users);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -39,7 +40,7 @@ export const getUserById = async (req: Request, res: Response) => {
 
     res.json(user);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -74,7 +75,7 @@ export const updateUser = async (req: AuthRequest, res: Response) => {
     });
     res.json(updatedUser);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -95,6 +96,6 @@ export const deleteUser = async (req: AuthRequest, res: Response) => {
     await user.destroy();
     res.json({ message: 'User deleted successfully' });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };

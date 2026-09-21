@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import Course from '../models/Course';
 import Institution from '../models/Institution';
 import { Op } from 'sequelize';
+import { sendError } from '../utils/sendError';
 
 export const getAllCourses = async (req: Request, res: Response) => {
   try {
@@ -28,7 +29,7 @@ export const getAllCourses = async (req: Request, res: Response) => {
 
     res.json(courses);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -46,7 +47,7 @@ export const getCourseById = async (req: Request, res: Response) => {
 
     res.json(course);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -58,7 +59,7 @@ export const createCourse = async (req: Request, res: Response) => {
     });
     res.status(201).json(courseWithInstitution);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -77,7 +78,7 @@ export const updateCourse = async (req: Request, res: Response) => {
     });
     res.json(updatedCourse);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -93,6 +94,6 @@ export const deleteCourse = async (req: Request, res: Response) => {
     await course.destroy();
     res.json({ message: 'Course deleted successfully' });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };

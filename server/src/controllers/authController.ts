@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import User from '../models/User';
 import { hashPassword, comparePassword } from '../utils/hashPassword';
 import { generateToken } from '../utils/generateToken';
+import { sendError } from '../utils/sendError';
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -38,7 +39,7 @@ export const register = async (req: Request, res: Response) => {
       token,
     });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -72,7 +73,7 @@ export const login = async (req: Request, res: Response) => {
       token,
     });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -86,6 +87,6 @@ export const getProfile = async (req: any, res: Response) => {
       role: user.role,
     });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };

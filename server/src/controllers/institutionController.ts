@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import Institution from '../models/Institution';
 import Course from '../models/Course';
 import { Op } from 'sequelize';
+import { sendError } from '../utils/sendError';
 
 export const getAllInstitutions = async (req: Request, res: Response) => {
   try {
@@ -24,7 +25,7 @@ export const getAllInstitutions = async (req: Request, res: Response) => {
 
     res.json(institutions);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -47,7 +48,7 @@ export const getInstitutionById = async (req: Request, res: Response) => {
 
     res.json(institution);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -67,7 +68,7 @@ export const getInstitutionCourses = async (req: Request, res: Response) => {
 
     res.json(courses);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -76,7 +77,7 @@ export const createInstitution = async (req: Request, res: Response) => {
     const institution = await Institution.create(req.body);
     res.status(201).json(institution);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -92,7 +93,7 @@ export const updateInstitution = async (req: Request, res: Response) => {
     await institution.update(req.body);
     res.json(institution);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -108,6 +109,6 @@ export const deleteInstitution = async (req: Request, res: Response) => {
     await institution.destroy();
     res.json({ message: 'Institution deleted successfully' });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };

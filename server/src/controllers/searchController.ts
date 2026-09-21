@@ -5,6 +5,7 @@ import Equipment from '../models/Equipment';
 import Course from '../models/Course';
 import Booking from '../models/Booking';
 import Specialist from '../models/Specialist';
+import { sendError } from '../utils/sendError';
 
 type SearchResult = {
   id: string;
@@ -122,7 +123,7 @@ export const search = async (req: Request, res: Response) => {
 
     res.json(results);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -154,6 +155,6 @@ export const getPopularSearches = async (_req: Request, res: Response) => {
     });
     res.json(equipment.map((e) => e.name));
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };

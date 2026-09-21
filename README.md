@@ -116,12 +116,18 @@ cd server && npm run db:import-models
 **Frontend** — Next.js 14, React 18, TypeScript, Tailwind CSS, CSS Modules
 **Backend** — Node.js, Express, TypeScript, PostgreSQL, Sequelize, JWT, bcryptjs
 
-## 🔑 Тестовые данные
+## 🔑 Учётные записи после сида
 
-После seed доступны два аккаунта:
+Создаётся один администратор — `admin@cloudyscience.ru`. Пароль берётся
+из `SEED_ADMIN_PASSWORD`; в production без этой переменной сид
+останавливается, вне production используется `admin123`.
 
-- Администратор — `admin@cloudco.ru` / `admin123`
-- Пользователь — `user@cloudco.ru` / `user123`
+```
+SEED_ADMIN_PASSWORD='ваш-пароль' npm run db:seed
+```
+
+Демо-авторы постов получают случайные пароли — они нужны только
+как подписи под контентом.
 
 ## 📖 Документация
 

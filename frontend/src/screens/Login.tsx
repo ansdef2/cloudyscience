@@ -88,19 +88,6 @@ export default function Login() {
             </button>
           </p>
         </form>
-
-        <div className={styles.hint}>
-          <div className={`${styles.hintGlow} protoGlowCard`} />
-          <p className={styles.hintTitle}>Тестовый аккаунт</p>
-          <div className={styles.hintRow}>
-            <span className={styles.hintLabel}>Email</span>
-            <span>user@cloudco.ru</span>
-          </div>
-          <div className={styles.hintRow}>
-            <span className={styles.hintLabel}>Пароль</span>
-            <span>user123</span>
-          </div>
-        </div>
       </div>
     </div>
   )

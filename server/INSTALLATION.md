@@ -63,17 +63,18 @@ cd ..
 npm run dev
 ```
 
-## Тестовые данные
+## Учётные записи после сида
 
-После запуска seed скрипта будут созданы:
+Создаётся один администратор — `admin@cloudyscience.ru`. Пароль задаётся
+переменной `SEED_ADMIN_PASSWORD` при запуске сида; в production без неё
+сид останавливается, вне production берётся `admin123`.
 
-**Администратор:**
-- Email: `admin@cloudco.ru`
-- Password: `admin123`
+```
+SEED_ADMIN_PASSWORD='ваш-пароль' npm run db:seed
+```
 
-**Тестовый пользователь:**
-- Email: `user@cloudco.ru`
-- Password: `user123`
+Демо-авторы постов (`anton@`, `masha@`) получают случайные пароли:
+они нужны как подписи под контентом, входить ими не предполагается.
 
 ## API Endpoints
 

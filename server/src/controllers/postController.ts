@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { Op } from 'sequelize';
 import Post from '../models/Post';
 import User from '../models/User';
+import { sendError } from '../utils/sendError';
 
 const AUTHOR_ATTRIBUTES = ['id', 'name', 'avatar'];
 
@@ -33,7 +34,7 @@ export const getAllPosts = async (req: Request, res: Response) => {
 
     res.json(posts);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -49,7 +50,7 @@ export const getPostById = async (req: Request, res: Response) => {
 
     res.json(post);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -66,7 +67,7 @@ export const likePost = async (req: Request, res: Response) => {
 
     res.json({ id: post.id, likes: post.likes });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -78,7 +79,7 @@ export const createPost = async (req: any, res: Response) => {
     });
     res.status(201).json(created);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };
 
@@ -98,6 +99,6 @@ export const deletePost = async (req: any, res: Response) => {
     await post.destroy();
     res.json({ message: 'Post deleted successfully' });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    sendError(res, error);
   }
 };

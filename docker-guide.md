@@ -106,17 +106,16 @@ docker-compose down --rmi all # + Удалить образы
 docker system prune           # Очистить неиспользуемые данные Docker
 ```
 
-## Тестовые данные
+## Учётные записи после сида
 
-После выполнения seed скрипта:
+Создаётся один администратор — `admin@cloudyscience.ru` с паролем из
+переменной `SEED_ADMIN_PASSWORD`:
 
-**Администратор:**
-- Email: admin@cloudco.ru
-- Password: admin123
+```
+docker compose exec -e SEED_ADMIN_PASSWORD='ваш-пароль' backend node dist/config/seed.js
+```
 
-**Пользователь:**
-- Email: user@cloudco.ru
-- Password: user123
+В production без этой переменной сид останавливается.
 
 ## Структура Docker
 
