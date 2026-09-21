@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import ImageWithFallback from '@/components/ImageWithFallback'
+import ProfileMenu from '@/components/ProfileMenu'
 import ActionCards from '@/components/ActionCards'
 import CourseCard from '@/components/CourseCard'
 import HighlightCard from '@/components/HighlightCard'
@@ -63,25 +64,7 @@ export default function HomePage() {
 
       <header className={styles.topBar}>
         <span className={styles.logo}>Облако науки</span>
-        <div className={styles.topActions}>
-          <button className={styles.iconButton} aria-label="Уведомления">
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden>
-              <path
-                d="M18 8a6 6 0 1 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-          <ImageWithFallback
-            src="/prototype/profile.jpg"
-            alt="Профиль"
-            className={styles.avatar}
-            bare
-          />
-        </div>
+        <ProfileMenu />
       </header>
 
       {institution && (

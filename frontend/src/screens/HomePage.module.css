@@ -38,27 +38,6 @@
   color: var(--proto-text);
 }
 
-.topActions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.iconButton {
-  display: inline-flex;
-  width: 24px;
-  height: 24px;
-  color: var(--proto-text);
-  background: none;
-}
-
-.avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
 /* Метка учреждения на карте */
 .mapPin {
   position: absolute;

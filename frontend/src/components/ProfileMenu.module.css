@@ -1,0 +1,91 @@
+.actions {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.iconButton {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  color: var(--proto-text);
+  background: none;
+}
+
+.avatarButton {
+  display: inline-flex;
+  padding: 0;
+  background: none;
+  border-radius: 50%;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Заглушка, когда фотографии профиля нет: инициал на тёмном круге */
+.avatarFallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  background: var(--proto-field);
+  color: var(--proto-text-70);
+  font-size: 13px;
+}
+
+.popover {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  z-index: 20;
+  min-width: 208px;
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--proto-radius-field);
+  background: var(--proto-surface);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+}
+
+.name {
+  font-size: 14px;
+  color: var(--proto-text);
+}
+
+.email {
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--proto-text-50);
+  overflow-wrap: anywhere;
+}
+
+.divider {
+  margin: 12px -16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.action {
+  display: block;
+  width: 100%;
+  padding: 0;
+  background: none;
+  color: var(--proto-text-70);
+  font-size: 14px;
+  text-align: left;
+}
+
+.action:hover {
+  color: var(--proto-text);
+}
+
+.empty {
+  font-size: 13px;
+  color: var(--proto-text-50);
+}
