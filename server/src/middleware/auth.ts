@@ -36,3 +36,23 @@ export const authorizeAdmin = async (req: AuthRequest, res: Response, next: Next
     res.status(403).json({ error: 'Admin access required' });
   }
 };
+
+/**
+ * Не требует входа, но если токен есть — подставляет пользователя.
+ * Нужно там, где страница открыта всем, а часть данных личная.
+ */
+export const optionalAuthenticate = async (req: AuthRequest, _res: Response, next: NextFunction) => {
+  const token = req.headers.authorization?.split(' ')[1];
+
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET) as any;
+      const user = await User.findByPk(decoded.userId);
+      if (user) req.user = user;
+    } catch {
+      // Просроченный или чужой токен для гостевой страницы не ошибка
+    }
+  }
+
+  next();
+};

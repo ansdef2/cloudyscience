@@ -13,6 +13,7 @@ import userRoutes from './routes/users';
 import searchRoutes from './routes/search';
 import postRoutes from './routes/posts';
 import specialistRoutes from './routes/specialists';
+import progressRoutes from './routes/progress';
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/auth', authRoutes);
 app.use('/api/institutions', institutionRoutes);
 app.use('/api/courses', courseRoutes);
+app.use('/api/progress', progressRoutes);
 app.use('/api/equipment', equipmentRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/users', userRoutes);

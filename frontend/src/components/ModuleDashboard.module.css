@@ -1,0 +1,230 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ---- Шапка с прогрессом ---- */
+
+.summary {
+  --glow: var(--proto-glow-purple);
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 20px;
+  border-radius: var(--proto-radius-card);
+  background: var(--proto-surface);
+  overflow: hidden;
+}
+
+.summaryGlow {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--proto-radius-card);
+  pointer-events: none;
+}
+
+.ring {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+.ringValue {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--proto-text);
+}
+
+.summaryText {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.moduleLabel {
+  font-size: 12px;
+  color: var(--proto-text-50);
+}
+
+.moduleTitle {
+  font-family: var(--proto-font-display);
+  font-size: 16px;
+  line-height: 1.2;
+  color: var(--proto-text);
+}
+
+.moduleCount {
+  font-size: 13px;
+  color: var(--proto-text-60);
+}
+
+/* ---- Блоки с текстом ---- */
+
+.block {
+  padding: 18px 20px;
+  border-radius: var(--proto-radius-card);
+  background: var(--proto-surface);
+}
+
+.blockTitle {
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--proto-text);
+}
+
+.blockText {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--proto-text-70);
+  white-space: pre-line;
+}
+
+.list {
+  margin: 0;
+  padding-left: 18px;
+  /* Tailwind preflight убирает маркеры у списков — возвращаем их */
+  list-style: disc;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--proto-text-70);
+}
+
+.list li + li {
+  margin-top: 4px;
+}
+
+/* ---- Этапы ---- */
+
+.stages {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stage {
+  border-radius: var(--proto-radius-field);
+  background: var(--proto-surface);
+  overflow: hidden;
+}
+
+.stageDone {
+  background: rgba(var(--proto-glow-green), 0.14);
+}
+
+.stageHead {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  background: none;
+  text-align: left;
+}
+
+.stageNumber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50%;
+  font-size: 12px;
+  color: var(--proto-text-60);
+}
+
+.stageNumberDone {
+  border-color: transparent;
+  background: rgb(var(--proto-glow-green));
+  color: #04120c;
+}
+
+.stageInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.stageTitle {
+  font-size: 14px;
+  color: var(--proto-text);
+}
+
+.stageOutcome {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--proto-text-50);
+}
+
+.chevron {
+  margin-left: auto;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  color: var(--proto-text-50);
+  transition: transform 0.2s ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.stageBody {
+  padding: 0 16px 16px 52px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.stageSection {
+  font-size: 12px;
+  color: var(--proto-text-50);
+}
+
+.theory {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--proto-text-70);
+  white-space: pre-line;
+}
+
+.toggle {
+  align-self: flex-start;
+  padding: 9px 18px;
+  border-radius: var(--proto-radius-pill);
+  background: var(--proto-text);
+  color: #10101a;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.toggleDone {
+  background: var(--proto-field);
+  color: var(--proto-text-70);
+}
+
+.toggle:disabled {
+  opacity: 0.6;
+}
+
+.guestHint {
+  font-size: 12px;
+  color: var(--proto-text-50);
+}
+
+.guestLink {
+  color: var(--proto-text);
+  text-decoration: underline;
+}

@@ -21,6 +21,27 @@ export interface Institution {
   updatedAt: string;
 }
 
+export interface ModuleStage {
+  id: string;
+  order: number;
+  title: string;
+  summary?: string;
+  outcome?: string;
+  theory?: string;
+}
+
+export interface CourseModule {
+  id: string;
+  order: number;
+  title: string;
+  summary?: string;
+  goal?: string;
+  outcomes: string[];
+  resultSummary?: string;
+  resultItems: string[];
+  stages: ModuleStage[];
+}
+
 export interface Course {
   id: string;
   institutionId: string;
@@ -33,6 +54,9 @@ export interface Course {
   spotsLeft?: number;
   address?: string;
   Institution?: Institution;
+  modules?: CourseModule[];
+  /** Этапы, отмеченные текущим пользователем; у гостя пусто */
+  completedStageIds?: string[];
   createdAt: string;
   updatedAt: string;
 }

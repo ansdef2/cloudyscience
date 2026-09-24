@@ -12,6 +12,8 @@ function normalizeCourse(course: any): Course {
     ...course,
     images: course.images ?? [],
     spotsLeft: course.availableSpots ?? 0,
+    modules: course.modules ?? [],
+    completedStageIds: course.completedStageIds ?? [],
     address: course.address ?? course.Institution?.address ?? '',
   }
 }
@@ -117,4 +119,15 @@ export async function bookCourse(
     console.error('Ошибка записи на курс:', error)
     throw error
   }
+}
+
+/**
+ * Отметить этап модуля пройденным или снять отметку.
+ * Возвращает полный список отмеченных этапов пользователя.
+ */
+export async function setStageCompleted(stageId: string, completed: boolean): Promise<string[]> {
+  const response = await api.put<{ completedStageIds: string[] }>(`/progress/stages/${stageId}`, {
+    completed,
+  })
+  return response.data.completedStageIds ?? []
 }

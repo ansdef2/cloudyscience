@@ -7,12 +7,12 @@ import {
   deleteCourse,
 } from '../controllers/courseController';
 import { authenticate } from '../middleware/auth';
-import { authorizeAdmin } from '../middleware/auth';
+import { authorizeAdmin, optionalAuthenticate } from '../middleware/auth';
 
 const router = Router();
 
 router.get('/', getAllCourses);
-router.get('/:id', getCourseById);
+router.get('/:id', optionalAuthenticate, getCourseById);
 router.post('/', authenticate, authorizeAdmin, createCourse);
 router.put('/:id', authenticate, authorizeAdmin, updateCourse);
 router.delete('/:id', authenticate, authorizeAdmin, deleteCourse);

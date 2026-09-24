@@ -8,6 +8,9 @@ import Post from '../models/Post';
 import Specialist from '../models/Specialist';
 import { randomBytes } from 'crypto';
 import { hashPassword } from '../utils/hashPassword';
+import CourseModule from '../models/CourseModule';
+import ModuleStage from '../models/ModuleStage';
+import { module1 } from './data/module1';
 
 /** Демо-авторы нужны только как подписи под постами, входить ими незачем. */
 const randomPassword = () => randomBytes(24).toString('base64url');
@@ -64,26 +67,34 @@ const seedDatabase = async () => {
       isOpen: true,
     });
 
-    // Create courses
+    // Единственный курс платформы
     const course1 = await Course.create({
       institutionId: institution1.id,
-      title: 'Информационные технологии и проектная деятельность',
-      direction: 'IT Квантум',
-      description: 'Интересуетесь наукой и техникой? Собираетесь стать великим создателем игр? Мечтаете освоить новейшие информационные технологии, игровые движки, хотите собрать собственные VR очки, создать свою первую 3D-модель или научиться обрабатывать панорамные видеоролики? Всё это у нас!',
+      title: 'Проектное управление и информационные технологии',
+      direction: 'IT-куб',
+      description: 'Курс о том, как довести цифровой продукт от идеи до работающего решения: сформулировать проблему и цель, спланировать работу, реализовать проект и проверить результат по заранее выбранным критериям. Каждый обучающийся ведёт собственный IT-проект — веб-сервис, бот, систему автоматизации, аналитический инструмент или другое цифровое решение.',
       images: ['/courses/it-cube.jpg'],
       totalSpots: 20,
       availableSpots: 2,
     });
 
-    const course2 = await Course.create({
-      institutionId: institution1.id,
-      title: 'Виртуальная и дополненная реальность',
-      direction: 'VR/AR Квантум',
-      description: 'Освойте технологии виртуальной и дополненной реальности, создавайте immersive-приложения и изучайте работу с современными VR/AR-платформами.',
-      images: ['/courses/vr-ar.jpg'],
-      totalSpots: 15,
-      availableSpots: 3,
+    // Содержание первого модуля из методички курса
+    const createdModule = await CourseModule.create({
+      courseId: course1.id,
+      order: module1.order,
+      title: module1.title,
+      summary: module1.summary,
+      goal: module1.goal,
+      outcomes: module1.outcomes,
+      resultSummary: module1.resultSummary,
+      resultItems: module1.resultItems,
     });
+
+    for (const stage of module1.stages) {
+      await ModuleStage.create({ moduleId: createdModule.id, ...stage });
+    }
+
+    console.log(`Модуль «${createdModule.title}»: этапов ${module1.stages.length}`);
 
     // Create equipment
     const equipment1 = await Equipment.create({

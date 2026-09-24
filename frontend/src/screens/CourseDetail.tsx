@@ -5,10 +5,12 @@ import { useRouter } from 'next/navigation'
 import ProtoTopBar from '@/components/ProtoTopBar'
 import ImageWithFallback from '@/components/ImageWithFallback'
 import ProtoCalendar from '@/components/ProtoCalendar'
+import ModuleDashboard from '@/components/ModuleDashboard'
 import { Course } from '@/models/Api'
 import { bookCourse, getCourseById } from '@/services/institutionService'
 import { pluralize } from '@/utils/format'
 import { useToast } from '@/hooks/useToast'
+import { useAuth } from '@/hooks/useAuth'
 import styles from './CourseDetail.module.css'
 
 const AVAILABLE_TIMES = ['14:00', '16:00']
@@ -20,6 +22,7 @@ interface CourseDetailProps {
 export default function CourseDetail({ courseId }: CourseDetailProps) {
   const router = useRouter()
   const toast = useToast()
+  const { isAuthenticated } = useAuth()
 
   const [course, setCourse] = useState<Course | 'loading' | null>('loading')
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
@@ -28,10 +31,15 @@ export default function CourseDetail({ courseId }: CourseDetailProps) {
   const [wantReminder, setWantReminder] = useState(true)
   const [addToCalendar, setAddToCalendar] = useState(false)
   const [isBooking, setIsBooking] = useState(false)
+  const [completedStageIds, setCompletedStageIds] = useState<string[]>([])
 
   useEffect(() => {
-    getCourseById(courseId).then((found) => setCourse(found || null))
-  }, [courseId])
+    getCourseById(courseId).then((found) => {
+      setCourse(found || null)
+      setCompletedStageIds(found?.completedStageIds ?? [])
+    })
+    // Прогресс личный: после входа или выхода карточку нужно перечитать
+  }, [courseId, isAuthenticated])
 
   const handleBook = async () => {
     if (!selectedDate || !selectedTime) {
@@ -114,6 +122,16 @@ export default function CourseDetail({ courseId }: CourseDetailProps) {
         </div>
 
         {course.description && <p className={styles.description}>{course.description}</p>}
+
+        {course.modules?.map((module) => (
+          <ModuleDashboard
+            key={module.id}
+            module={module}
+            completedStageIds={completedStageIds}
+            onProgressChange={setCompletedStageIds}
+            isAuthenticated={isAuthenticated}
+          />
+        ))}
 
         <div className={styles.booking}>
           <div className={`${styles.bookingGlow} protoGlowHero`} />
