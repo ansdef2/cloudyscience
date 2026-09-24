@@ -11,8 +11,8 @@ export default function LoadingScreen() {
           <div className={styles.square2}></div>
         </div>
         <div className={styles.logoText}>
-          <span className={styles.cloud}>Cloud</span>
-          <span className={styles.co}>.co-</span>
+          <span className={styles.wordFirst}>Облако</span>
+          <span className={styles.wordSecond}>науки</span>
         </div>
       </div>
       <div className={styles.loader}></div>
