@@ -108,7 +108,7 @@ const seedDatabase = async () => {
       image: '/equipment/milling-machine.jpg',
       characteristics: [
         {
-          section: 'Характеристики',
+          section: '',
           rows: [
             { label: 'Рабочее поле', value: '400 x 300 x 100 мм' },
             { label: 'Материалы', value: 'Дерево, пластик, алюминий' },
@@ -129,7 +129,7 @@ const seedDatabase = async () => {
       image: '/equipment/3d-printer.jpg',
       characteristics: [
         {
-          section: 'Характеристики',
+          section: '',
           rows: [
             { label: 'Область печати', value: '220 x 220 x 250 мм' },
             { label: 'Технология', value: 'FDM' },
@@ -149,7 +149,7 @@ const seedDatabase = async () => {
       image: '/equipment/computer-class.jpg',
       characteristics: [
         {
-          section: 'Характеристики',
+          section: '',
           rows: [
             { label: 'Рабочих мест', value: '12' },
             { label: 'ПО', value: 'CAD, Unity, Blender' },

@@ -9,6 +9,9 @@ import { getEquipmentById } from '@/services/equipmentService'
 import { Equipment, SpecSection } from '@/models/Equipment'
 import styles from './EquipmentDetail.module.css'
 
+/** Заголовок блока: одноимённый подраздел внутри него не дублируем. */
+const SPECS_TITLE = 'Характеристики'
+
 /**
  * Характеристики приходят массивом разделов (порядок задан импортом справочника),
  * но у демо-позиций может остаться плоский объект — поддерживаем оба вида.
@@ -19,7 +22,9 @@ function toSections(characteristics: Equipment['characteristics']): SpecSection[
 
   return [
     {
-      section: 'Характеристики',
+      // Без имени: блок целиком уже озаглавлен «Характеристики»,
+      // иначе заголовок задваивается
+      section: '',
       rows: Object.entries(characteristics).map(([label, value]) => ({
         label,
         value: String(value),
@@ -109,11 +114,13 @@ export default function EquipmentDetail({ equipmentId }: EquipmentDetailProps) {
 
       {sections.length > 0 && (
         <div className={styles.specs}>
-          <h2 className={styles.specsTitle}>Характеристики</h2>
+          <h2 className={styles.specsTitle}>{SPECS_TITLE}</h2>
 
           {sections.map((section) => (
             <section key={section.section} className={styles.section}>
-              <h3 className={styles.sectionTitle}>{section.section}</h3>
+              {section.section && section.section !== SPECS_TITLE && (
+                <h3 className={styles.sectionTitle}>{section.section}</h3>
+              )}
               <div className={styles.rows}>
                 {section.rows.map((row) => (
                   <div key={`${section.section}-${row.label}`} className={styles.row}>
