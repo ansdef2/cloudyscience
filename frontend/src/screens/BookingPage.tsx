@@ -6,6 +6,8 @@ import ProtoTopBar from '@/components/ProtoTopBar'
 import ProtoCalendar from '@/components/ProtoCalendar'
 import { createBooking } from '@/services/bookingService'
 import { getEquipmentById } from '@/services/equipmentService'
+import { getMyTeams, Team } from '@/services/teamService'
+import { getAuthToken } from '@/utils/api'
 import { useToast } from '@/hooks/useToast'
 import styles from './BookingPage.module.css'
 
@@ -38,6 +40,16 @@ export default function BookingPage({ equipmentId }: BookingPageProps) {
   const [equipmentName, setEquipmentName] = useState('Оборудование')
   const [equipmentAddress, setEquipmentAddress] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [teams, setTeams] = useState<Team[]>([])
+  const [teamId, setTeamId] = useState<string | null>(null)
+
+  // Команды пользователя — чтобы забронировать на команду, а не на себя
+  useEffect(() => {
+    if (!getAuthToken()) return
+    getMyTeams()
+      .then(setTeams)
+      .catch(() => setTeams([]))
+  }, [])
 
   useEffect(() => {
     getEquipmentById(equipmentId).then((equipment) => {
@@ -77,6 +89,7 @@ export default function BookingPage({ equipmentId }: BookingPageProps) {
         date: selectedDate,
         time: selectedTime,
         rentalType,
+        teamId: teamId ?? undefined,
         files: selectedFiles,
         location: rentalType === 'in-person' ? equipmentAddress : undefined,
       })
@@ -244,6 +257,33 @@ export default function BookingPage({ equipmentId }: BookingPageProps) {
                   <span className={styles.summaryLabel}>Тип</span>
                   <span>{rentalType === 'remote' ? 'Дистанционно' : 'Лично'}</span>
                 </div>
+                {teams.length > 0 && (
+                  <div className={styles.owner}>
+                    <span className={styles.summaryLabel}>Для кого</span>
+                    <div className={styles.ownerChoices}>
+                      <button
+                        className={`${styles.ownerChip} ${teamId === null ? styles.ownerChipActive : ''}`}
+                        onClick={() => setTeamId(null)}
+                        aria-pressed={teamId === null}
+                      >
+                        Для себя
+                      </button>
+                      {teams.map((team) => (
+                        <button
+                          key={team.id}
+                          className={`${styles.ownerChip} ${teamId === team.id ? styles.ownerChipActive : ''}`}
+                          onClick={() => setTeamId(team.id)}
+                          aria-pressed={teamId === team.id}
+                        >
+                          Команда «{team.name}»
+                        </button>
+                      ))}
+                    </div>
+                    {teamId && (
+                      <span className={styles.ownerHint}>Бронь увидят все участники команды</span>
+                    )}
+                  </div>
+                )}
                 {selectedFiles.length > 0 && (
                   <div className={styles.summaryRow}>
                     <span className={styles.summaryLabel}>Файлы</span>

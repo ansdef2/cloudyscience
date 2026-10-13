@@ -1,0 +1,71 @@
+.container {
+  width: 100%;
+  max-width: var(--proto-width);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding-bottom: 40px;
+  background: var(--proto-bg);
+  font-family: var(--proto-font-text);
+  color: var(--proto-text);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 22px var(--proto-gutter) 0;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--proto-font-display);
+  font-size: 24px;
+  font-weight: 400;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Карточка курса — на всю ширину колонки */
+.item > :first-child {
+  width: 100%;
+  flex-basis: auto;
+}
+
+.venue {
+  margin: 0;
+  padding: 0 8px;
+  font-size: 12px;
+  color: var(--proto-text-50);
+}
+
+.empty {
+  color: var(--proto-text-50);
+  font-size: 14px;
+}
+
+@media (min-width: 960px) {
+  .content {
+    gap: 28px;
+    padding-top: 40px;
+  }
+
+  .title {
+    font-size: 32px;
+  }
+
+  .list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 24px;
+  }
+}

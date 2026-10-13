@@ -6,6 +6,7 @@ import BrandLogo from '@/components/BrandLogo'
 import MapWindow, { MapPlace } from '@/components/map/MapWindow'
 import ProfileMenu from '@/components/ProfileMenu'
 import SiteHeader from '@/components/SiteHeader'
+import BottomNav from '@/components/BottomNav'
 import ActionCards from '@/components/ActionCards'
 import CourseCard from '@/components/CourseCard'
 import HighlightCard from '@/components/HighlightCard'
@@ -145,10 +146,7 @@ export default function HomePage() {
               <button
                 className={styles.sectionAction}
                 aria-label="Все курсы"
-                onClick={() =>
-                  // Курс на платформе один — ведём прямо на него, а не в пустой поиск
-                  router.push(allCourses.length === 1 ? `/course/${allCourses[0].id}` : '/search')
-                }
+                onClick={() => router.push('/courses')}
               >
                 <svg viewBox="0 0 24 24" fill="none" aria-hidden>
                   <path
@@ -196,6 +194,7 @@ export default function HomePage() {
           ))}
         </section>
       </div>
+      <BottomNav />
     </div>
   )
 }

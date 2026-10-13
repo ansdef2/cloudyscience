@@ -9,6 +9,13 @@ import styles from './ProfileMenu.module.css'
 
 type OpenPanel = 'none' | 'profile' | 'bell'
 
+const MENU = [
+  { href: '/profile', label: 'Профиль' },
+  { href: '/chats', label: 'Чаты' },
+  { href: '/teams', label: 'Команды' },
+  { href: '/admin', label: 'Админка', adminOnly: true },
+]
+
 /**
  * Колокольчик и аватар в шапке. До этого оба были декоративными:
  * клик по ним не делал ничего, и это выглядело как поломка.
@@ -107,6 +114,20 @@ export default function ProfileMenu() {
         <div className={styles.popover}>
           <p className={styles.name}>{user?.name}</p>
           <p className={styles.email}>{user?.email}</p>
+          <div className={styles.divider} />
+          {MENU.filter((item) => !item.adminOnly || user?.role === 'admin').map((item) => (
+            <button
+              key={item.href}
+              className={styles.action}
+              type="button"
+              onClick={() => {
+                setPanel('none')
+                router.push(item.href)
+              }}
+            >
+              {item.label}
+            </button>
+          ))}
           <div className={styles.divider} />
           <button className={styles.action} type="button" onClick={handleLogout}>
             Выйти

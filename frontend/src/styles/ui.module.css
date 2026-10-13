@@ -1,0 +1,338 @@
+/*
+ * Общие элементы новых экранов (люди, чаты, команды, профиль, админка)
+ * в токенах прототипа. Телефон — колонка макета, с 960 px — сетка до 1200.
+ */
+.page {
+  width: 100%;
+  max-width: var(--proto-width);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding-bottom: 40px;
+  background: var(--proto-bg);
+  font-family: var(--proto-font-text);
+  color: var(--proto-text);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 22px var(--proto-gutter) 0;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--proto-font-display);
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.subtitle {
+  margin: -8px 0 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--proto-text-60);
+}
+
+.sectionTitle {
+  margin: 8px 0 0;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+/* Переключатель вкладок — «таблетки», как фильтры ленты */
+.tabs {
+  display: flex;
+  gap: 6px;
+  padding: 4px;
+  border-radius: var(--proto-radius-pill);
+  background: var(--proto-field);
+}
+
+.tab {
+  flex: 1;
+  height: 40px;
+  border-radius: var(--proto-radius-pill);
+  background: transparent;
+  color: var(--proto-text-70);
+  font-size: 14px;
+}
+
+.tabActive {
+  background: #ffffff;
+  color: #000000;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Карточка-строка: аватар, текст, действия */
+.card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 20px;
+  background: var(--proto-surface);
+}
+
+.cardLink {
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.cardLink:hover {
+  background: #14141e;
+}
+
+.cardBody {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.cardTitle {
+  overflow: hidden;
+  font-size: 15px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.cardMeta {
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--proto-text-60);
+  text-overflow: ellipsis;
+}
+
+.cardActions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 6px;
+}
+
+/* Блок-панель: формы, сведения */
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  border-radius: var(--proto-radius-card);
+  background: var(--proto-surface);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 13px;
+  color: var(--proto-text-60);
+}
+
+.input,
+.textarea,
+.select {
+  width: 100%;
+  padding: 0 14px;
+  border: none;
+  border-radius: var(--proto-radius-field);
+  background: var(--proto-field);
+  color: var(--proto-text);
+  font-family: var(--proto-font-text);
+  font-size: 14px;
+  outline: none;
+}
+
+.input,
+.select {
+  height: 46px;
+}
+
+.textarea {
+  min-height: 96px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  line-height: 1.45;
+  resize: vertical;
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--proto-text-50);
+}
+
+.input:focus-visible,
+.textarea:focus-visible,
+.select:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.35);
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+}
+
+.row > * {
+  flex: 1;
+  min-width: 0;
+}
+
+.primary,
+.secondary,
+.ghost,
+.danger {
+  display: inline-flex;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 18px;
+  border-radius: var(--proto-radius-pill);
+  font-family: var(--proto-font-text);
+  font-size: 14px;
+  white-space: nowrap;
+  transition: opacity 0.15s ease;
+}
+
+.primary {
+  background: #ffffff;
+  color: #000000;
+}
+
+.secondary {
+  background: var(--proto-pill);
+  color: var(--proto-text);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.ghost {
+  background: var(--proto-field);
+  color: var(--proto-text);
+}
+
+.danger {
+  background: rgba(232, 69, 69, 0.14);
+  color: #ff8a8a;
+}
+
+.small {
+  height: 34px;
+  padding: 0 14px;
+  font-size: 13px;
+}
+
+.primary:disabled,
+.secondary:disabled,
+.ghost:disabled,
+.danger:disabled {
+  opacity: 0.5;
+}
+
+.block {
+  width: 100%;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 8px;
+  background: var(--proto-field);
+  font-size: 11px;
+  color: var(--proto-text-70);
+  white-space: nowrap;
+}
+
+.badgeGreen {
+  background: rgba(0, 179, 125, 0.18);
+  color: rgb(90, 220, 170);
+}
+
+.badgeBlue {
+  background: rgba(0, 106, 128, 0.25);
+  color: rgb(120, 200, 230);
+}
+
+.badgeRed {
+  background: rgba(232, 69, 69, 0.16);
+  color: #ff8a8a;
+}
+
+.empty {
+  padding: 28px 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--proto-text-50);
+}
+
+.muted {
+  color: var(--proto-text-50);
+}
+
+@media (min-width: 960px) {
+  .content {
+    gap: 24px;
+    padding-top: 40px;
+  }
+
+  .title {
+    font-size: 32px;
+  }
+
+  .primary:hover {
+    background: #ececec;
+  }
+
+  .ghost:hover,
+  .secondary:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  /* Списки людей и команд — сеткой карточек */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 12px;
+  }
+}
+
+/*
+ * На узком экране действия карточки переезжают под текст —
+ * иначе кнопки отжимают имя до «Бо…».
+ */
+@media (max-width: 599px) {
+  .cardWrap {
+    flex-wrap: wrap;
+  }
+
+  .cardWrap > .cardBody {
+    flex: 1 1 calc(100% - 64px);
+  }
+
+  .cardWrap > .cardActions {
+    flex: 1 1 100%;
+    justify-content: flex-end;
+  }
+
+  .cardWrap > .cardActions > * {
+    flex: 1 1 0;
+  }
+
+  /* Крестик «убрать» остаётся квадратным */
+  .cardWrap > .cardActions > .danger {
+    flex: 0 0 auto;
+  }
+}

@@ -59,9 +59,17 @@ const KIND_LABEL: Record<MapItem['kind'], string> = {
   course: 'Курс',
 }
 
-const setInteractive = (map: MapLibreMap, enabled: boolean) => {
-  const handlers = [map.dragPan, map.scrollZoom, map.doubleClickZoom, map.touchZoomRotate, map.keyboard, map.boxZoom]
-  handlers.forEach((handler) => (enabled ? handler.enable() : handler.disable()))
+/**
+ * В карточке карту можно двигать пальцем или мышью и приближать щипком
+ * и двойным тапом, но колесо мыши остаётся странице — иначе прокрутка
+ * ленты застревала бы на карте. На весь экран — все жесты.
+ */
+const setInteractive = (map: MapLibreMap, expanded: boolean) => {
+  map.dragPan.enable()
+  map.touchZoomRotate.enable()
+  map.doubleClickZoom.enable()
+  const fullOnly = [map.scrollZoom, map.keyboard, map.boxZoom]
+  fullOnly.forEach((handler) => (expanded ? handler.enable() : handler.disable()))
   // Вращать незачем: на карте одна улица, а повёрнутая карта только путает
   map.touchZoomRotate.disableRotation()
 }
@@ -108,10 +116,10 @@ const fitToPlaces = (map: MapLibreMap, places: MapPlace[], expanded: boolean, du
 const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 /**
- * Карта главного экрана. Свёрнута — карточка в ленте, как в макете:
- * кластеры видны, но карта не перехватывает прокрутку страницы, а тап
- * разворачивает её. Развёрнута — на весь экран, с жестами и списком
- * объектов по тапу на кластер.
+ * Карта главного экрана. Свёрнута — карточка в ленте, как в макете: её
+ * можно двигать пальцем и приближать щипком, колесо мыши остаётся
+ * странице. Кнопка в углу разворачивает карту на весь экран, тап по
+ * кластеру — тоже, сразу со списком объектов.
  *
  * Карта создаётся один раз и при развороте не пересоздаётся: меняется
  * только позиционирование окна, а MapLibre сам подстраивает холст.
@@ -140,6 +148,7 @@ export default function MapWindow({ places }: MapWindowProps) {
   // Обработчик меняется каждый рендер, а маркеры создаются один раз — зовут его через ref
   const handleFeatureClickRef = useRef<(props: FeatureProps, at: [number, number]) => void>(() => {})
   const sheetOpenRef = useRef(false)
+  const expandRef = useRef<() => void>(() => {})
   sheetOpenRef.current = sheetPlaceIds !== null
   expandedRef.current = expanded
 
@@ -190,8 +199,14 @@ export default function MapWindow({ places }: MapWindowProps) {
     const index = indexRef.current
     if (!map || !index) return
 
+    // Список объектов не влезает в карточку — сначала разворачиваем карту
+    const showList = (placeIds: string[]) => {
+      if (!expandedRef.current) expandRef.current()
+      setSheetPlaceIds(placeIds)
+    }
+
     if (!props.cluster) {
-      setSheetPlaceIds([props.placeId])
+      showList([props.placeId])
       return
     }
 
@@ -204,7 +219,7 @@ export default function MapWindow({ places }: MapWindowProps) {
       return
     }
 
-    setSheetPlaceIds(placeIds)
+    showList(placeIds)
   }
 
   // Карта создаётся один раз; библиотека грузится только в браузере
@@ -343,6 +358,7 @@ export default function MapWindow({ places }: MapWindowProps) {
       animatingRef.current = false
     }
   }, [expanded])
+  expandRef.current = expand
 
   const collapse = useCallback(() => {
     const slot = slotRef.current
@@ -426,11 +442,6 @@ export default function MapWindow({ places }: MapWindowProps) {
         )}
 
         <div className={styles.tint} aria-hidden />
-
-        {/* Свёрнутая карта не ловит жесты: тап по ней только разворачивает */}
-        {!expanded && (
-          <button className={styles.cover} type="button" aria-label="Развернуть карту" onClick={expand} />
-        )}
 
         <button
           ref={toggleRef}

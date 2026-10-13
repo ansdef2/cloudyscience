@@ -30,6 +30,14 @@
   box-shadow: none;
 }
 
+.window .map {
+  cursor: grab;
+}
+
+.window .map:active {
+  cursor: grabbing;
+}
+
 .window .map,
 .window .fallback {
   position: absolute;
@@ -56,20 +64,6 @@
 
 .expanded .tint {
   opacity: 0.45;
-}
-
-.cover {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  background: transparent;
-  cursor: zoom-in;
-}
-
-.cover:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.6);
-  outline-offset: -2px;
-  border-radius: inherit;
 }
 
 /* Кнопка свернуть/развернуть — тёмный скруглённый квадрат в углу */
@@ -216,12 +210,6 @@
   .window:not(.expanded) .clusterCount {
     font-size: 11px;
   }
-}
-
-/* Свёрнутая карта — превью: кластеры видны, но не кликаются */
-.window:not(.expanded) .cluster,
-.window:not(.expanded) .point {
-  pointer-events: none;
 }
 
 /* Список объектов кластера — шторка снизу */

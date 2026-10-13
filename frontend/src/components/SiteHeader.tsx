@@ -1,24 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import BrandLogo from './BrandLogo'
 import ProfileMenu from './ProfileMenu'
-import { Course } from '@/models/Api'
-import { api } from '@/utils/api'
+import ChatsLink from './ChatsLink'
 import { APP_HOME } from '@/utils/navigation'
 import styles from './SiteHeader.module.css'
-
-/** Курс на платформе один — ссылку на него узнаём один раз за сессию */
-let courseHrefPromise: Promise<string | null> | null = null
-const loadCourseHref = () => {
-  courseHrefPromise ??= api
-    .get<Course[]>('/courses')
-    .then((response) => (response.data[0] ? `/course/${response.data[0].id}` : null))
-    .catch(() => null)
-  return courseHrefPromise
-}
 
 /**
  * Шапка приложения для широких экранов: логотип, разделы и профиль.
@@ -26,17 +14,6 @@ const loadCourseHref = () => {
  */
 export default function SiteHeader() {
   const pathname = usePathname()
-  const [courseHref, setCourseHref] = useState<string | null>(null)
-
-  useEffect(() => {
-    let cancelled = false
-    loadCourseHref().then((href) => {
-      if (!cancelled) setCourseHref(href)
-    })
-    return () => {
-      cancelled = true
-    }
-  }, [])
 
   const links = [
     { href: APP_HOME, label: 'Главная', active: pathname === APP_HOME },
@@ -45,9 +22,12 @@ export default function SiteHeader() {
       label: 'Оборудование',
       active: pathname.startsWith('/equipment') || pathname.startsWith('/booking'),
     },
-    ...(courseHref
-      ? [{ href: courseHref, label: 'Курс', active: pathname.startsWith('/course') }]
-      : []),
+    { href: '/courses', label: 'Курсы', active: pathname.startsWith('/course') },
+    {
+      href: '/people',
+      label: 'Люди',
+      active: ['/people', '/chats', '/teams'].some((prefix) => pathname.startsWith(prefix)),
+    },
     { href: '/search', label: 'Поиск', active: pathname.startsWith('/search') },
   ]
 
@@ -72,7 +52,10 @@ export default function SiteHeader() {
             ))}
           </nav>
 
-          <ProfileMenu />
+          <div className={styles.right}>
+            <ChatsLink active={pathname.startsWith('/chats')} />
+            <ProfileMenu />
+          </div>
         </div>
       </header>
       <div className={styles.spacer} aria-hidden />

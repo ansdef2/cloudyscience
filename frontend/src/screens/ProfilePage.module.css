@@ -1,0 +1,111 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.me {
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+}
+
+.name {
+  margin: 0;
+  font-family: var(--proto-font-display);
+  font-size: 20px;
+  font-weight: 400;
+}
+
+.role {
+  align-self: flex-start;
+  margin-top: 4px;
+}
+
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.link {
+  justify-content: space-between;
+  width: 100%;
+  color: var(--proto-text);
+  font-family: var(--proto-font-text);
+  text-align: left;
+}
+
+.linkTitle {
+  font-size: 15px;
+}
+
+.unread {
+  display: inline-flex;
+  min-width: 22px;
+  height: 22px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+  border-radius: 11px;
+  background: rgb(150, 90, 255);
+  box-shadow: 0 0 10px rgba(150, 90, 255, 0.7);
+  font-size: 12px;
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.logout {
+  align-self: center;
+}
+
+@media (min-width: 960px) {
+  .layout {
+    display: grid;
+    grid-template-columns: 360px minmax(0, 1fr);
+    grid-template-areas:
+      'me bookings'
+      'links bookings'
+      'links consultations'
+      'logout consultations';
+    grid-template-rows: auto auto auto 1fr;
+    column-gap: 48px;
+    row-gap: 16px;
+    align-items: start;
+  }
+
+  .me {
+    grid-area: me;
+  }
+
+  .links {
+    grid-area: links;
+  }
+
+  .bookings {
+    grid-area: bookings;
+  }
+
+  .consultations {
+    grid-area: consultations;
+  }
+
+  .logout {
+    grid-area: logout;
+    align-self: start;
+    justify-self: start;
+  }
+}
+
+/* Статус и «Отменить» — в ряд; бейдж не растягивается вместе с кнопкой */
+.statusActions {
+  align-items: center;
+}
+
+.statusActions > :first-child {
+  flex: 0 0 auto;
+}

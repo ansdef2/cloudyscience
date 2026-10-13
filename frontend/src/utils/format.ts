@@ -76,3 +76,25 @@ export const pluralize = (count: number, forms: [string, string, string]): strin
   if (tail === 1) return forms[0]
   return forms[2]
 }
+
+/** «Сегодня в 14:48» / «12 июня в 09:30» — как в макете */
+export function formatPublishedAt(value: string): string {
+  const date = new Date(value)
+  const time = date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
+  const isToday = new Date().toDateString() === date.toDateString()
+
+  if (isToday) {
+    return `Сегодня в ${time}`
+  }
+
+  return `${date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })} в ${time}`
+}
+
+/** Статусы брони по-русски — для профиля, команды и админки */
+export const BOOKING_STATUS: Record<string, string> = {
+  pending: 'Ожидает',
+  confirmed: 'Подтверждена',
+  active: 'Идёт',
+  completed: 'Завершена',
+  cancelled: 'Отменена',
+}
