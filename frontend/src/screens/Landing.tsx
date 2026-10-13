@@ -25,8 +25,8 @@ interface Stats {
  */
 const COMPANY = {
   name: 'ООО «Архада»',
-  ogrn: '',
-  inn: '',
+  ogrn: '1267700015791',
+  inn: '9729414609',
 }
 
 const FEATURES = [
