@@ -406,6 +406,12 @@
   text-align: right;
 }
 
+.legal a {
+  color: var(--proto-text-60);
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.2);
+}
+
 @media (min-width: 768px) {
   .hero {
     grid-template-columns: 1.15fr 1fr;

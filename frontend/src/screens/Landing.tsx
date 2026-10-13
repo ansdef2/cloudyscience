@@ -231,6 +231,7 @@ export default function Landing() {
           <span>{COMPANY.name}</span>
           {COMPANY.ogrn && <span>ОГРН {COMPANY.ogrn}</span>}
           {COMPANY.inn && <span>ИНН {COMPANY.inn}</span>}
+          {COMPANY.email && <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>}
         </div>
       </footer>
     </div>
