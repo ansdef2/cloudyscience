@@ -240,3 +240,19 @@ export const getCourseEnrollments = async (req: Request, res: Response) => {
     sendError(res, error);
   }
 };
+
+/** Все записи на все курсы — для админки */
+export const getAllEnrollments = async (_req: Request, res: Response) => {
+  try {
+    const enrollments = await CourseEnrollment.findAll({
+      include: [
+        { model: User, attributes: ['id', 'name', 'email'] },
+        { model: Course, attributes: ['id', 'title', 'totalSpots', 'availableSpots'] },
+      ],
+      order: [['createdAt', 'DESC']],
+    });
+    res.json(enrollments);
+  } catch (error: any) {
+    sendError(res, error);
+  }
+};

@@ -3,12 +3,15 @@ import sequelize from '../config/database';
 import User from './User';
 import Course from './Course';
 import Equipment from './Equipment';
+import Team from './Team';
 
 class Booking extends Model {
   public id!: string;
   public userId!: string;
   public courseId?: string;
   public equipmentId?: string;
+  /** Бронь на команду: видна всем её участникам */
+  public teamId?: string | null;
   public date!: Date;
   public time!: string;
   public endTime?: string;
@@ -54,6 +57,14 @@ Booking.init(
         key: 'id',
       },
     },
+    teamId: {
+      type: DataTypes.UUID,
+      references: {
+        model: 'teams',
+        key: 'id',
+      },
+      onDelete: 'SET NULL',
+    },
     date: {
       type: DataTypes.DATE,
       allowNull: false,
@@ -94,5 +105,6 @@ Booking.init(
 Booking.belongsTo(User, { foreignKey: 'userId' });
 Booking.belongsTo(Course, { foreignKey: 'courseId' });
 Booking.belongsTo(Equipment, { foreignKey: 'equipmentId' });
+Booking.belongsTo(Team, { foreignKey: 'teamId' });
 
 export default Booking;

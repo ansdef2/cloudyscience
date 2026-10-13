@@ -23,6 +23,8 @@ interface DataPatch {
 /** Курс, на который ведётся запись с главного экрана */
 export const MAIN_COURSE_TITLE = 'Проектное управление и информационные технологии';
 export const MAIN_COURSE_SPOTS = 30;
+/** Где проходит курс: кластер на Большой Московской, 126 */
+export const COURSE_VENUE_ADDRESS = 'Большая Московская ул., 126';
 
 /**
  * Точки учреждений на Большой Московской (Великий Новгород).
@@ -101,6 +103,24 @@ const PATCHES: DataPatch[] = [
       );
 
       return `перенесено записей: ${rows.length}; мест на курсе ${MAIN_COURSE_SPOTS}, занято ${taken}`;
+    },
+  },
+  {
+    id: '2026-10-course-at-126',
+    run: async (transaction) => {
+      // Курс проводится в кластере на Большой Московской, 126, а не в Кванториуме
+      const course = await Course.findOne({ where: { title: MAIN_COURSE_TITLE }, transaction });
+      const target = await Institution.findOne({
+        where: { address: { [Op.startsWith]: COURSE_VENUE_ADDRESS } },
+        transaction,
+      });
+      if (!course || !target) {
+        return 'курс или учреждение на Большой Московской, 126 не найдены — ничего не менял';
+      }
+      if (course.institutionId === target.id) return 'курс уже привязан к дому 126';
+
+      await course.update({ institutionId: target.id }, { transaction });
+      return `курс перенесён в «${target.name}»`;
     },
   },
 ];

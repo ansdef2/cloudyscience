@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { Op } from 'sequelize';
 import User from '../models/User';
 import { AuthRequest } from '../middleware/auth';
 import { hashPassword } from '../utils/hashPassword';
@@ -26,12 +27,36 @@ export const getAllUsers = async (req: any, res: Response) => {
   }
 };
 
-export const getUserById = async (req: Request, res: Response) => {
+/**
+ * Обучающиеся для поиска — чтобы написать человеку и позвать в команду.
+ * Только имя и аватар: почту не отдаём, для связи есть чаты.
+ */
+export const getDirectory = async (req: AuthRequest, res: Response) => {
+  try {
+    const where: any = { role: 'user', id: { [Op.ne]: req.user.id } };
+    const search = typeof req.query.search === 'string' ? req.query.search.trim() : '';
+    if (search) where.name = { [Op.iLike]: `%${search}%` };
+
+    const users = await User.findAll({
+      where,
+      attributes: ['id', 'name', 'avatar'],
+      order: [['name', 'ASC']],
+      limit: 100,
+    });
+
+    res.json(users);
+  } catch (error: any) {
+    sendError(res, error);
+  }
+};
+
+export const getUserById = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
 
+    // Чужой профиль — только публичные поля: почту видят владелец и админ
     const user = await User.findByPk(id, {
-      attributes: { exclude: ['password'] },
+      attributes: canManage(req, id) ? { exclude: ['password'] } : ['id', 'name', 'avatar'],
     });
 
     if (!user) {

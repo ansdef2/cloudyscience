@@ -10,6 +10,10 @@ import ModuleStage from './ModuleStage';
 import StageProgress from './StageProgress';
 import CourseEnrollment from './CourseEnrollment';
 import IotChannel from './IotChannel';
+import Team from './Team';
+import TeamMember from './TeamMember';
+import Message from './Message';
+import ConsultationRequest from './ConsultationRequest';
 
 // Define associations
 Institution.hasMany(Course, { foreignKey: 'institutionId', as: 'courses' });
@@ -36,4 +40,8 @@ export {
   StageProgress,
   CourseEnrollment,
   IotChannel,
+  Team,
+  TeamMember,
+  Message,
+  ConsultationRequest,
 };
