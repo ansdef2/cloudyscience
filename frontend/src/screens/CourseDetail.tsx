@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import ProtoTopBar from '@/components/ProtoTopBar'
 import ImageWithFallback from '@/components/ImageWithFallback'
@@ -181,22 +182,29 @@ export default function CourseDetail({ courseId }: CourseDetailProps) {
 
               {isAuthenticated && spots > 0 && (
                 <label className={styles.check}>
-                  <span className={styles.checkBox} onClick={() => setAgreed(!agreed)}>
-                    {agreed && (
-                      <svg className={styles.checkBoxIcon} viewBox="0 0 14 14" fill="none" aria-hidden>
-                        <path
-                          d="m2 7.5 3.5 3.5L12 3.5"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    )}
+                  {/* Настоящий чекбокс: переключается кликом по всей строке и с клавиатуры */}
+                  <input
+                    className={styles.checkInput}
+                    type="checkbox"
+                    checked={agreed}
+                    onChange={(event) => setAgreed(event.target.checked)}
+                  />
+                  <span className={styles.checkBox} aria-hidden>
+                    <svg className={styles.checkBoxIcon} viewBox="0 0 14 14" fill="none">
+                      <path
+                        d="m2 7.5 3.5 3.5L12 3.5"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
                   </span>
                   <span>
                     Я согласен/согласна на{' '}
-                    <span className={styles.link}>обработку персональных данных</span>
+                    <Link href="/privacy" target="_blank" className={styles.link}>
+                      обработку персональных данных
+                    </Link>
                   </span>
                 </label>
               )}
