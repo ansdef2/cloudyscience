@@ -14,8 +14,12 @@ const securityHeaders = [
   { key: 'Strict-Transport-Security', value: 'max-age=31536000' },
 ]
 
+const { version } = require('./package.json')
+
 const nextConfig = {
   reactStrictMode: true,
+  // Номер версии — в подвале сайта
+  env: { NEXT_PUBLIC_APP_VERSION: version },
   poweredByHeader: false,
   images: {
     domains: ['localhost'],
