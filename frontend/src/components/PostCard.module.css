@@ -6,6 +6,7 @@
  */
 .card {
   --glow: var(--proto-glow-lime);
+  cursor: pointer;
   position: relative;
   display: flex;
   width: 100%;
@@ -89,11 +90,21 @@
 }
 
 .text {
+  display: -webkit-box;
   margin: 0;
+  overflow: hidden;
   font-size: 16px;
   line-height: 1.4;
   color: var(--proto-text-70);
   overflow-wrap: anywhere;
+  /* В ленте — превью; целиком текст на странице публикации */
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.card:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.6);
+  outline-offset: 2px;
 }
 
 /* Лайки и «Поделиться» прижаты к низу, даже если текст короткий */

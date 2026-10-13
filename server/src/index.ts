@@ -16,6 +16,10 @@ import postRoutes from './routes/posts';
 import specialistRoutes from './routes/specialists';
 import progressRoutes from './routes/progress';
 import iotRoutes from './routes/iot';
+import teamRoutes from './routes/teams';
+import chatRoutes from './routes/chats';
+import consultationRoutes from './routes/consultations';
+import adminRoutes from './routes/admin';
 import { startIotPolling } from './controllers/iotController';
 
 dotenv.config();
@@ -41,6 +45,10 @@ app.use('/api/search', searchRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/specialists', specialistRoutes);
 app.use('/api/iot', iotRoutes);
+app.use('/api/teams', teamRoutes);
+app.use('/api/chats', chatRoutes);
+app.use('/api/consultations', consultationRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

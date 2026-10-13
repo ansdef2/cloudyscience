@@ -1,0 +1,110 @@
+.create {
+  align-self: flex-start;
+}
+
+.teamCard {
+  align-items: flex-start;
+}
+
+.teamMark {
+  display: inline-flex;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  background: linear-gradient(140deg, rgba(0, 179, 125, 0.55), rgba(0, 106, 128, 0.55));
+  font-family: var(--proto-font-display);
+  font-size: 16px;
+}
+
+.teamMarkLarge {
+  width: 64px;
+  height: 64px;
+  border-radius: 20px;
+  font-size: 24px;
+  box-shadow: 0 10px 30px rgba(0, 106, 128, 0.45);
+}
+
+.topic {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* ---- Страница команды ---- */
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.hero {
+  --glow: var(--proto-glow-green);
+  box-shadow:
+    inset 0 -60px 40px -30px rgba(var(--glow), 0.25),
+    0 15px 31.6px rgba(0, 106, 128, 0.18);
+}
+
+.topicFull {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--proto-text-70);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.heroActions > * {
+  flex: 1 1 160px;
+}
+
+.columns {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.blockHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dangerZone {
+  display: flex;
+  justify-content: center;
+  padding-top: 8px;
+}
+
+@media (min-width: 960px) {
+  .columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 32px;
+    align-items: start;
+  }
+
+  .heroActions > * {
+    flex: 0 0 auto;
+  }
+
+  .dangerZone {
+    justify-content: flex-start;
+  }
+}

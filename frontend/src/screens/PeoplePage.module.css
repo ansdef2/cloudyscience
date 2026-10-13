@@ -1,0 +1,62 @@
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.links {
+  display: flex;
+  gap: 6px;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Карточка человека и раскрывающаяся под ней форма */
+.expert {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form {
+  animation: drop-in 0.2s ease;
+}
+
+@keyframes drop-in {
+  from {
+    transform: translateY(-6px);
+    opacity: 0;
+  }
+}
+
+.teamChoices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+@media (min-width: 960px) {
+  .controls {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .controls > :first-child {
+    flex: 0 0 360px;
+  }
+
+  .controls > :last-child {
+    flex: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .form {
+    animation: none;
+  }
+}

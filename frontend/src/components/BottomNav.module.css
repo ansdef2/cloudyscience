@@ -1,0 +1,63 @@
+/* Стеклянная плашка снизу, как на референсе; только на телефоне */
+.nav {
+  position: fixed;
+  z-index: 50;
+  left: 50%;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  display: flex;
+  width: calc(min(100vw, var(--proto-width)) - 24px);
+  height: 68px;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 8px;
+  transform: translateX(-50%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 34px;
+  background: rgba(14, 14, 22, 0.82);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+}
+
+.tab {
+  display: flex;
+  flex: 1;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  color: var(--proto-text-50);
+  transition: color 0.15s ease;
+}
+
+.tab svg {
+  width: 26px;
+  height: 26px;
+}
+
+.label {
+  font-size: 10px;
+}
+
+.active {
+  color: var(--proto-text);
+}
+
+.tab:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.6);
+  outline-offset: -6px;
+  border-radius: 20px;
+}
+
+/* Чтобы низ страницы не прятался под панелью */
+.spacer {
+  height: 92px;
+}
+
+@media (min-width: 960px) {
+  .nav,
+  .spacer {
+    display: none;
+  }
+}

@@ -1,24 +1,13 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import ImageWithFallback from './ImageWithFallback'
 import { Post, likePost } from '@/services/postService'
 import { useToast } from '@/hooks/useToast'
-import { APP_HOME } from '@/utils/navigation'
+import { formatPublishedAt } from '@/utils/format'
+import { postPath, shareLink } from '@/utils/share'
 import styles from './PostCard.module.css'
-
-/** «Сегодня в 14:48» / «12 июня в 09:30» — как в макете */
-function formatPublishedAt(value: string): string {
-  const date = new Date(value)
-  const time = date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
-  const isToday = new Date().toDateString() === date.toDateString()
-
-  if (isToday) {
-    return `Сегодня в ${time}`
-  }
-
-  return `${date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })} в ${time}`
-}
 
 interface PostCardProps {
   post: Post
@@ -28,6 +17,7 @@ export default function PostCard({ post }: PostCardProps) {
   const [likes, setLikes] = useState(post.likes)
   const [isLiking, setIsLiking] = useState(false)
   const toast = useToast()
+  const router = useRouter()
 
   const handleLike = async () => {
     if (isLiking) return
@@ -42,27 +32,24 @@ export default function PostCard({ post }: PostCardProps) {
   }
 
   const handleShare = async () => {
-    const url = `${window.location.origin}${APP_HOME}?post=${post.id}`
-
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: post.title, url })
-        return
-      } catch {
-        // Пользователь закрыл системный диалог — тихо уходим в копирование
-      }
-    }
-
-    try {
-      await navigator.clipboard.writeText(url)
-      toast.success('Ссылка скопирована')
-    } catch {
-      toast.error('Не удалось скопировать ссылку')
-    }
+    const result = await shareLink(post.title, postPath(post.id))
+    if (result === 'copied') toast.success('Ссылка на публикацию скопирована')
+    if (result === 'failed') toast.error('Не удалось скопировать ссылку')
   }
 
+  const open = () => router.push(postPath(post.id))
+
   return (
-    <article className={styles.card}>
+    <article
+      className={styles.card}
+      role="link"
+      tabIndex={0}
+      aria-label={`Открыть публикацию «${post.title}»`}
+      onClick={open}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter') open()
+      }}
+    >
       <div className={`${styles.glow} protoGlowSoft`} />
 
       <div className={styles.head}>
@@ -89,11 +76,24 @@ export default function PostCard({ post }: PostCardProps) {
       </div>
 
       <div className={styles.footer}>
-        <button className="protoPill" onClick={handleLike} disabled={isLiking}>
+        <button
+          className="protoPill"
+          onClick={(event) => {
+            event.stopPropagation()
+            handleLike()
+          }}
+          disabled={isLiking}
+        >
           {likes} 👍
         </button>
 
-        <button className={`${styles.share} protoPill`} onClick={handleShare}>
+        <button
+          className={`${styles.share} protoPill`}
+          onClick={(event) => {
+            event.stopPropagation()
+            handleShare()
+          }}
+        >
           Поделиться
           <svg className={styles.shareIcon} viewBox="0 0 24 24" fill="none" aria-hidden>
             <path

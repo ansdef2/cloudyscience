@@ -6,6 +6,8 @@ import { api } from '@/utils/api'
 export interface BookingRequest {
   equipmentId?: string
   courseId?: string
+  /** Бронь на команду — её видят все участники */
+  teamId?: string
   date: string
   time: string
   endTime?: string
@@ -28,6 +30,9 @@ export interface Booking {
     title: string
   }
   userId: string
+  teamId?: string | null
+  team?: { id: string; name: string }
+  user?: { id: string; name: string; email?: string }
   date: string
   time: string
   endTime?: string
@@ -46,6 +51,8 @@ function normalizeBooking(booking: any): Booking {
     ...booking,
     equipment: booking.Equipment ?? undefined,
     course: booking.Course ?? undefined,
+    team: booking.Team ?? undefined,
+    user: booking.User ?? undefined,
   }
 }
 
@@ -91,9 +98,10 @@ export async function getBookingById(id: string): Promise<Booking | null> {
 /**
  * Отменить бронирование
  */
+/** Отмена — статус cancelled, а не удаление: администратор видит историю */
 export async function cancelBooking(id: string): Promise<void> {
   try {
-    await api.delete(`/bookings/${id}`)
+    await api.put(`/bookings/${id}`, { status: 'cancelled' })
   } catch (error) {
     console.error('Ошибка отмены бронирования:', error)
     throw error
