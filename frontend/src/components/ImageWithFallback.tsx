@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { fileUrl } from '@/services/uploadService'
 import styles from './ImageWithFallback.module.css'
 
 interface ImageWithFallbackProps {
@@ -84,7 +85,8 @@ export default function ImageWithFallback({
       )}
       <img
         ref={imageRef}
-        src={src}
+        // Загруженные через админку картинки лежат на бэкенде (/api/files/...)
+        src={fileUrl(src) ?? src}
         alt={alt}
         // В режиме bare прятать нечем и незачем: заглушки под картинкой нет
         className={`${styles.image} ${className} ${loading && !bare ? styles.hidden : ''}`}

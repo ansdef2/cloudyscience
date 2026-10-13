@@ -148,6 +148,14 @@ export const deleteCourse = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Course not found' });
     }
 
+    const enrolled = await CourseEnrollment.count({ where: { courseId: id } });
+    if (enrolled && req.query.force !== 'true') {
+      return res.status(409).json({
+        error: `На курс записано ${enrolled} чел. — удаление снимет их с курса. Подтвердите удаление ещё раз`,
+        code: 'HAS_ENROLLMENTS',
+      });
+    }
+
     await course.destroy();
     res.json({ message: 'Course deleted successfully' });
   } catch (error: any) {

@@ -19,8 +19,9 @@ import ui from '@/styles/ui.module.css'
 import styles from './AdminPage.module.css'
 import UsersTab from './admin/UsersTab'
 import ReportsTab from './admin/ReportsTab'
+import CatalogTab from './admin/CatalogTab'
 
-type Tab = 'enrollments' | 'bookings' | 'consultations' | 'users' | 'reports'
+type Tab = 'enrollments' | 'bookings' | 'consultations' | 'users' | 'reports' | 'catalog'
 
 interface Enrollment {
   id: string
@@ -53,6 +54,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'consultations', label: 'Консультации' },
   { id: 'users', label: 'Пользователи' },
   { id: 'reports', label: 'Жалобы' },
+  { id: 'catalog', label: 'Каталог' },
 ]
 
 const formatDate = (iso: string) =>
@@ -98,6 +100,7 @@ export default function AdminPage() {
               {tab === 'consultations' && <Consultations />}
               {tab === 'users' && <UsersTab meId={me.id} />}
               {tab === 'reports' && <ReportsTab />}
+              {tab === 'catalog' && <CatalogTab />}
             </>
           )}
         </AuthGate>

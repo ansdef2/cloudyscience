@@ -73,7 +73,7 @@ function BookingWizard({ equipmentId }: BookingPageProps) {
     return { year: now.getFullYear(), month: now.getMonth() + 1 }
   })
   const [availability, setAvailability] = useState<Availability | null>(null)
-  const [bounds, setBounds] = useState<{ today: string; lastDate: string } | null>(null)
+  const [bounds, setBounds] = useState<{ today: string; lastDate: string; closed?: boolean } | null>(null)
   const [loadingSlots, setLoadingSlots] = useState(false)
   const [rentalType, setRentalType] = useState<'remote' | 'in-person'>('remote')
   const [equipmentName, setEquipmentName] = useState('Оборудование')
@@ -99,7 +99,7 @@ function BookingWizard({ equipmentId }: BookingPageProps) {
     })
     // Границы календаря — по времени площадки: сервер знает, какое там «сегодня»
     getAvailability(equipmentId)
-      .then((data) => setBounds({ today: data.today, lastDate: data.lastDate }))
+      .then((data) => setBounds({ today: data.today, lastDate: data.lastDate, closed: data.closed }))
       .catch(() => setBounds(null))
   }, [equipmentId])
 
@@ -236,6 +236,10 @@ function BookingWizard({ equipmentId }: BookingPageProps) {
       </div>
 
       <h1 className={styles.title}>{equipmentName}</h1>
+
+      {bounds?.closed && (
+        <p className={styles.info}>Оборудование сейчас не принимает брони — загляните позже или выберите другое.</p>
+      )}
 
       {step === 'files' && (
         <>

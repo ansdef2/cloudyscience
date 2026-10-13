@@ -157,6 +157,9 @@ export const createBooking = async (req: AuthRequest, res: Response) => {
       // Блокировка строки оборудования выстраивает брони одного станка в очередь
       const equipment = await Equipment.findByPk(equipmentId, { transaction, lock: transaction.LOCK.UPDATE });
       if (!equipment) throw Object.assign(new Error('Оборудование не найдено'), { status: 404 });
+      if (!equipment.isOpen) {
+        throw Object.assign(new Error('Оборудование сейчас не принимает брони'), { status: 409 });
+      }
 
       const problem = validateSlot(date, time, equipment.workingHours);
       if (problem) throw Object.assign(new Error(problem), { status: 400 });

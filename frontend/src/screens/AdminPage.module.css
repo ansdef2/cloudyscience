@@ -213,3 +213,207 @@
     flex: 1 1 auto;
   }
 }
+
+/* ── Каталог ─────────────────────────────────────────────────────────── */
+
+.entityForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.formActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.hint {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--proto-text-50);
+}
+
+.mono {
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  font-size: 13px;
+}
+
+.check {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.check input {
+  width: 18px;
+  height: 18px;
+  accent-color: #ffffff;
+}
+
+.imageField {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.imagePreview {
+  display: block;
+  width: 72px;
+  height: 72px;
+  flex: 0 0 auto;
+  border-radius: 14px;
+  background: var(--proto-field);
+  object-fit: cover;
+}
+
+.imageControls {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.left {
+  align-self: flex-start;
+}
+
+.demoList {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--proto-text-70);
+}
+
+/* Редактор содержания курса */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.contentTitle {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.module,
+.stage {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: var(--proto-field);
+}
+
+.stage {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.moduleHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.moduleToggle {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  color: var(--proto-text);
+  font-family: var(--proto-font-text);
+  font-size: 14px;
+  text-align: left;
+}
+
+.moduleToggle > span:nth-child(2) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.moduleToggle > span:nth-child(3) {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+/* На телефоне число этапов не влезает рядом с названием — прячем */
+@media (max-width: 599px) {
+  .moduleToggle > span:nth-child(3) {
+    display: none;
+  }
+}
+
+.moduleNumber,
+.stageNumber {
+  display: inline-flex;
+  width: 26px;
+  height: 26px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(150, 90, 255, 0.25);
+  font-size: 12px;
+}
+
+.stageNumber {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.order {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 4px;
+}
+
+.order > button {
+  width: 34px;
+  padding: 0;
+}
+
+.moduleBody {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.stages {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+@media (min-width: 960px) {
+  .entityForm {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 16px;
+  }
+
+  .entityForm > :has(textarea),
+  .entityForm > :has(.imageField),
+  .entityForm > .check,
+  .entityForm > .formActions {
+    grid-column: 1 / -1;
+  }
+}

@@ -2,6 +2,7 @@ import { Op, QueryTypes, Transaction } from 'sequelize';
 import sequelize from './database';
 import Booking from '../models/Booking';
 import Course from '../models/Course';
+import Equipment from '../models/Equipment';
 import CourseEnrollment from '../models/CourseEnrollment';
 import Institution from '../models/Institution';
 
@@ -121,6 +122,18 @@ const PATCHES: DataPatch[] = [
 
       await course.update({ institutionId: target.id }, { transaction });
       return `курс перенесён в «${target.name}»`;
+    },
+  },
+  {
+    // «1.26 км от вас» в сиде было написано вручную, а не посчитано от
+    // пользователя — на карточках выглядело как настоящее расстояние
+    id: '2026-10-no-fake-distance',
+    run: async (transaction) => {
+      const [updated] = await Equipment.update(
+        { distance: null },
+        { where: { distance: '1.26 км от вас' }, transaction }
+      );
+      return `убрано выдуманное расстояние у ${updated} позиций оборудования`;
     },
   },
 ];

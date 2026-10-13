@@ -33,7 +33,7 @@ const seedDatabase = async () => {
     if (!adminPassword && process.env.NODE_ENV === 'production') {
       throw new Error(
         'SEED_ADMIN_PASSWORD не задан. Запустите сид так: ' +
-          'dc exec -e SEED_ADMIN_PASSWORD=<пароль> backend node dist/config/seed.js'
+          'dc exec -e SEED_ADMIN_PASSWORD=<пароль> backend node dist/config/seed.js',
       );
     }
     const hashedPassword = await hashPassword(adminPassword || 'admin123');
@@ -78,7 +78,8 @@ const seedDatabase = async () => {
       institutionId: institution2.id,
       title: MAIN_COURSE_TITLE,
       direction: 'IT-куб',
-      description: 'Курс о том, как довести цифровой продукт от идеи до работающего решения: сформулировать проблему и цель, спланировать работу, реализовать проект и проверить результат по заранее выбранным критериям. Каждый обучающийся ведёт собственный IT-проект — веб-сервис, бот, систему автоматизации, аналитический инструмент или другое цифровое решение.',
+      description:
+        'Курс о том, как довести цифровой продукт от идеи до работающего решения: сформулировать проблему и цель, спланировать работу, реализовать проект и проверить результат по заранее выбранным критериям. Каждый обучающийся ведёт собственный IT-проект — веб-сервис, бот, систему автоматизации, аналитический инструмент или другое цифровое решение.',
       images: ['/courses/it-cube.jpg'],
       // Мест 30; свободные считаются от записей в course_enrollments
       totalSpots: MAIN_COURSE_SPOTS,
@@ -103,71 +104,84 @@ const seedDatabase = async () => {
 
     console.log(`Модуль «${createdModule.title}»: этапов ${module1.stages.length}`);
 
+    // Демо-наполнение (посты, эксперты, три позиции оборудования) — для
+    // локальной разработки и показа. На боевой установке по умолчанию не
+    // создаётся: включается SEED_DEMO=true
+    const withDemo = process.env.SEED_DEMO
+      ? process.env.SEED_DEMO === 'true'
+      : process.env.NODE_ENV !== 'production';
+
     // Create equipment
-    const equipment1 = await Equipment.create({
-      institutionId: institution2.id,
-      name: 'Фрезерный станок',
-      type: 'Фрезерный станок',
-      description: 'Современный фрезерный станок для обработки различных материалов',
-      workingHours: '10:00-17:00',
-      isOpen: true,
-      distance: '1.26 км от вас',
-      image: '/equipment/milling-machine.jpg',
-      characteristics: [
-        {
-          section: '',
-          rows: [
-            { label: 'Рабочее поле', value: '400 x 300 x 100 мм' },
-            { label: 'Материалы', value: 'Дерево, пластик, алюминий' },
-            { label: 'Точность', value: '0.01 мм' },
-          ],
-        },
-      ],
-    });
+    if (withDemo) {
+      await Equipment.create({
+        institutionId: institution2.id,
+        name: 'Фрезерный станок',
+        type: 'Фрезерный станок',
+        description: 'Современный фрезерный станок для обработки различных материалов',
+        workingHours: '10:00-17:00',
+        isOpen: true,
+        image: '/equipment/milling-machine.jpg',
+        characteristics: [
+          {
+            section: '',
+            rows: [
+              { label: 'Рабочее поле', value: '400 x 300 x 100 мм' },
+              { label: 'Материалы', value: 'Дерево, пластик, алюминий' },
+              { label: 'Точность', value: '0.01 мм' },
+            ],
+          },
+        ],
+      });
 
-    const equipment2 = await Equipment.create({
-      institutionId: institution2.id,
-      name: '3D принтер',
-      type: '3D - Принтер',
-      description: 'Профессиональный 3D принтер для создания объемных объектов',
-      workingHours: '10:00-17:00',
-      isOpen: false,
-      distance: '1.26 км от вас',
-      image: '/equipment/3d-printer.jpg',
-      characteristics: [
-        {
-          section: '',
-          rows: [
-            { label: 'Область печати', value: '220 x 220 x 250 мм' },
-            { label: 'Технология', value: 'FDM' },
-            { label: 'Материалы', value: 'PLA, ABS, PETG' },
-          ],
-        },
-      ],
-    });
+      await Equipment.create({
+        institutionId: institution2.id,
+        name: '3D принтер',
+        type: '3D - Принтер',
+        description: 'Профессиональный 3D принтер для создания объемных объектов',
+        workingHours: '10:00-17:00',
+        isOpen: false,
+        image: '/equipment/3d-printer.jpg',
+        characteristics: [
+          {
+            section: '',
+            rows: [
+              { label: 'Область печати', value: '220 x 220 x 250 мм' },
+              { label: 'Технология', value: 'FDM' },
+              { label: 'Материалы', value: 'PLA, ABS, PETG' },
+            ],
+          },
+        ],
+      });
 
-    const equipment3 = await Equipment.create({
-      institutionId: institution1.id,
-      name: 'Компьютерный класс',
-      type: 'Компьютер',
-      description: 'Оснащенный современным оборудованием компьютерный класс',
-      workingHours: '9:00-19:00',
-      isOpen: true,
-      image: '/equipment/computer-class.jpg',
-      characteristics: [
-        {
-          section: '',
-          rows: [
-            { label: 'Рабочих мест', value: '12' },
-            { label: 'ПО', value: 'CAD, Unity, Blender' },
-          ],
-        },
-      ],
-    });
+      await Equipment.create({
+        institutionId: institution1.id,
+        name: 'Компьютерный класс',
+        type: 'Компьютер',
+        description: 'Оснащенный современным оборудованием компьютерный класс',
+        workingHours: '9:00-19:00',
+        isOpen: true,
+        image: '/equipment/computer-class.jpg',
+        characteristics: [
+          {
+            section: '',
+            rows: [
+              { label: 'Рабочих мест', value: '12' },
+              { label: 'ПО', value: 'CAD, Unity, Blender' },
+            ],
+          },
+        ],
+      });
+    }
 
     // Реальный парк оборудования из data/models.db — поверх демо-позиций выше
     const importedModels = await importEquipmentModels();
     console.log(`Импортировано из справочника: ${importedModels}`);
+
+    if (!withDemo) {
+      console.log('Демо-наполнение пропущено (SEED_DEMO не true)');
+      console.log('Seed data created successfully!');
+      process.exit(0);
+    }
 
     // Авторы ленты
     const authorPassword = await hashPassword(randomPassword());

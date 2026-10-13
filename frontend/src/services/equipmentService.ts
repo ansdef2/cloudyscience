@@ -95,6 +95,8 @@ export interface Availability {
   /** «Сегодня» и последний день брони — по времени площадок, а не браузера */
   today: string
   lastDate: string
+  /** Оборудование не принимает брони */
+  closed?: boolean
   workingHours: { start: string; end: string }
   slots: AvailabilitySlot[]
 }

@@ -108,6 +108,14 @@ export const deleteEquipment = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Equipment not found' });
     }
 
+    // С бронями оборудование не удаляем — пропала бы история; его можно закрыть
+    const bookings = await Booking.count({ where: { equipmentId: id } });
+    if (bookings) {
+      return res.status(409).json({
+        error: `У оборудования есть брони (${bookings}) — удалить нельзя. Снимите галочку «Работает», и бронировать его перестанут`,
+      });
+    }
+
     await equipment.destroy();
     res.json({ message: 'Equipment deleted successfully' });
   } catch (error: any) {
@@ -121,7 +129,7 @@ export const deleteEquipment = async (req: Request, res: Response) => {
  */
 export const getAvailability = async (req: Request, res: Response) => {
   try {
-    const equipment = await Equipment.findByPk(req.params.id, { attributes: ['id', 'workingHours'] });
+    const equipment = await Equipment.findByPk(req.params.id, { attributes: ['id', 'workingHours', 'isOpen'] });
     if (!equipment) return res.status(404).json({ error: 'Equipment not found' });
 
     const now = siteNow();
@@ -143,7 +151,7 @@ export const getAvailability = async (req: Request, res: Response) => {
       ).map((booking) => booking.time)
     );
 
-    const bookableDay = date >= now.date && date <= lastDate;
+    const bookableDay = equipment.isOpen && date >= now.date && date <= lastDate;
     const slots = slotsFor(equipment.workingHours).map((time) => {
       const past = date < now.date || (date === now.date && toMinutes(time)! <= now.minutes);
       const status = taken.has(time) ? 'taken' : past || !bookableDay ? 'past' : 'free';
@@ -153,6 +161,8 @@ export const getAvailability = async (req: Request, res: Response) => {
     res.json({
       date,
       today: now.date,
+      // Закрытое оборудование не бронируется: все слоты недоступны
+      closed: !equipment.isOpen,
       lastDate,
       workingHours: { start: fromMinutes(hours.start), end: fromMinutes(hours.end) },
       slots,
