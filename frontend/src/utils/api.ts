@@ -1,7 +1,7 @@
 // Утилита для работы с API
 // Бэкенд живёт в этом же репозитории, в server/
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
 
 export interface ApiResponse<T> {
   data: T

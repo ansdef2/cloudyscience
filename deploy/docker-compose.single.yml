@@ -60,8 +60,13 @@ services:
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
       CORS_ORIGIN: ${PUBLIC_URL:?укажите PUBLIC_URL в deploy/.env}
 
+      # Загруженные файлы (к броням, аватары, картинки) — в томе uploads
+      UPLOAD_DIR: /app/uploads
+
       # Сид пересоздаёт схему и стирает данные — запускается вручную
       SEED_ON_START: "false"
+    volumes:
+      - uploads:/app/uploads
     depends_on:
       postgres:
         condition: service_healthy
@@ -84,3 +89,4 @@ volumes:
   caddy_data:
   caddy_config:
   postgres_data:
+  uploads:

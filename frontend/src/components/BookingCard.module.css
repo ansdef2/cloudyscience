@@ -1,0 +1,103 @@
+.booking {
+  display: flex;
+  flex-direction: column;
+  border-radius: 20px;
+  background: var(--proto-surface);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+}
+
+.actions {
+  align-items: center;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 0 14px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 14px;
+  font-size: 13px;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 14px;
+  margin: 0;
+}
+
+.facts dt {
+  color: var(--proto-text-50);
+}
+
+.facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.access,
+.files {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.accessTitle {
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--proto-text-50);
+}
+
+.accessText {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(0, 179, 125, 0.1);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.accessText a {
+  color: rgb(120, 200, 230);
+  text-decoration: underline;
+}
+
+.file {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: var(--proto-field);
+  color: var(--proto-text);
+  font-family: var(--proto-font-text);
+  font-size: 13px;
+  text-align: left;
+}
+
+.fileName {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cancel {
+  align-self: flex-start;
+}
+
+@media (min-width: 960px) {
+  .file:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+}

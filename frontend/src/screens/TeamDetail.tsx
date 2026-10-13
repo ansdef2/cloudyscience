@@ -4,13 +4,13 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import ProtoTopBar from '@/components/ProtoTopBar'
 import Avatar from '@/components/Avatar'
+import BookingCard from '@/components/BookingCard'
 import AuthGate from '@/components/AuthGate'
 import { User } from '@/models/Api'
 import { Booking } from '@/services/bookingService'
 import { deleteTeam, getTeam, removeTeamMember, Team } from '@/services/teamService'
 import { useToast } from '@/hooks/useToast'
 import { api, ApiError } from '@/utils/api'
-import { BOOKING_STATUS } from '@/utils/format'
 import ui from '@/styles/ui.module.css'
 import styles from './Teams.module.css'
 
@@ -42,7 +42,9 @@ function TeamView({ teamId, me }: { teamId: string; me: User }) {
     api
       .get<any[]>(`/teams/${teamId}/bookings`)
       .then((response) =>
-        setBookings(response.data.map((item) => ({ ...item, equipment: item.Equipment, user: item.User })))
+        setBookings(
+          response.data.map((item) => ({ ...item, equipment: item.Equipment, user: item.User, team: undefined }))
+        )
       )
       .catch(() => setBookings([]))
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -154,16 +156,7 @@ function TeamView({ teamId, me }: { teamId: string; me: User }) {
           ) : (
             <div className={ui.list}>
               {bookings.map((booking) => (
-                <div key={booking.id} className={`${ui.card} ${ui.cardWrap}`}>
-                  <div className={ui.cardBody}>
-                    <span className={ui.cardTitle}>{booking.equipment?.name ?? 'Оборудование'}</span>
-                    <span className={ui.cardMeta}>
-                      {new Date(booking.date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })},{' '}
-                      {booking.time} · оформил(а) {booking.user?.name}
-                    </span>
-                  </div>
-                  <span className={ui.badge}>{BOOKING_STATUS[booking.status] ?? booking.status}</span>
-                </div>
+                <BookingCard key={booking.id} booking={booking} showAuthor />
               ))}
             </div>
           )}

@@ -1,13 +1,18 @@
 import { Response } from 'express';
 import { Op } from 'sequelize';
+import sequelize from '../config/database';
 import { AuthRequest } from '../middleware/auth';
 import Booking from '../models/Booking';
+import FileUpload from '../models/FileUpload';
 import Course from '../models/Course';
 import Equipment from '../models/Equipment';
 import Team from '../models/Team';
 import TeamMember from '../models/TeamMember';
 import User from '../models/User';
 import { sendError } from '../utils/sendError';
+import { attachFilesToBooking } from './uploadController';
+import { BOOKING_FILES_MAX } from '../config/uploads';
+import { dayRange, normalizeTime, storedDate, validateSlot } from '../utils/schedule';
 
 const STATUSES = ['pending', 'confirmed', 'active', 'completed', 'cancelled'] as const;
 
@@ -17,7 +22,41 @@ const details = (isAdmin: boolean) => [
   { model: Equipment },
   { model: Team, attributes: ['id', 'name'] },
   { model: User, attributes: isAdmin ? ['id', 'name', 'email'] : ['id', 'name'] },
+  { model: FileUpload, as: 'uploads', attributes: ['id', 'originalName', 'size', 'createdAt'] },
 ];
+
+/** Бронь, которая занимает слот: всё, кроме отменённых */
+const ACTIVE_STATUSES = ['pending', 'confirmed', 'active', 'completed'];
+
+class SlotTaken extends Error {}
+
+/**
+ * Занят ли слот. Вызывать внутри транзакции после блокировки строки
+ * оборудования — тогда две одновременные брони одного слота не пройдут обе.
+ */
+const ensureSlotFree = async (
+  equipmentId: string,
+  date: string,
+  time: string,
+  transaction: import('sequelize').Transaction,
+  exceptBookingId?: string
+) => {
+  const { start, end } = dayRange(date);
+  const clash = await Booking.findOne({
+    where: {
+      equipmentId,
+      time,
+      date: { [Op.gte]: start, [Op.lt]: end },
+      status: { [Op.in]: ACTIVE_STATUSES },
+      ...(exceptBookingId ? { id: { [Op.ne]: exceptBookingId } } : {}),
+    },
+    transaction,
+  });
+  if (clash) throw new SlotTaken();
+};
+
+const slotTakenResponse = (res: Response) =>
+  res.status(409).json({ error: 'Это время уже заняли — выберите другое', code: 'SLOT_TAKEN' });
 
 const myTeamIds = async (userId: string) =>
   (await TeamMember.findAll({ where: { userId }, attributes: ['teamId'] })).map((row) => row.teamId);
@@ -76,8 +115,7 @@ export const getBookingById = async (req: AuthRequest, res: Response) => {
 export const createBooking = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user.id;
-    const { courseId, equipmentId, teamId, date, time, endTime, rentalType, files, location, notes } =
-      req.body;
+    const { courseId, equipmentId, teamId, date, time, rentalType, fileIds, location, notes } = req.body ?? {};
 
     // Запись на курс живёт в course_enrollments: там одна запись на человека
     // и счёт мест. Через брони её больше не создать — иначе оба ограничения обходятся.
@@ -91,6 +129,10 @@ export const createBooking = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: 'Equipment must be specified' });
     }
 
+    if (Array.isArray(fileIds) && fileIds.length > BOOKING_FILES_MAX) {
+      return res.status(400).json({ error: `Не больше ${BOOKING_FILES_MAX} файлов к одной брони` });
+    }
+
     // Бронировать на команду может только её участник
     if (teamId) {
       const membership = await TeamMember.findOne({ where: { teamId, userId } });
@@ -99,22 +141,43 @@ export const createBooking = async (req: AuthRequest, res: Response) => {
       }
     }
 
-    const booking = await Booking.create({
-      userId,
-      equipmentId,
-      teamId: teamId || null,
-      date,
-      time,
-      endTime,
-      rentalType: rentalType || 'remote',
-      files: files || [],
-      location,
-      notes,
-      status: 'pending',
+    const bookingId = await sequelize.transaction(async (transaction) => {
+      // Блокировка строки оборудования выстраивает брони одного станка в очередь
+      const equipment = await Equipment.findByPk(equipmentId, { transaction, lock: transaction.LOCK.UPDATE });
+      if (!equipment) throw Object.assign(new Error('Оборудование не найдено'), { status: 404 });
+
+      const problem = validateSlot(date, time, equipment.workingHours);
+      if (problem) throw Object.assign(new Error(problem), { status: 400 });
+
+      const slotTime = normalizeTime(time);
+      await ensureSlotFree(equipment.id, date, slotTime, transaction);
+
+      const booking = await Booking.create(
+        {
+          userId,
+          equipmentId: equipment.id,
+          teamId: teamId || null,
+          date: storedDate(date),
+          time: slotTime,
+          rentalType: rentalType === 'in-person' ? 'in-person' : 'remote',
+          location,
+          notes,
+          status: 'pending',
+        },
+        { transaction }
+      );
+
+      const files = await attachFilesToBooking(fileIds, userId, booking.id, transaction);
+      if (files.length) {
+        await booking.update({ files: files.map((file) => file.originalName) }, { transaction });
+      }
+      return booking.id;
     });
 
-    res.status(201).json(await Booking.findByPk(booking.id, { include: details(false) }));
+    res.status(201).json(await Booking.findByPk(bookingId, { include: details(false) }));
   } catch (error: any) {
+    if (error instanceof SlotTaken) return slotTakenResponse(res);
+    if (error?.status) return res.status(error.status).json({ error: error.message });
     sendError(res, error);
   }
 };
@@ -141,8 +204,12 @@ export const updateBooking = async (req: AuthRequest, res: Response) => {
 
     let changes: Record<string, unknown>;
     if (isAdmin) {
-      const { userId: _userId, ...rest } = body;
-      changes = rest;
+      // Администратор правит статус, заметку и доступ к оборудованию.
+      // Перенос на другое время — новой бронью, чтобы не обойти проверку слота.
+      changes = {};
+      for (const key of ['status', 'notes', 'accessInfo', 'location'] as const) {
+        if (body[key] !== undefined) changes[key] = body[key];
+      }
     } else {
       if (body.status !== undefined && body.status !== 'cancelled') {
         return res.status(403).json({ error: 'Статус брони меняет администратор; вы можете её отменить' });
@@ -152,9 +219,22 @@ export const updateBooking = async (req: AuthRequest, res: Response) => {
       if (body.status === 'cancelled') changes.status = 'cancelled';
     }
 
-    await booking.update(changes);
+    // Вернуть отменённую бронь можно, только если её слот никто не занял
+    const reviving =
+      booking.status === 'cancelled' && changes.status !== undefined && changes.status !== 'cancelled';
+
+    await sequelize.transaction(async (transaction) => {
+      if (reviving && booking.equipmentId) {
+        await Equipment.findByPk(booking.equipmentId, { transaction, lock: transaction.LOCK.UPDATE });
+        const date = new Date(booking.date).toISOString().slice(0, 10);
+        await ensureSlotFree(booking.equipmentId, date, booking.time, transaction, booking.id);
+      }
+      await booking.update(changes, { transaction });
+    });
+
     res.json(await Booking.findByPk(booking.id, { include: details(isAdmin) }));
   } catch (error: any) {
+    if (error instanceof SlotTaken) return slotTakenResponse(res);
     sendError(res, error);
   }
 };

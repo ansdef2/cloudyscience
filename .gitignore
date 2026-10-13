@@ -30,3 +30,6 @@ out/
 # local env files
 .env
 .env*.local
+
+# Загруженные пользователями файлы (локальный запуск бэкенда)
+server/uploads/

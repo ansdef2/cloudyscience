@@ -13,6 +13,7 @@ import {
 } from '@/services/peopleService'
 import { useToast } from '@/hooks/useToast'
 import { api, ApiError } from '@/utils/api'
+import { downloadUpload, formatSize } from '@/services/uploadService'
 import { BOOKING_STATUS, pluralize } from '@/utils/format'
 import ui from '@/styles/ui.module.css'
 import styles from './AdminPage.module.css'
@@ -36,9 +37,12 @@ interface AdminBooking {
   status: string
   notes?: string
   createdAt: string
+  location?: string | null
+  accessInfo?: string | null
   Equipment?: { id: string; name: string }
   User?: { id: string; name: string; email: string }
   Team?: { id: string; name: string } | null
+  uploads?: { id: string; originalName: string; size: number }[]
 }
 
 const TABS: { id: Tab; label: string }[] = [
@@ -258,41 +262,138 @@ function Bookings() {
       ) : (
         <div className={ui.list}>
           {visible.map((item) => (
-            <div key={item.id} className={`${ui.card} ${styles.row}`}>
-              <div className={ui.cardBody}>
-                <span className={ui.cardTitle}>{item.Equipment?.name ?? 'Оборудование удалено'}</span>
-                <span className={ui.cardMeta}>
-                  {formatDate(item.date)}, {item.time} · {item.rentalType === 'remote' ? 'дистанционно' : 'лично'}
-                </span>
-                <span className={ui.cardMeta}>
-                  {item.User?.name} ·{' '}
-                  <a className={styles.mail} href={`mailto:${item.User?.email}`}>
-                    {item.User?.email}
-                  </a>
-                  {item.Team && (
-                    <span className={`${ui.badge} ${ui.badgeBlue} ${styles.team}`}>
-                      команда «{item.Team.name}»
-                    </span>
-                  )}
-                </span>
-              </div>
-              <select
-                className={`${ui.select} ${styles.status}`}
-                value={item.status}
-                onChange={(event) => changeStatus(item, event.target.value)}
-                aria-label="Статус брони"
-              >
-                {Object.entries(BOOKING_STATUS).map(([value, label]) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <AdminBookingRow
+              key={item.id}
+              item={item}
+              onStatus={(next) => changeStatus(item, next)}
+              onSaved={(saved) =>
+                setItems((current) => current?.map((row) => (row.id === saved.id ? { ...row, ...saved } : row)) ?? null)
+              }
+            />
           ))}
         </div>
       )}
     </>
+  )
+}
+
+/** Бронь в админке: статус сразу, по «Подробнее» — файлы и данные для подключения */
+function AdminBookingRow({
+  item,
+  onStatus,
+  onSaved,
+}: {
+  item: AdminBooking
+  onStatus: (next: string) => void
+  onSaved: (saved: Partial<AdminBooking> & { id: string }) => void
+}) {
+  const toast = useToast()
+  const [open, setOpen] = useState(false)
+  const [accessInfo, setAccessInfo] = useState(item.accessInfo ?? '')
+  const [saving, setSaving] = useState(false)
+  const files = item.uploads ?? []
+
+  const saveAccess = async () => {
+    setSaving(true)
+    try {
+      await api.put(`/bookings/${item.id}`, { accessInfo: accessInfo.trim() || null })
+      onSaved({ id: item.id, accessInfo: accessInfo.trim() || null })
+      toast.success('Данные для подключения сохранены — их видит автор брони')
+    } catch (error) {
+      toast.error(error instanceof ApiError ? error.message : 'Не удалось сохранить')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const download = async (id: string, name: string) => {
+    try {
+      await downloadUpload(id, name)
+    } catch (error) {
+      toast.error(error instanceof ApiError ? error.message : 'Не удалось скачать файл')
+    }
+  }
+
+  return (
+    <div className={styles.bookingItem}>
+      <div className={`${ui.card} ${styles.row}`}>
+        <div className={ui.cardBody}>
+          <span className={ui.cardTitle}>{item.Equipment?.name ?? 'Оборудование удалено'}</span>
+          <span className={ui.cardMeta}>
+            {formatDate(item.date)}, {item.time} · {item.rentalType === 'remote' ? 'дистанционно' : 'лично'}
+            {files.length > 0 && ` · ${files.length} ${pluralize(files.length, ['файл', 'файла', 'файлов'])}`}
+          </span>
+          <span className={ui.cardMeta}>
+            {item.User?.name} ·{' '}
+            <a className={styles.mail} href={`mailto:${item.User?.email}`}>
+              {item.User?.email}
+            </a>
+            {item.Team && (
+              <span className={`${ui.badge} ${ui.badgeBlue} ${styles.team}`}>команда «{item.Team.name}»</span>
+            )}
+          </span>
+        </div>
+        <div className={styles.rowActions}>
+          <select
+            className={`${ui.select} ${styles.status}`}
+            value={item.status}
+            onChange={(event) => onStatus(event.target.value)}
+            aria-label="Статус брони"
+          >
+            {Object.entries(BOOKING_STATUS).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+          <button className={`${ui.ghost} ${ui.small}`} onClick={() => setOpen(!open)} aria-expanded={open}>
+            {open ? 'Скрыть' : 'Подробнее'}
+          </button>
+        </div>
+      </div>
+
+      {open && (
+        <div className={`${ui.panel} ${styles.bookingDetails}`}>
+          {item.notes && <p className={styles.message}>{item.notes}</p>}
+
+          {files.length > 0 && (
+            <div className={styles.fileList}>
+              {files.map((file) => (
+                <button
+                  key={file.id}
+                  className={`${ui.ghost} ${ui.small}`}
+                  onClick={() => download(file.id, file.originalName)}
+                >
+                  {file.originalName} · {formatSize(file.size)} ↓
+                </button>
+              ))}
+            </div>
+          )}
+
+          <label className={ui.field}>
+            <span className={ui.label}>
+              {item.rentalType === 'remote'
+                ? 'Как подключиться: ссылка на удалённый доступ, логин, инструкция'
+                : 'Что передать автору: кабинет, кого спросить на месте'}
+            </span>
+            <textarea
+              className={ui.textarea}
+              value={accessInfo}
+              onChange={(event) => setAccessInfo(event.target.value)}
+              maxLength={2000}
+              placeholder="Например: https://app.octoeverywhere.com/… — вход откроется за 10 минут до начала"
+            />
+          </label>
+          <button
+            className={`${ui.primary} ${ui.small} ${styles.save}`}
+            onClick={saveAccess}
+            disabled={saving || accessInfo === (item.accessInfo ?? '')}
+          >
+            {saving ? 'Сохраняем...' : 'Сохранить'}
+          </button>
+        </div>
+      )}
+    </div>
   )
 }
 

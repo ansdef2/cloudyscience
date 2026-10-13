@@ -1,0 +1,7 @@
+# Контекст сборки бэкенда — корень репозитория; в образ нужен только server/
+.git
+frontend
+deploy
+**/node_modules
+server/dist
+server/uploads

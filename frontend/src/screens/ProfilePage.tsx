@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import ProtoTopBar from '@/components/ProtoTopBar'
 import BottomNav from '@/components/BottomNav'
 import Avatar from '@/components/Avatar'
+import BookingCard from '@/components/BookingCard'
 import AuthGate from '@/components/AuthGate'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
@@ -19,7 +20,6 @@ import {
 } from '@/services/peopleService'
 import { getMyTeams, Team } from '@/services/teamService'
 import { ApiError } from '@/utils/api'
-import { BOOKING_STATUS } from '@/utils/format'
 import ui from '@/styles/ui.module.css'
 import styles from './ProfilePage.module.css'
 
@@ -132,24 +132,12 @@ function Profile({ user }: { user: User }) {
         ) : (
           <div className={ui.list}>
             {bookings.map((booking) => (
-              <div key={booking.id} className={`${ui.card} ${ui.cardWrap}`}>
-                <div className={ui.cardBody}>
-                  <span className={ui.cardTitle}>{booking.equipment?.name ?? 'Оборудование'}</span>
-                  <span className={ui.cardMeta}>
-                    {new Date(booking.date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })},{' '}
-                    {booking.time}
-                    {booking.team ? ` · команда «${booking.team.name}»` : ''}
-                  </span>
-                </div>
-                <div className={`${ui.cardActions} ${styles.statusActions}`}>
-                  <span className={ui.badge}>{BOOKING_STATUS[booking.status] ?? booking.status}</span>
-                  {canCancel(booking) && (
-                    <button className={`${ui.ghost} ${ui.small}`} onClick={() => cancel(booking)}>
-                      Отменить
-                    </button>
-                  )}
-                </div>
-              </div>
+              <BookingCard
+                key={booking.id}
+                booking={booking}
+                showAuthor={booking.userId !== user.id}
+                onCancel={canCancel(booking) ? cancel : undefined}
+              />
             ))}
           </div>
         )}

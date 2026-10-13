@@ -12,9 +12,16 @@ export interface BookingRequest {
   time: string
   endTime?: string
   rentalType?: 'remote' | 'in-person'
-  files?: string[]
+  /** Загруженные заранее файлы (uploadService.uploadBookingFile) */
+  fileIds?: string[]
   location?: string
   notes?: string
+}
+
+export interface BookingFile {
+  id: string
+  originalName: string
+  size: number
 }
 
 export interface Booking {
@@ -39,8 +46,11 @@ export interface Booking {
   rentalType: 'remote' | 'in-person'
   status: 'pending' | 'confirmed' | 'active' | 'completed' | 'cancelled'
   files?: string[]
+  uploads?: BookingFile[]
   location?: string
   notes?: string
+  /** Как подключиться при дистанционной аренде — пишет администратор */
+  accessInfo?: string | null
   createdAt: string
   updatedAt: string
 }

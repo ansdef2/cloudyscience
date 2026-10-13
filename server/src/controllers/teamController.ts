@@ -3,6 +3,7 @@ import { Op } from 'sequelize';
 import sequelize from '../config/database';
 import { AuthRequest } from '../middleware/auth';
 import Booking from '../models/Booking';
+import FileUpload from '../models/FileUpload';
 import Equipment from '../models/Equipment';
 import Message from '../models/Message';
 import Team from '../models/Team';
@@ -226,7 +227,12 @@ export const getTeamBookings = async (req: AuthRequest, res: Response) => {
 
     const bookings = await Booking.findAll({
       where: { teamId: req.params.id },
-      include: [{ model: Equipment }, { model: User, attributes: PUBLIC_USER_ATTRIBUTES }],
+      include: [
+        { model: Equipment },
+        { model: Team, attributes: ['id', 'name'] },
+        { model: User, attributes: PUBLIC_USER_ATTRIBUTES },
+        { model: FileUpload, as: 'uploads', attributes: ['id', 'originalName', 'size', 'createdAt'] },
+      ],
       order: [['date', 'DESC']],
     });
     res.json(bookings);

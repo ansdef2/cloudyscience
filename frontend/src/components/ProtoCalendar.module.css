@@ -6,11 +6,48 @@
   gap: 10px;
 }
 
+.head {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
 .month {
+  flex: 1;
   margin: 0;
   font-size: 14px;
   text-align: center;
   color: var(--proto-text);
+}
+
+.nav {
+  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.45);
+  font-size: 22px;
+  line-height: 1;
+  color: var(--proto-text);
+}
+
+.nav:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.weekday {
+  font-size: 11px;
+  color: var(--proto-text-50);
+}
+
+.weekday.weekend {
+  color: var(--proto-weekend);
+  opacity: 0.7;
 }
 
 .grid {
@@ -23,6 +60,7 @@
 
 .day {
   display: flex;
+  cursor: pointer;
   width: 32px;
   height: 32px;
   align-items: center;

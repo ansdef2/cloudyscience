@@ -67,6 +67,39 @@
   flex: 0 0 auto;
 }
 
+.bookingItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rowActions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 6px;
+}
+
+.bookingDetails {
+  gap: 12px;
+}
+
+.fileList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.fileList > * {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.save {
+  align-self: flex-end;
+}
+
 .consultation {
   align-items: flex-start;
 }
@@ -114,5 +147,13 @@
 
   .status {
     width: 100%;
+  }
+
+  .rowActions {
+    flex: 1 1 100%;
+  }
+
+  .rowActions > .status {
+    flex: 1 1 auto;
   }
 }
