@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import ProtoTopBar from '@/components/ProtoTopBar'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
+import { afterAuthPath } from '@/utils/navigation'
 import styles from './Auth.module.css'
 
 export default function Register() {
@@ -36,7 +37,7 @@ export default function Register() {
 
     if (result.success) {
       toast.success('Регистрация успешна!')
-      router.push('/')
+      router.push(afterAuthPath())
     } else {
       toast.error(result.error || 'Ошибка регистрации')
     }
@@ -52,15 +53,17 @@ export default function Register() {
           <p className={styles.subtitle}>Создайте аккаунт для начала работы</p>
         </div>
 
-        <form className={styles.form} onSubmit={handleSubmit}>
+        <form className={styles.form} onSubmit={handleSubmit} method="post" autoComplete="on">
           <div className={styles.field}>
             <label className={styles.label} htmlFor="name">
               Имя
             </label>
             <input
               id="name"
+              name="name"
               className={styles.input}
               type="text"
+              autoComplete="name"
               placeholder="Введите имя"
               value={name}
               onChange={(event) => setName(event.target.value)}
@@ -74,8 +77,11 @@ export default function Register() {
             </label>
             <input
               id="email"
+              name="email"
               className={styles.input}
               type="email"
+              inputMode="email"
+              autoComplete="username"
               placeholder="example@email.com"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
@@ -89,8 +95,11 @@ export default function Register() {
             </label>
             <input
               id="password"
+              name="password"
               className={styles.input}
               type="password"
+              autoComplete="new-password"
+              minLength={6}
               placeholder="Минимум 6 символов"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
@@ -104,7 +113,11 @@ export default function Register() {
 
           <p className={styles.switch}>
             Уже есть аккаунт?{' '}
-            <button className={styles.link} type="button" onClick={() => router.push('/login')}>
+            <button
+              className={styles.link}
+              type="button"
+              onClick={() => router.push(`/login${window.location.search}`)}
+            >
               Войти
             </button>
           </p>

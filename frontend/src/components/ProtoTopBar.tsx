@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { APP_HOME } from '@/utils/navigation'
 import styles from './ProtoTopBar.module.css'
 
 /** Верхняя панель внутренних экранов: назад слева, логотип-действие справа */
@@ -29,7 +30,7 @@ export default function ProtoTopBar({ onBack }: ProtoTopBarProps) {
         </svg>
       </button>
 
-      <button className={styles.button} aria-label="На главную" onClick={() => router.push('/')}>
+      <button className={styles.button} aria-label="На главную" onClick={() => router.push(APP_HOME)}>
         <svg viewBox="0 0 24 24" fill="none" aria-hidden>
           <path
             d="M4 15a4 4 0 0 1 .9-7.9 5.5 5.5 0 0 1 10.5-1.3A4.4 4.4 0 1 1 16 15H4Z"

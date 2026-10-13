@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import ImageWithFallback from '@/components/ImageWithFallback'
 import { useAuth } from '@/hooks/useAuth'
+import { loginPathFromHere } from '@/utils/navigation'
 import styles from './ProfileMenu.module.css'
 
 type OpenPanel = 'none' | 'profile' | 'bell'
@@ -46,7 +47,7 @@ export default function ProfileMenu() {
 
     // Гостя незачем водить по пустому меню — сразу на вход
     if (!isAuthenticated) {
-      router.push('/login')
+      router.push(loginPathFromHere())
       return
     }
     toggle('profile')
@@ -55,7 +56,8 @@ export default function ProfileMenu() {
   const handleLogout = () => {
     logout()
     setPanel('none')
-    router.push('/login')
+    // После выхода — на лендинг, там кнопка входа
+    router.push('/')
   }
 
   return (

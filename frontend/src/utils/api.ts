@@ -23,13 +23,34 @@ export class ApiError extends Error {
 // Единый ключ хранения JWT: его же пишет useAuth при входе
 export const AUTH_TOKEN_KEY = 'token'
 
-// Получить токен авторизации (если требуется)
+/**
+ * «Запомнить меня» — токен в localStorage и переживает закрытие браузера.
+ * Без галочки — в sessionStorage, и вход забывается вместе с вкладкой.
+ */
 export function getAuthToken(): string | null {
   if (typeof window === 'undefined') return null
   try {
-    return localStorage.getItem(AUTH_TOKEN_KEY)
+    return localStorage.getItem(AUTH_TOKEN_KEY) ?? sessionStorage.getItem(AUTH_TOKEN_KEY)
   } catch {
     return null
+  }
+}
+
+export function setAuthToken(token: string, remember: boolean) {
+  try {
+    clearAuthToken()
+    ;(remember ? localStorage : sessionStorage).setItem(AUTH_TOKEN_KEY, token)
+  } catch {
+    // Хранилище недоступно (приватный режим) — вход проживёт до перезагрузки
+  }
+}
+
+export function clearAuthToken() {
+  try {
+    localStorage.removeItem(AUTH_TOKEN_KEY)
+    sessionStorage.removeItem(AUTH_TOKEN_KEY)
+  } catch {
+    // Нечего чистить
   }
 }
 
@@ -54,9 +75,7 @@ export async function apiRequest<T>(
     // Обработка 401 (Unauthorized)
     if (response.status === 401) {
       if (typeof window !== 'undefined') {
-        localStorage.removeItem(AUTH_TOKEN_KEY)
-        // Можно перенаправить на страницу входа
-        // window.location.href = '/login'
+        clearAuthToken()
       }
       throw new ApiError('Требуется авторизация', 401)
     }

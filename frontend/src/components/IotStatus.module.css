@@ -1,0 +1,84 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 28px;
+  padding: 0 24px;
+}
+
+.channel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 18px;
+  border-radius: 20px;
+  background: var(--proto-surface);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--proto-text-50);
+}
+
+.online {
+  background: rgb(var(--proto-glow-green));
+  box-shadow: 0 0 8px rgba(0, 179, 125, 0.9);
+}
+
+.name {
+  flex: 1;
+  font-size: 14px;
+  color: var(--proto-text);
+}
+
+.provider {
+  font-size: 11px;
+  color: var(--proto-text-50);
+}
+
+.state {
+  margin: 0;
+  font-size: 13px;
+  color: var(--proto-text-70);
+}
+
+.job {
+  color: var(--proto-text-50);
+}
+
+.track {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.fill {
+  height: 100%;
+  border-radius: 3px;
+  background: rgb(var(--proto-glow-blue));
+  box-shadow: 0 0 10px rgba(0, 106, 128, 0.9);
+  transition: width 0.4s ease;
+}
+
+.foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--proto-text-50);
+}
+
+.link {
+  color: var(--proto-text);
+  text-decoration: underline;
+}

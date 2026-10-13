@@ -10,6 +10,7 @@ export interface SpecSection {
 
 export interface Equipment {
   id: string
+  institutionId?: string
   name: string
   type: string
   address: string

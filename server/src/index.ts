@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import sequelize from './config/database';
+import { applyDataPatches } from './config/patches';
 // Регистрирует ассоциации моделей (в т.ч. алиас Institution.courses) — без этого include падает
 import './models';
 import authRoutes from './routes/auth';
@@ -14,6 +15,8 @@ import searchRoutes from './routes/search';
 import postRoutes from './routes/posts';
 import specialistRoutes from './routes/specialists';
 import progressRoutes from './routes/progress';
+import iotRoutes from './routes/iot';
+import { startIotPolling } from './controllers/iotController';
 
 dotenv.config();
 
@@ -37,6 +40,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/specialists', specialistRoutes);
+app.use('/api/iot', iotRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -62,6 +66,9 @@ const startServer = async () => {
       await sequelize.sync({ alter: true });
       console.log('Database models synchronized.');
     }
+
+    await applyDataPatches();
+    startIotPolling();
     
     app.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);

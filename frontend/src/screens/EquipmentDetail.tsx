@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import ProtoTopBar from '@/components/ProtoTopBar'
 import ImageWithFallback from '@/components/ImageWithFallback'
 import Model3D from '@/components/Model3D'
+import IotStatus from '@/components/IotStatus'
 import { getEquipmentById } from '@/services/equipmentService'
 import { Equipment, SpecSection } from '@/models/Equipment'
 import styles from './EquipmentDetail.module.css'
@@ -111,6 +112,8 @@ export default function EquipmentDetail({ equipmentId }: EquipmentDetailProps) {
           Забронировать
         </button>
       </div>
+
+      <IotStatus equipmentId={equipment.id} />
 
       {sections.length > 0 && (
         <div className={styles.specs}>
