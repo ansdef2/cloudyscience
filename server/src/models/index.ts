@@ -8,6 +8,8 @@ import Specialist from './Specialist';
 import CourseModule from './CourseModule';
 import ModuleStage from './ModuleStage';
 import StageProgress from './StageProgress';
+import CourseEnrollment from './CourseEnrollment';
+import IotChannel from './IotChannel';
 
 // Define associations
 Institution.hasMany(Course, { foreignKey: 'institutionId', as: 'courses' });
@@ -32,4 +34,6 @@ export {
   CourseModule,
   ModuleStage,
   StageProgress,
+  CourseEnrollment,
+  IotChannel,
 };

@@ -11,6 +11,7 @@ import { hashPassword } from '../utils/hashPassword';
 import CourseModule from '../models/CourseModule';
 import ModuleStage from '../models/ModuleStage';
 import { module1 } from './data/module1';
+import { INSTITUTION_COORDINATES, MAIN_COURSE_SPOTS, MAIN_COURSE_TITLE } from './patches';
 
 /** Демо-авторы нужны только как подписи под постами, входить ими незачем. */
 const randomPassword = () => randomBytes(24).toString('base64url');
@@ -48,6 +49,8 @@ const seedDatabase = async () => {
     const institution1 = await Institution.create({
       name: 'ГОАУ Новгородский Кванториум',
       address: 'Большая Московская ул., 39, корп. 1',
+      latitude: INSTITUTION_COORDINATES[0].latitude,
+      longitude: INSTITUTION_COORDINATES[0].longitude,
       workingHours: '9:00-19:00',
       phone: '+7 (8162) 63-79-55',
       website: 'https://kvantorium53.ru',
@@ -59,6 +62,8 @@ const seedDatabase = async () => {
     const institution2 = await Institution.create({
       name: 'Центр дополнительного образования',
       address: 'Большая Московская ул., 126, корп. 3',
+      latitude: INSTITUTION_COORDINATES[1].latitude,
+      longitude: INSTITUTION_COORDINATES[1].longitude,
       workingHours: '10:00-17:00',
       phone: '+7 (8162) 12-34-56',
       website: 'https://example.ru',
@@ -70,12 +75,13 @@ const seedDatabase = async () => {
     // Единственный курс платформы
     const course1 = await Course.create({
       institutionId: institution1.id,
-      title: 'Проектное управление и информационные технологии',
+      title: MAIN_COURSE_TITLE,
       direction: 'IT-куб',
       description: 'Курс о том, как довести цифровой продукт от идеи до работающего решения: сформулировать проблему и цель, спланировать работу, реализовать проект и проверить результат по заранее выбранным критериям. Каждый обучающийся ведёт собственный IT-проект — веб-сервис, бот, систему автоматизации, аналитический инструмент или другое цифровое решение.',
       images: ['/courses/it-cube.jpg'],
-      totalSpots: 20,
-      availableSpots: 2,
+      // Мест 30; свободные считаются от записей в course_enrollments
+      totalSpots: MAIN_COURSE_SPOTS,
+      availableSpots: MAIN_COURSE_SPOTS,
     });
 
     // Содержание первого модуля из методички курса

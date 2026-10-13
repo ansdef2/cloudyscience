@@ -11,6 +11,8 @@ class Institution extends Model {
   public logo!: string;
   public images!: string[];
   public isOpen!: boolean;
+  public latitude?: number | null;
+  public longitude?: number | null;
   public createdAt!: Date;
   public updatedAt!: Date;
 }
@@ -51,6 +53,15 @@ Institution.init(
     isOpen: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,
+    },
+    // Точка на карте главного экрана; без координат учреждение на карту не попадает
+    latitude: {
+      type: DataTypes.DOUBLE,
+      validate: { min: -90, max: 90 },
+    },
+    longitude: {
+      type: DataTypes.DOUBLE,
+      validate: { min: -180, max: 180 },
     },
   },
   {
