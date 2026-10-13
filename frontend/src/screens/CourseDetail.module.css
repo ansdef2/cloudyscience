@@ -230,6 +230,7 @@
 
 /* Согласие на обработку данных */
 .check {
+  position: relative;
   z-index: 1;
   display: flex;
   width: 100%;
@@ -257,9 +258,30 @@
 .checkBoxIcon {
   width: 14px;
   height: 14px;
+  opacity: 0;
+}
+
+/* Сам чекбокс прозрачный поверх нарисованного квадрата */
+.checkInput {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.checkInput:checked + .checkBox .checkBoxIcon {
+  opacity: 1;
+}
+
+.checkInput:focus-visible + .checkBox {
+  outline: 2px solid var(--proto-text-60);
+  outline-offset: 2px;
 }
 
 .link {
+  color: inherit;
   text-decoration: underline;
 }
 

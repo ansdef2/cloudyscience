@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -30,6 +32,15 @@ import { reportServerError } from './utils/alerts';
  * автотесты — на случайном.
  */
 const app = express();
+
+/** Версия из package.json: src/app.ts и dist/app.js лежат на уровень ниже него */
+const APP_VERSION = (() => {
+  try {
+    return JSON.parse(fs.readFileSync(path.resolve(__dirname, '..', 'package.json'), 'utf8')).version as string;
+  } catch {
+    return 'unknown';
+  }
+})();
 
 // Перед бэкендом стоит Caddy: настоящий адрес клиента — в X-Forwarded-For
 app.set('trust proxy', 1);
@@ -64,7 +75,7 @@ app.use('/api/safety', safetyRoutes);
 app.get('/api/files/:name', servePublicFile);
 
 app.get('/api/health', (_req, res) => {
-  res.json({ status: 'OK', message: 'Server is running' });
+  res.json({ status: 'OK', message: 'Server is running', version: APP_VERSION });
 });
 
 app.use('/api', (_req, res) => {

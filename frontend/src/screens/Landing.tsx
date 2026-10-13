@@ -221,7 +221,10 @@ export default function Landing() {
 
       <footer className={styles.footer}>
         <div className={styles.footerStart}>
-          <span>© {new Date().getFullYear()} Облако науки</span>
+          <span>
+            © {new Date().getFullYear()} Облако науки
+            {process.env.NEXT_PUBLIC_APP_VERSION && ` · версия ${process.env.NEXT_PUBLIC_APP_VERSION}`}
+          </span>
           <nav className={styles.docs} aria-label="Документы">
             <Link href="/privacy">Политика конфиденциальности</Link>
             <Link href="/terms">Пользовательское соглашение</Link>

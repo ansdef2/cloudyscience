@@ -532,6 +532,7 @@ GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) на
 
 ## 📖 Документация
 
+- [Журнал изменений](CHANGELOG.md) — текущая версия 1.2.1
 - [Docker Guide](docker-guide.md)
 - [Развёртывание на сервере](deploy/DEPLOY_TIMEWEB.md)
 - [Ассеты прототипа: что выгрузить из Figma](frontend/ASSETS_PROTOTYPE.md)

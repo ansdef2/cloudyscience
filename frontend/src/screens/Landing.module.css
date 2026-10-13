@@ -368,14 +368,13 @@
 
 .footer {
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 8px;
+  flex-direction: column;
+  gap: 16px;
   margin-top: 56px;
   padding-top: 24px;
   padding-bottom: 32px;
   font-size: 12px;
+  line-height: 1.5;
   color: var(--proto-text-50);
 }
 
@@ -387,29 +386,46 @@
 
 .docs {
   display: flex;
-  flex-wrap: wrap;
-  gap: 4px 14px;
-}
-
-.docs a {
-  color: var(--proto-text-60);
-  text-decoration: underline;
-  text-decoration-color: rgba(255, 255, 255, 0.2);
-}
-
-/* Реквизиты — в правом нижнем углу */
-.legal {
-  display: flex;
   flex-direction: column;
-  gap: 2px;
-  margin-left: auto;
-  text-align: right;
+  gap: 4px;
 }
 
+.docs a,
 .legal a {
   color: var(--proto-text-60);
   text-decoration: underline;
   text-decoration-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Реквизиты: на телефоне — под ссылками, тем же левым краем */
+.legal {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* С планшета: ссылки слева, реквизиты в правом нижнем углу */
+@media (min-width: 768px) {
+  .footer {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .docs {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+  }
+
+  .legal {
+    padding-top: 0;
+    border-top: 0;
+    text-align: right;
+  }
 }
 
 @media (min-width: 768px) {

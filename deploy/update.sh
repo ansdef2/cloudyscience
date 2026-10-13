@@ -145,7 +145,8 @@ else
   fi
 fi
 
-ok "Версия: $(git -C "$APP_DIR" log -1 --format='%h %s')"
+APP_VERSION="$(grep -m1 '"version"' "$APP_DIR/server/package.json" 2>/dev/null | cut -d'"' -f4 || true)"
+ok "Версия ${APP_VERSION:-?}: $(git -C "$APP_DIR" log -1 --format='%h %s')"
 
 # ── 3. Сборка и запуск ──────────────────────────────────────────────────────
 
