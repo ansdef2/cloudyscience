@@ -37,7 +37,12 @@
 html,
 body {
   max-width: 100vw;
+  /*
+   * clip, а не hidden: hidden делает body контейнером прокрутки, и
+   * position: sticky внутри перестаёт работать. hidden — для старых браузеров.
+   */
   overflow-x: hidden;
+  overflow-x: clip;
   font-family: var(--font-onest);
   background-color: var(--bg-primary);
   color: var(--text-primary);

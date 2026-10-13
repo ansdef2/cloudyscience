@@ -72,6 +72,8 @@
 
 .action {
   width: 220px;
+  max-width: 100%;
+  margin-top: auto;
   z-index: 1;
 }
 
@@ -81,4 +83,54 @@
   color: var(--proto-text-50);
   font-size: 14px;
   text-align: center;
+}
+
+/* Десктоп: заголовок и поиск в одну строку, карточки — сеткой */
+@media (min-width: 960px) {
+  .content {
+    gap: 32px;
+    padding: 40px 0 0;
+  }
+
+  .head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+  }
+
+  .pageTitle {
+    margin: 0;
+    font-family: var(--proto-font-display);
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--proto-text);
+  }
+
+  .searchBox {
+    width: 420px;
+    flex: 0 1 420px;
+  }
+
+  .list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  .card {
+    height: 100%;
+    min-height: 200px;
+    padding: 28px 18px 10px;
+    transition: transform 0.15s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+  }
+
+  .name {
+    font-size: 17px;
+  }
 }

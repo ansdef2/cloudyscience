@@ -51,13 +51,22 @@ export default function SearchPage() {
   const hasQuery = Boolean(debouncedQuery.trim())
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} protoPage`}>
       <ProtoTopBar />
 
       <div className={styles.content}>
-        <ProtoSearchField value={query} onChange={setQuery} autoFocus />
+        <div className={styles.head}>
+          <h1 className={`${styles.pageTitle} protoDesktopOnly`}>Поиск</h1>
+          <div className={styles.searchBox}>
+            <ProtoSearchField value={query} onChange={setQuery} autoFocus />
+          </div>
+        </div>
 
-        {!hasQuery && <ActionCards />}
+        {!hasQuery && (
+          <div className={styles.actions}>
+            <ActionCards />
+          </div>
+        )}
 
         {hasQuery && isLoading && <div className={`bigLoader ${styles.loader}`} />}
 

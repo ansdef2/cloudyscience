@@ -108,6 +108,12 @@
   font-size: 14px;
 }
 
+/* Справа на десктопе: характеристики и телеметрия */
+.details {
+  display: flex;
+  flex-direction: column;
+}
+
 /* Таблица характеристик */
 .specs {
   padding: 0 24px;
@@ -141,42 +147,98 @@
 
 .row {
   display: flex;
-  gap: 32px;
+  gap: 20px;
   align-items: flex-start;
 }
 
 .label {
   width: 150px;
   flex: 0 0 150px;
+  overflow-wrap: anywhere;
   font-size: 14px;
   line-height: 18px;
   color: var(--proto-text-50);
 }
 
 .value {
-  width: 130px;
-  flex: 0 0 130px;
+  min-width: 0;
+  flex: 1;
   font-size: 14px;
   line-height: 18px;
   color: var(--proto-text);
-}
-
-.footerButton {
-  display: flex;
-  height: 54px;
-  width: calc(100% - 48px);
-  align-items: center;
-  justify-content: center;
-  margin: 30px 24px 0;
-  border-radius: var(--proto-radius-pill);
-  background: #ffffff;
-  color: #000000;
-  font-family: var(--proto-font-text);
-  font-size: 14px;
 }
 
 .notFound {
   padding: 60px 20px;
   text-align: center;
   color: var(--proto-text-50);
+}
+
+/*
+ * Десктоп: карточка с фото и бронью слева и не уезжает при прокрутке,
+ * характеристики и телеметрия — справа.
+ */
+@media (min-width: 960px) {
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    gap: 56px;
+    align-items: start;
+    margin-top: 32px;
+  }
+
+  .hero {
+    position: sticky;
+    top: 104px;
+    margin-top: 0;
+    padding: 40px 40px 40px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .photo {
+    height: 340px;
+    margin-top: 36px;
+  }
+
+  .bookButton {
+    margin-top: 40px;
+  }
+
+  .specs {
+    margin-top: 8px;
+    padding: 0;
+  }
+
+  .specsTitle {
+    margin-bottom: 28px;
+    font-size: 24px;
+  }
+
+  .rows {
+    gap: 0;
+  }
+
+  .row {
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .label {
+    width: 240px;
+    flex-basis: 240px;
+    font-size: 15px;
+    line-height: 20px;
+  }
+
+  .value {
+    font-size: 15px;
+    line-height: 20px;
+  }
+
+  .section {
+    margin-bottom: 32px;
+  }
 }

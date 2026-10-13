@@ -84,7 +84,7 @@ export default function CourseDetail({ courseId }: CourseDetailProps) {
 
   if (course === 'loading') {
     return (
-      <div className={styles.container}>
+      <div className={`${styles.container} protoPage`}>
         <ProtoTopBar />
         <div className="bigLoader" style={{ marginTop: 60 }} />
       </div>
@@ -93,7 +93,7 @@ export default function CourseDetail({ courseId }: CourseDetailProps) {
 
   if (!course) {
     return (
-      <div className={styles.container}>
+      <div className={`${styles.container} protoPage`}>
         <ProtoTopBar />
         <div className={styles.notFound}>Направление не найдено</div>
       </div>
@@ -106,124 +106,138 @@ export default function CourseDetail({ courseId }: CourseDetailProps) {
   const taken = Math.max(0, total - spots)
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} protoPage`}>
       <ProtoTopBar />
 
+      {/*
+        Колонки нужны только десктопу: на телефоне они «прозрачны»
+        (display: contents) и порядок блоков задаёт order — как раньше.
+      */}
       <div className={styles.content}>
-        <div className={styles.hero}>
-          <div className={`${styles.heroGlow} protoGlowHero`} />
+        <div className={styles.side}>
+          <div className={styles.hero}>
+            <div className={`${styles.heroGlow} protoGlowHero`} />
 
-          <div className={styles.heroText}>
-            <h1 className={styles.title}>{course.direction || course.title}</h1>
-            {course.address && <p className={styles.address}>{course.address}</p>}
-            <p className={`${styles.spots} protoBrandText`}>
-              {enrolled
-                ? 'Вы записаны на курс'
-                : `Осталось ${spots} ${pluralize(spots, [
-                    'свободное место',
-                    'свободных места',
-                    'свободных мест',
-                  ])} из ${total}`}
-            </p>
-          </div>
-
-          <div className={styles.photo}>
-            <ImageWithFallback
-              src={course.images?.[0] ?? ''}
-              alt={course.title}
-              className={styles.photoImage}
-              fallbackText={course.title}
-            />
-            <div className={`${styles.photoGlow} protoPhotoGlow`} />
-          </div>
-        </div>
-
-        {course.description && <p className={styles.description}>{course.description}</p>}
-
-        {!enrolled && (
-          <div className={styles.booking} ref={enrollRef}>
-            <div className={`${styles.bookingGlow} protoGlowHero`} />
-
-            <div className={styles.bookingHead}>
-              <h2 className={styles.bookingTitle}>Записаться на курс</h2>
-              <p className={styles.bookingSubtitle}>
-                «{course.title}». После записи откроется личный прогресс: отмечайте пройденные
-                этапы, и он сохранится в вашей учётной записи
+            <div className={styles.heroText}>
+              <h1 className={styles.title}>{course.direction || course.title}</h1>
+              {course.address && <p className={styles.address}>{course.address}</p>}
+              <p className={`${styles.spots} protoBrandText`}>
+                {enrolled
+                  ? 'Вы записаны на курс'
+                  : `Осталось ${spots} ${pluralize(spots, [
+                      'свободное место',
+                      'свободных места',
+                      'свободных мест',
+                    ])} из ${total}`}
               </p>
             </div>
 
-            <div className={styles.meter}>
-              <div className={styles.meterHead}>
-                <span>Занято мест</span>
-                <span className={styles.meterValue}>
-                  {taken} из {total}
-                </span>
-              </div>
-              <div
-                className={styles.meterTrack}
-                role="progressbar"
-                aria-label="Занято мест"
-                aria-valuemin={0}
-                aria-valuemax={total}
-                aria-valuenow={taken}
-              >
-                <div
-                  className={styles.meterFill}
-                  style={{ width: `${total ? (taken / total) * 100 : 0}%` }}
-                />
-              </div>
-              <p className={styles.meterNote}>Одна запись на человека</p>
+            <div className={styles.photo}>
+              <ImageWithFallback
+                src={course.images?.[0] ?? ''}
+                alt={course.title}
+                className={styles.photoImage}
+                fallbackText={course.title}
+              />
+              <div className={`${styles.photoGlow} protoPhotoGlow`} />
             </div>
-
-            {isAuthenticated && spots > 0 && (
-              <label className={styles.check}>
-                <span className={styles.checkBox} onClick={() => setAgreed(!agreed)}>
-                  {agreed && (
-                    <svg className={styles.checkBoxIcon} viewBox="0 0 14 14" fill="none" aria-hidden>
-                      <path
-                        d="m2 7.5 3.5 3.5L12 3.5"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  )}
-                </span>
-                <span>
-                  Я согласен/согласна на{' '}
-                  <span className={styles.link}>обработку персональных данных</span>
-                </span>
-              </label>
-            )}
-
-            <button
-              className={styles.submit}
-              onClick={handleEnroll}
-              disabled={isEnrolling || authLoading || spots <= 0}
-            >
-              {spots <= 0
-                ? 'Мест нет'
-                : isEnrolling
-                  ? 'Записываем...'
-                  : isAuthenticated
-                    ? 'Записаться'
-                    : 'Войти и записаться'}
-            </button>
           </div>
-        )}
 
-        {course.modules?.map((module) => (
-          <ModuleDashboard
-            key={module.id}
-            module={module}
-            completedStageIds={completedStageIds}
-            onProgressChange={setCompletedStageIds}
-            isAuthenticated={isAuthenticated}
-            isEnrolled={enrolled}
-            onEnrollRequest={() => enrollRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
-          />
-        ))}
+
+          {!enrolled && (
+            <div className={styles.booking} ref={enrollRef}>
+              <div className={`${styles.bookingGlow} protoGlowHero`} />
+
+              <div className={styles.bookingHead}>
+                <h2 className={styles.bookingTitle}>Записаться на курс</h2>
+                <p className={styles.bookingSubtitle}>
+                  «{course.title}». После записи откроется личный прогресс: отмечайте пройденные
+                  этапы, и он сохранится в вашей учётной записи
+                </p>
+              </div>
+
+              <div className={styles.meter}>
+                <div className={styles.meterHead}>
+                  <span>Занято мест</span>
+                  <span className={styles.meterValue}>
+                    {taken} из {total}
+                  </span>
+                </div>
+                <div
+                  className={styles.meterTrack}
+                  role="progressbar"
+                  aria-label="Занято мест"
+                  aria-valuemin={0}
+                  aria-valuemax={total}
+                  aria-valuenow={taken}
+                >
+                  <div
+                    className={styles.meterFill}
+                    style={{ width: `${total ? (taken / total) * 100 : 0}%` }}
+                  />
+                </div>
+                <p className={styles.meterNote}>Одна запись на человека</p>
+              </div>
+
+              {isAuthenticated && spots > 0 && (
+                <label className={styles.check}>
+                  <span className={styles.checkBox} onClick={() => setAgreed(!agreed)}>
+                    {agreed && (
+                      <svg className={styles.checkBoxIcon} viewBox="0 0 14 14" fill="none" aria-hidden>
+                        <path
+                          d="m2 7.5 3.5 3.5L12 3.5"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    )}
+                  </span>
+                  <span>
+                    Я согласен/согласна на{' '}
+                    <span className={styles.link}>обработку персональных данных</span>
+                  </span>
+                </label>
+              )}
+
+              <button
+                className={styles.submit}
+                onClick={handleEnroll}
+                disabled={isEnrolling || authLoading || spots <= 0}
+              >
+                {spots <= 0
+                  ? 'Мест нет'
+                  : isEnrolling
+                    ? 'Записываем...'
+                    : isAuthenticated
+                      ? 'Записаться'
+                      : 'Войти и записаться'}
+              </button>
+            </div>
+          )}
+
+        </div>
+
+        <div className={styles.main}>
+          {course.description && <p className={styles.description}>{course.description}</p>}
+
+          <div className={styles.modules}>
+            {course.modules?.map((module) => (
+              <ModuleDashboard
+                key={module.id}
+                module={module}
+                completedStageIds={completedStageIds}
+                onProgressChange={setCompletedStageIds}
+                isAuthenticated={isAuthenticated}
+                isEnrolled={enrolled}
+                onEnrollRequest={() =>
+                  enrollRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                }
+              />
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   )

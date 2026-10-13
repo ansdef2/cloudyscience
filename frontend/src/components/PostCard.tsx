@@ -4,6 +4,7 @@ import { useState } from 'react'
 import ImageWithFallback from './ImageWithFallback'
 import { Post, likePost } from '@/services/postService'
 import { useToast } from '@/hooks/useToast'
+import { APP_HOME } from '@/utils/navigation'
 import styles from './PostCard.module.css'
 
 /** «Сегодня в 14:48» / «12 июня в 09:30» — как в макете */
@@ -41,7 +42,7 @@ export default function PostCard({ post }: PostCardProps) {
   }
 
   const handleShare = async () => {
-    const url = `${window.location.origin}/?post=${post.id}`
+    const url = `${window.location.origin}${APP_HOME}?post=${post.id}`
 
     if (navigator.share) {
       try {
@@ -64,13 +65,15 @@ export default function PostCard({ post }: PostCardProps) {
     <article className={styles.card}>
       <div className={`${styles.glow} protoGlowSoft`} />
 
-      <ImageWithFallback
-        src={post.author?.avatar ?? ''}
-        alt={post.author?.name ?? 'Автор'}
-        className={styles.avatar}
-        bare
-      />
-      <p className={styles.author}>{post.author?.name}</p>
+      <div className={styles.head}>
+        <ImageWithFallback
+          src={post.author?.avatar ?? ''}
+          alt={post.author?.name ?? 'Автор'}
+          className={styles.avatar}
+          bare
+        />
+        <p className={styles.author}>{post.author?.name}</p>
+      </div>
 
       <ImageWithFallback
         src={post.image ?? ''}
@@ -79,26 +82,30 @@ export default function PostCard({ post }: PostCardProps) {
         fallbackText={post.title}
       />
 
-      <p className={styles.date}>{formatPublishedAt(post.publishedAt)}</p>
-      <h2 className={styles.title}>{post.title}</h2>
-      <p className={styles.text}>{post.text}</p>
+      <div className={styles.body}>
+        <p className={styles.date}>{formatPublishedAt(post.publishedAt)}</p>
+        <h2 className={styles.title}>{post.title}</h2>
+        <p className={styles.text}>{post.text}</p>
+      </div>
 
-      <button className={`${styles.likes} protoPill`} onClick={handleLike} disabled={isLiking}>
-        {likes} 👍
-      </button>
+      <div className={styles.footer}>
+        <button className="protoPill" onClick={handleLike} disabled={isLiking}>
+          {likes} 👍
+        </button>
 
-      <button className={`${styles.share} protoPill`} onClick={handleShare}>
-        Поделиться
-        <svg className={styles.shareIcon} viewBox="0 0 24 24" fill="none" aria-hidden>
-          <path
-            d="M14 4h6v6M20 4l-8.5 8.5M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"
-            stroke="currentColor"
-            strokeWidth="1.6"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </button>
+        <button className={`${styles.share} protoPill`} onClick={handleShare}>
+          Поделиться
+          <svg className={styles.shareIcon} viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path
+              d="M14 4h6v6M20 4l-8.5 8.5M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+      </div>
     </article>
   )
 }

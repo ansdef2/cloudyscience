@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import BrandLogo from '@/components/BrandLogo'
 import MapWindow, { MapPlace } from '@/components/map/MapWindow'
 import ProfileMenu from '@/components/ProfileMenu'
+import SiteHeader from '@/components/SiteHeader'
 import ActionCards from '@/components/ActionCards'
 import CourseCard from '@/components/CourseCard'
 import HighlightCard from '@/components/HighlightCard'
@@ -108,69 +109,82 @@ export default function HomePage() {
   }, [sort])
 
   return (
-    <div className={styles.container}>
-      <header className={styles.topBar}>
+    <div className={`${styles.container} protoPage`}>
+      <SiteHeader />
+
+      <header className={`${styles.topBar} protoMobileOnly`}>
         <BrandLogo height={26} className={styles.logo} />
         <ProfileMenu />
       </header>
 
+      {/*
+        Порядок блоков — мобильный: карта, поиск, действия, курсы, лента.
+        На десктопе боковая колонка встаёт справа от карты и ленты.
+      */}
       <div className={styles.content}>
-        <MapWindow places={places} />
-
-        <button className={styles.search} onClick={() => router.push('/search')}>
-          <svg className={styles.searchIcon} viewBox="0 0 20 20" fill="none" aria-hidden>
-            <circle cx="9" cy="9" r="6.5" stroke="currentColor" strokeWidth="1.5" />
-            <path d="m14 14 4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-          </svg>
-          Поиск
-        </button>
-
-        <div style={{ marginTop: 21 }}>
-          <ActionCards />
+        <div className={styles.mapArea}>
+          <MapWindow places={places} />
         </div>
 
-        <section className={styles.section}>
-          <div className={styles.sectionHead}>
-            <h2 className={styles.sectionTitle}>Свободные места на курсы</h2>
-            <button
-              className={styles.sectionAction}
-              aria-label="Все курсы"
-              onClick={() => router.push('/search?type=services')}
-            >
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden>
-                <path
-                  d="m9 6 6 6-6 6"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
+        <aside className={styles.side}>
+          <button className={styles.search} onClick={() => router.push('/search')}>
+            <svg className={styles.searchIcon} viewBox="0 0 20 20" fill="none" aria-hidden>
+              <circle cx="9" cy="9" r="6.5" stroke="currentColor" strokeWidth="1.5" />
+              <path d="m14 14 4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+            Поиск
+          </button>
+
+          <div className={styles.actions}>
+            <ActionCards />
           </div>
 
-          <div className={styles.carousel}>
-            {courses.length > 0 ? (
-              courses.map((course, index) => (
-                <CourseCard key={course.id} course={course} index={index} />
-              ))
-            ) : (
-              <p className={styles.empty}>Свободных мест сейчас нет</p>
-            )}
-          </div>
-        </section>
+          <section className={styles.section}>
+            <div className={styles.sectionHead}>
+              <h2 className={styles.sectionTitle}>Свободные места на курсы</h2>
+              <button
+                className={styles.sectionAction}
+                aria-label="Все курсы"
+                onClick={() =>
+                  // Курс на платформе один — ведём прямо на него, а не в пустой поиск
+                  router.push(allCourses.length === 1 ? `/course/${allCourses[0].id}` : '/search')
+                }
+              >
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden>
+                  <path
+                    d="m9 6 6 6-6 6"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
 
-        <section className={styles.section}>
-          <div className={styles.sectionHead}>
-            <h2 className={styles.sectionTitle}>Актуальное</h2>
-          </div>
+            <div className={`${styles.carousel} ${styles.courseList}`}>
+              {courses.length > 0 ? (
+                courses.map((course, index) => (
+                  <CourseCard key={course.id} course={course} index={index} />
+                ))
+              ) : (
+                <p className={styles.empty}>Свободных мест сейчас нет</p>
+              )}
+            </div>
+          </section>
 
-          <div className={styles.carousel}>
-            {highlights.map((post) => (
-              <HighlightCard key={post.id} post={post} />
-            ))}
-          </div>
-        </section>
+          <section className={styles.section}>
+            <div className={styles.sectionHead}>
+              <h2 className={styles.sectionTitle}>Актуальное</h2>
+            </div>
+
+            <div className={styles.carousel}>
+              {highlights.map((post) => (
+                <HighlightCard key={post.id} post={post} />
+              ))}
+            </div>
+          </section>
+        </aside>
 
         <section className={styles.feed}>
           <div className={styles.feedFilters}>

@@ -18,11 +18,12 @@ const timeAgo = (iso: string) => {
 }
 
 /**
- * Статус устройства из IoT-каналов. Пока у оборудования нет включённых
- * каналов, блок не показывается вовсе.
+ * Телеметрия устройства из IoT-каналов. Блок виден всегда: пока каналов
+ * нет, он показывает, что устройство ещё не подключено и через что его
+ * можно подключить, — это и есть резерв под IoT.
  */
 export default function IotStatus({ equipmentId }: { equipmentId: string }) {
-  const [channels, setChannels] = useState<IotChannel[]>([])
+  const [channels, setChannels] = useState<IotChannel[] | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -39,55 +40,72 @@ export default function IotStatus({ equipmentId }: { equipmentId: string }) {
     }
   }, [equipmentId])
 
-  if (channels.length === 0) return null
+  // Пока не знаем, есть ли каналы, места под блок не занимаем
+  if (channels === null) return null
 
   return (
-    <section className={styles.root} aria-label="Состояние устройства">
-      {channels.map((channel) => {
-        const online =
-          channel.lastSeenAt != null &&
-          Date.now() - new Date(channel.lastSeenAt).getTime() < ONLINE_WINDOW_MS
-        const reading = channel.lastReading
-        const progress = reading?.progress
+    <section className={styles.root} aria-label="Телеметрия">
+      <h2 className={styles.heading}>Телеметрия</h2>
 
-        return (
-          <div key={channel.id} className={styles.channel}>
-            <div className={styles.head}>
-              <span className={`${styles.dot} ${online ? styles.online : ''}`} aria-hidden />
-              <span className={styles.name}>{channel.name}</span>
-              <span className={styles.provider}>{channel.providerTitle}</span>
-            </div>
-
-            <p className={styles.state}>
-              {reading?.state ?? (online ? 'на связи' : 'нет данных')}
-              {reading?.job && <span className={styles.job}> · {reading.job}</span>}
-            </p>
-
-            {progress != null && (
-              <div
-                className={styles.track}
-                role="progressbar"
-                aria-valuemin={0}
-                aria-valuemax={100}
-                aria-valuenow={Math.round(progress)}
-              >
-                <div className={styles.fill} style={{ width: `${progress}%` }} />
-              </div>
-            )}
-
-            <div className={styles.foot}>
-              <span>
-                {channel.lastSeenAt ? `Сигнал ${timeAgo(channel.lastSeenAt)}` : 'Сигнала ещё не было'}
-              </span>
-              {channel.link && (
-                <a className={styles.link} href={channel.link} target="_blank" rel="noopener noreferrer">
-                  Открыть устройство
-                </a>
-              )}
-            </div>
+      {channels.length === 0 ? (
+        <div className={`${styles.channel} ${styles.empty}`}>
+          <div className={styles.head}>
+            <span className={styles.dot} aria-hidden />
+            <span className={styles.name}>Устройство не подключено</span>
+            <span className={styles.badge}>IoT</span>
           </div>
-        )
-      })}
+          <p className={styles.state}>
+            Когда устройство подключат через OctoEverywhere или Zenoh, здесь появятся его состояние,
+            прогресс задания и время последнего сигнала.
+          </p>
+        </div>
+      ) : (
+        channels.map((channel) => {
+          const online =
+            channel.lastSeenAt != null &&
+            Date.now() - new Date(channel.lastSeenAt).getTime() < ONLINE_WINDOW_MS
+          const reading = channel.lastReading
+          const progress = reading?.progress
+
+          return (
+            <div key={channel.id} className={styles.channel}>
+              <div className={styles.head}>
+                <span className={`${styles.dot} ${online ? styles.online : ''}`} aria-hidden />
+                <span className={styles.name}>{channel.name}</span>
+                <span className={styles.badge}>{channel.providerTitle}</span>
+              </div>
+
+              <p className={styles.state}>
+                {reading?.state ?? (online ? 'на связи' : 'нет данных')}
+                {reading?.job && <span className={styles.job}> · {reading.job}</span>}
+              </p>
+
+              {progress != null && (
+                <div
+                  className={styles.track}
+                  role="progressbar"
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={Math.round(progress)}
+                >
+                  <div className={styles.fill} style={{ width: `${progress}%` }} />
+                </div>
+              )}
+
+              <div className={styles.foot}>
+                <span>
+                  {channel.lastSeenAt ? `Сигнал ${timeAgo(channel.lastSeenAt)}` : 'Сигнала ещё не было'}
+                </span>
+                {channel.link && (
+                  <a className={styles.link} href={channel.link} target="_blank" rel="noopener noreferrer">
+                    Открыть устройство
+                  </a>
+                )}
+              </div>
+            </div>
+          )
+        })
+      )}
     </section>
   )
 }

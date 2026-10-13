@@ -52,15 +52,22 @@ export default function EquipmentCatalog() {
   }, [type, debouncedSearchQuery])
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} protoPage`}>
       <ProtoTopBar />
 
       <div className={styles.content}>
-        <ProtoSearchField
-          value={searchQuery}
-          onChange={setSearchQuery}
-          placeholder="Поиск оборудования"
-        />
+        <div className={styles.head}>
+          <h1 className={`${styles.pageTitle} protoDesktopOnly`}>
+            {type ? type : 'Оборудование'}
+          </h1>
+          <div className={styles.searchBox}>
+            <ProtoSearchField
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Поиск оборудования"
+            />
+          </div>
+        </div>
 
         {isLoading ? (
           <div className={`bigLoader ${styles.loader}`} />
