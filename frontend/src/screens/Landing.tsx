@@ -94,7 +94,6 @@ export default function Landing() {
       <main>
         <section className={styles.hero}>
           <div className={styles.heroText}>
-            <span className={styles.eyebrow}>Великий Новгород · Большая Московская</span>
             <h1 className={`${styles.heroTitle} protoBrandText`}>
               Оборудование и курсы технопарков — в одном окне
             </h1>
@@ -220,7 +219,6 @@ export default function Landing() {
 
       <footer className={styles.footer}>
         <span>© {new Date().getFullYear()} Облако науки</span>
-        <span>Великий Новгород · cloudyscience.ru</span>
       </footer>
     </div>
   )

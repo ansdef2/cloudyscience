@@ -336,7 +336,16 @@ cp deploy/.env.example deploy/.env      # домен, пароль базы, JWT
 docker compose -f deploy/docker-compose.single.yml --env-file deploy/.env up -d --build
 ```
 
-Обновление на работающем сервере. Схему при старте доводит
+Обновление на работающем сервере — одной командой: бэкап базы, код из GitHub,
+пересборка, проверка, что бэкенд поднялся. Если папка сайта была залита
+архивом или бандлом, скрипт сам переведёт её на `git clone` и перенесёт
+`deploy/.env`, сертификаты и 3D-модели:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ansdef2/cloudyscience/main/deploy/update.sh -o /root/update.sh && bash /root/update.sh
+```
+
+Вручную то же самое — так. Схему при старте доводит
 `sequelize.sync({ alter: true })`, данные — разовые патчи из
 [`server/src/config/patches.ts`](server/src/config/patches.ts): каждый
 выполняется один раз и отмечается в `data_patches`. Сид для этого не нужен.

@@ -214,6 +214,15 @@ gunzip -c ~/cloudco-2026-09-20.sql.gz | docker compose -f deploy/docker-compose.
 
 ## Обновление
 
+Одной командой — со всем, что ниже, плюс бэкап и проверка
+([`deploy/update.sh`](update.sh)):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ansdef2/cloudyscience/main/deploy/update.sh -o /root/update.sh && bash /root/update.sh
+```
+
+Вручную:
+
 ```bash
 cd /root/cloudco
 git pull                 # либо снова залить бандл
