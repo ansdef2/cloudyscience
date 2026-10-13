@@ -8,6 +8,8 @@ import { applyDataPatches } from './config/patches';
 import app from './app';
 import { startIotPolling } from './controllers/iotController';
 import { startUploadCleanup } from './controllers/uploadController';
+import { startNotificationCleanup } from './controllers/notificationController';
+import { attachRealtime } from './realtime/hub';
 
 const PORT = process.env.PORT || 3001;
 
@@ -25,8 +27,10 @@ const startServer = async () => {
     await applyDataPatches();
     startIotPolling();
     startUploadCleanup();
+    startNotificationCleanup();
 
     const server = http.createServer(app);
+    attachRealtime(server);
     server.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);
     });

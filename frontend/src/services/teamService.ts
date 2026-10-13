@@ -44,9 +44,38 @@ export async function deleteTeam(id: string): Promise<void> {
   await api.delete(`/teams/${id}`)
 }
 
-export async function addTeamMember(teamId: string, userId: string): Promise<Team> {
-  const response = await api.post<Team>(`/teams/${teamId}/members`, { userId })
-  return response.data
+export interface TeamInvitation {
+  id: string
+  teamId: string
+  status: 'pending' | 'accepted' | 'declined' | 'cancelled'
+  createdAt: string
+  Team?: { id: string; name: string; description?: string | null }
+  inviter?: { id: string; name: string; avatar?: string | null }
+  invitee?: { id: string; name: string; avatar?: string | null }
+}
+
+/** Пригласить в команду: человек попадёт в неё, когда примет приглашение */
+export async function inviteToTeam(teamId: string, userId: string) {
+  return (await api.post<TeamInvitation>(`/teams/${teamId}/invitations`, { userId })).data
+}
+
+/** Мои входящие приглашения */
+export async function getMyInvitations() {
+  return (await api.get<TeamInvitation[]>('/teams/invitations')).data
+}
+
+export async function respondInvitation(id: string, accept: boolean) {
+  return (await api.post<{ status: string; teamId: string }>(`/teams/invitations/${id}/${accept ? 'accept' : 'decline'}`))
+    .data
+}
+
+/** Ожидающие приглашения команды — для её создателя */
+export async function getTeamInvitations(teamId: string) {
+  return (await api.get<TeamInvitation[]>(`/teams/${teamId}/invitations`)).data
+}
+
+export async function cancelInvitation(teamId: string, invitationId: string) {
+  await api.delete(`/teams/${teamId}/invitations/${invitationId}`)
 }
 
 /** Убрать участника или выйти самому */

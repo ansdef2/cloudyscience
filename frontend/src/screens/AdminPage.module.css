@@ -100,6 +100,62 @@
   align-self: flex-end;
 }
 
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.badges > * {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.linkBox {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.subTabs {
+  align-self: flex-start;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.subTabs > * {
+  flex: 0 0 auto;
+  padding: 0 14px;
+  white-space: nowrap;
+}
+
+.report {
+  gap: 10px;
+}
+
+.reportHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.reportLine {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--proto-text-70);
+  overflow-wrap: anywhere;
+}
+
+.reportLine b {
+  font-weight: 500;
+  color: var(--proto-text);
+}
+
 .consultation {
   align-items: flex-start;
 }
@@ -119,7 +175,7 @@
 @media (min-width: 960px) {
   .tabs {
     align-self: flex-start;
-    width: 560px;
+    max-width: 100%;
   }
 
   .filters {

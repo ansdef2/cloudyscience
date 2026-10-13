@@ -11,6 +11,7 @@ import User from '../models/User';
 import { AuthRequest } from '../middleware/auth';
 import { Op } from 'sequelize';
 import { sendError } from '../utils/sendError';
+import { notify } from '../utils/notify';
 
 /**
  * Свободные места считаются от записей, а не уменьшаются счётчиком:
@@ -218,8 +219,17 @@ export const removeEnrollment = async (req: Request, res: Response) => {
       }
 
       const availableSpots = await syncAvailableSpots(course, transaction);
-      return { status: 200, body: { totalSpots: course.totalSpots, availableSpots } };
+      return { status: 200, body: { totalSpots: course.totalSpots, availableSpots }, title: course.title };
     });
+
+    if (result.status === 200 && 'title' in result) {
+      await notify(userId, {
+        type: 'enrollment_removed',
+        title: 'Вас сняли с курса',
+        body: `«${result.title}». Если это ошибка — напишите администратору площадки.`,
+        link: '/courses',
+      });
+    }
 
     res.status(result.status).json(result.body);
   } catch (error: any) {

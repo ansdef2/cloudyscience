@@ -1,0 +1,85 @@
+.backdrop {
+  position: fixed;
+  z-index: 120;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+}
+
+.dialog {
+  width: 100%;
+  max-width: 480px;
+  max-height: calc(100vh - 24px);
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  animation: rise 0.22s ease;
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+}
+
+.title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.target {
+  margin: -6px 0 0;
+  font-size: 13px;
+  color: var(--proto-text-60);
+  overflow-wrap: anywhere;
+}
+
+.reasons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.reason {
+  padding: 8px 12px;
+  border-radius: 40px;
+  background: var(--proto-field);
+  color: var(--proto-text-70);
+  font-family: var(--proto-font-text);
+  font-size: 13px;
+}
+
+.reasonActive {
+  background: #ffffff;
+  color: #000000;
+}
+
+.hint {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--proto-text-50);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+@media (min-width: 960px) {
+  .backdrop {
+    align-items: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dialog {
+    animation: none;
+  }
+}

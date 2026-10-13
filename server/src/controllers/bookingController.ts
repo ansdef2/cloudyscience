@@ -13,6 +13,18 @@ import { sendError } from '../utils/sendError';
 import { attachFilesToBooking } from './uploadController';
 import { BOOKING_FILES_MAX } from '../config/uploads';
 import { dayRange, normalizeTime, storedDate, validateSlot } from '../utils/schedule';
+import { notify, notifyAdmins } from '../utils/notify';
+
+const STATUS_LABEL: Record<string, string> = {
+  pending: 'ожидает подтверждения',
+  confirmed: 'подтверждена',
+  active: 'идёт',
+  completed: 'завершена',
+  cancelled: 'отменена',
+};
+
+const humanDate = (date: string | Date) =>
+  new Date(date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', timeZone: 'UTC' });
 
 const STATUSES = ['pending', 'confirmed', 'active', 'completed', 'cancelled'] as const;
 
@@ -141,7 +153,7 @@ export const createBooking = async (req: AuthRequest, res: Response) => {
       }
     }
 
-    const bookingId = await sequelize.transaction(async (transaction) => {
+    const created = await sequelize.transaction(async (transaction) => {
       // Блокировка строки оборудования выстраивает брони одного станка в очередь
       const equipment = await Equipment.findByPk(equipmentId, { transaction, lock: transaction.LOCK.UPDATE });
       if (!equipment) throw Object.assign(new Error('Оборудование не найдено'), { status: 404 });
@@ -171,10 +183,20 @@ export const createBooking = async (req: AuthRequest, res: Response) => {
       if (files.length) {
         await booking.update({ files: files.map((file) => file.originalName) }, { transaction });
       }
-      return booking.id;
+      return { id: booking.id, equipmentName: equipment.name, time: slotTime };
     });
 
-    res.status(201).json(await Booking.findByPk(bookingId, { include: details(false) }));
+    await notifyAdmins(
+      {
+        type: 'booking_new',
+        title: 'Новая бронь',
+        body: `${req.user.name}: ${created.equipmentName}, ${humanDate(storedDate(date))} в ${created.time}`,
+        link: '/admin?tab=bookings',
+      },
+      { email: true }
+    );
+
+    res.status(201).json(await Booking.findByPk(created.id, { include: details(false) }));
   } catch (error: any) {
     if (error instanceof SlotTaken) return slotTakenResponse(res);
     if (error?.status) return res.status(error.status).json({ error: error.message });
@@ -219,6 +241,9 @@ export const updateBooking = async (req: AuthRequest, res: Response) => {
       if (body.status === 'cancelled') changes.status = 'cancelled';
     }
 
+    const previousStatus = booking.status;
+    const previousAccess = booking.accessInfo ?? null;
+
     // Вернуть отменённую бронь можно, только если её слот никто не занял
     const reviving =
       booking.status === 'cancelled' && changes.status !== undefined && changes.status !== 'cancelled';
@@ -232,7 +257,46 @@ export const updateBooking = async (req: AuthRequest, res: Response) => {
       await booking.update(changes, { transaction });
     });
 
-    res.json(await Booking.findByPk(booking.id, { include: details(isAdmin) }));
+    const updated = await Booking.findByPk(booking.id, { include: details(isAdmin) });
+    const equipmentName = (updated as any)?.Equipment?.name ?? 'оборудование';
+    const when = `${humanDate(booking.date)} в ${booking.time}`;
+
+    if (isAdmin && booking.userId !== req.user.id) {
+      // Автору брони — о решении администратора; письмом, это важно не пропустить
+      if (changes.status !== undefined && previousStatus !== changes.status) {
+        await notify(
+          booking.userId,
+          {
+            type: 'booking_status',
+            title: `Бронь ${STATUS_LABEL[String(changes.status)] ?? changes.status}`,
+            body: `${equipmentName}, ${when}`,
+            link: '/profile',
+          },
+          { email: true }
+        );
+      }
+      if (changes.accessInfo && changes.accessInfo !== previousAccess) {
+        await notify(
+          booking.userId,
+          {
+            type: 'booking_access',
+            title: 'Данные для подключения к оборудованию',
+            body: `${equipmentName}, ${when}. Откройте бронь в профиле.`,
+            link: '/profile',
+          },
+          { email: true }
+        );
+      }
+    } else if (changes.status === 'cancelled' && previousStatus !== 'cancelled') {
+      await notifyAdmins({
+        type: 'booking_cancelled',
+        title: 'Бронь отменена',
+        body: `${req.user.name}: ${equipmentName}, ${when}`,
+        link: '/admin?tab=bookings',
+      });
+    }
+
+    res.json(updated);
   } catch (error: any) {
     if (error instanceof SlotTaken) return slotTakenResponse(res);
     sendError(res, error);

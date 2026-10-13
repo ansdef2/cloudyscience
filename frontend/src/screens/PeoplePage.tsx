@@ -11,7 +11,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useDebounce } from '@/hooks/useDebounce'
 import { useToast } from '@/hooks/useToast'
 import { Expert, getExperts, getLearners, Learner, requestConsultation } from '@/services/peopleService'
-import { addTeamMember, getMyTeams, Team } from '@/services/teamService'
+import { getMyTeams, inviteToTeam, Team } from '@/services/teamService'
 import { ApiError } from '@/utils/api'
 import { loginPathFromHere } from '@/utils/navigation'
 import ui from '@/styles/ui.module.css'
@@ -243,10 +243,10 @@ function LearnerList({ query }: { query: string }) {
 
   const invite = async (team: Team, learner: Learner) => {
     try {
-      await addTeamMember(team.id, learner.id)
-      toast.success(`${learner.name} теперь в команде «${team.name}»`)
+      await inviteToTeam(team.id, learner.id)
+      toast.success(`Приглашение в «${team.name}» отправлено — ${learner.name} увидит его в уведомлениях`)
     } catch (error) {
-      toast.error(error instanceof ApiError ? error.message : 'Не удалось добавить в команду')
+      toast.error(error instanceof ApiError ? error.message : 'Не удалось пригласить')
     } finally {
       setInviteFor(null)
     }
@@ -280,16 +280,16 @@ function LearnerList({ query }: { query: string }) {
                     : router.push('/teams?create=1')
                 }
                 aria-expanded={inviteFor === learner.id}
-                title={ownTeams.length ? 'Добавить в команду' : 'Сначала создайте команду'}
+                title={ownTeams.length ? 'Пригласить в команду' : 'Сначала создайте команду'}
               >
-                В команду
+                Пригласить
               </button>
             </div>
           </div>
 
           {inviteFor === learner.id && (
             <div className={`${ui.panel} ${styles.form}`}>
-              <span className={ui.label}>В какую команду добавить</span>
+              <span className={ui.label}>В какую команду пригласить</span>
               <div className={styles.teamChoices}>
                 {ownTeams.map((team) => (
                   <button key={team.id} className={`${ui.ghost} ${ui.small}`} onClick={() => invite(team, learner)}>

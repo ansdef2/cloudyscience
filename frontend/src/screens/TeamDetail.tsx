@@ -8,7 +8,15 @@ import BookingCard from '@/components/BookingCard'
 import AuthGate from '@/components/AuthGate'
 import { User } from '@/models/Api'
 import { Booking } from '@/services/bookingService'
-import { deleteTeam, getTeam, removeTeamMember, Team } from '@/services/teamService'
+import {
+  cancelInvitation,
+  deleteTeam,
+  getTeam,
+  getTeamInvitations,
+  removeTeamMember,
+  Team,
+  TeamInvitation,
+} from '@/services/teamService'
 import { useToast } from '@/hooks/useToast'
 import { api, ApiError } from '@/utils/api'
 import ui from '@/styles/ui.module.css'
@@ -31,6 +39,7 @@ function TeamView({ teamId, me }: { teamId: string; me: User }) {
   const [team, setTeam] = useState<Team | null>(null)
   const [bookings, setBookings] = useState<Booking[]>([])
   const [error, setError] = useState<string | null>(null)
+  const [invitations, setInvitations] = useState<TeamInvitation[]>([])
 
   const load = () =>
     getTeam(teamId)
@@ -50,10 +59,27 @@ function TeamView({ teamId, me }: { teamId: string; me: User }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [teamId])
 
+  const isOwner = team?.myRole === 'owner'
+
+  // Кого создатель уже позвал, но кто ещё не ответил
+  useEffect(() => {
+    if (!isOwner) return
+    getTeamInvitations(teamId)
+      .then(setInvitations)
+      .catch(() => setInvitations([]))
+  }, [isOwner, teamId])
+
   if (error) return <div className={ui.empty}>{error}</div>
   if (!team) return <div className="bigLoader" />
 
-  const isOwner = team.myRole === 'owner'
+  const revoke = async (invitation: TeamInvitation) => {
+    try {
+      await cancelInvitation(team.id, invitation.id)
+      setInvitations((current) => current.filter((item) => item.id !== invitation.id))
+    } catch (revokeError) {
+      toast.error(revokeError instanceof ApiError ? revokeError.message : 'Не получилось')
+    }
+  }
 
   const remove = async (userId: string, name: string) => {
     if (!window.confirm(userId === me.id ? 'Выйти из команды?' : `Убрать ${name} из команды?`)) return
@@ -108,7 +134,7 @@ function TeamView({ teamId, me }: { teamId: string; me: User }) {
             <h2 className={ui.sectionTitle}>Участники</h2>
             {isOwner && (
               <button className={`${ui.ghost} ${ui.small}`} onClick={() => router.push('/people?tab=learners')}>
-                + Добавить
+                + Пригласить
               </button>
             )}
           </div>
@@ -141,6 +167,20 @@ function TeamView({ teamId, me }: { teamId: string; me: User }) {
                       ✕
                     </button>
                   )}
+                </div>
+              </div>
+            ))}
+            {invitations.map((invitation) => (
+              <div key={invitation.id} className={`${ui.card} ${ui.cardWrap} ${styles.pendingMember}`}>
+                <Avatar name={invitation.invitee?.name ?? '?'} src={invitation.invitee?.avatar} size={40} />
+                <div className={ui.cardBody}>
+                  <span className={ui.cardTitle}>{invitation.invitee?.name}</span>
+                  <span className={ui.cardMeta}>Приглашение отправлено, ждём ответа</span>
+                </div>
+                <div className={ui.cardActions}>
+                  <button className={`${ui.ghost} ${ui.small}`} onClick={() => revoke(invitation)}>
+                    Отозвать
+                  </button>
                 </div>
               </div>
             ))}

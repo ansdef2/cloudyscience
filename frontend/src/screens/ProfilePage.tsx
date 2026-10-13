@@ -13,6 +13,7 @@ import { User } from '@/models/Api'
 import { Booking, cancelBooking, getUserBookings } from '@/services/bookingService'
 import { getUnreadCount } from '@/services/chatService'
 import { resendParentConsent } from '@/services/accountService'
+import { getNotifications } from '@/services/notificationService'
 import {
   CONSULTATION_STATUS,
   Consultation,
@@ -44,12 +45,16 @@ function Profile({ user }: { user: User }) {
   const toast = useToast()
   const { logout } = useAuth()
   const [unread, setUnread] = useState(0)
+  const [notificationsUnread, setNotificationsUnread] = useState(0)
   const [teams, setTeams] = useState<Team[]>([])
   const [bookings, setBookings] = useState<Booking[] | null>(null)
   const [consultations, setConsultations] = useState<Consultation[]>([])
 
   useEffect(() => {
     getUnreadCount().then(setUnread).catch(() => setUnread(0))
+    getNotifications()
+      .then((data) => setNotificationsUnread(data.unread))
+      .catch(() => setNotificationsUnread(0))
     getMyTeams().then(setTeams).catch(() => setTeams([]))
     getUserBookings().then(setBookings).catch(() => setBookings([]))
     getConsultations().then(setConsultations).catch(() => setConsultations([]))
@@ -130,6 +135,14 @@ function Profile({ user }: { user: User }) {
       )}
 
       <nav className={styles.links} aria-label="Разделы профиля">
+        <button className={`${ui.card} ${ui.cardLink} ${styles.link}`} onClick={() => router.push('/notifications')}>
+          <span className={styles.linkTitle}>Уведомления</span>
+          {notificationsUnread > 0 ? (
+            <span className={styles.unread}>{notificationsUnread}</span>
+          ) : (
+            <span className={ui.muted}>›</span>
+          )}
+        </button>
         <button className={`${ui.card} ${ui.cardLink} ${styles.link}`} onClick={() => router.push('/chats')}>
           <span className={styles.linkTitle}>Чаты</span>
           {unread > 0 ? <span className={styles.unread}>{unread}</span> : <span className={ui.muted}>›</span>}

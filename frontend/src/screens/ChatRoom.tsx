@@ -14,12 +14,17 @@ import {
   sendTeamMessage,
 } from '@/services/chatService'
 import { getTeam } from '@/services/teamService'
+import { blockUser, unblockUser } from '@/services/safetyService'
+import ReportDialog from '@/components/ReportDialog'
 import { useToast } from '@/hooks/useToast'
+import { useRealtime, useRealtimeConnected } from '@/hooks/useRealtime'
 import { ApiError } from '@/utils/api'
 import ui from '@/styles/ui.module.css'
 import styles from './Chats.module.css'
 
+/** Без сокета опрашиваем часто, с ним — изредка, на случай потерянного события */
 const POLL_MS = 4000
+const POLL_CONNECTED_MS = 30000
 
 interface ChatRoomProps {
   kind: 'user' | 'team'
@@ -47,6 +52,12 @@ function Room({ kind, id, me }: ChatRoomProps & { me: User }) {
   const [error, setError] = useState<string | null>(null)
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
+  const [canWrite, setCanWrite] = useState(true)
+  const [blockedByMe, setBlockedByMe] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [report, setReport] = useState<{ userId?: string; messageId?: string; label: string } | null>(null)
+  const connected = useRealtimeConnected()
   const listRef = useRef<HTMLDivElement>(null)
   const lastAtRef = useRef<string | undefined>(undefined)
 
@@ -72,6 +83,8 @@ function Room({ kind, id, me }: ChatRoomProps & { me: User }) {
             setAvatar(data.peer.avatar ?? null)
             setMessages([])
           }
+          setCanWrite(data.canWrite !== false)
+          setBlockedByMe(!!data.blockedByMe)
           append(data.messages)
         } else {
           if (initial) {
@@ -85,16 +98,45 @@ function Room({ kind, id, me }: ChatRoomProps & { me: User }) {
         if (initial) setError(loadError instanceof ApiError ? loadError.message : 'Чат недоступен')
       }
     },
-    [kind, id, append]
+    [kind, id, append],
   )
 
   useEffect(() => {
     lastAtRef.current = undefined
     setMessages(null)
     load(true)
-    const timer = window.setInterval(() => load(false), POLL_MS)
-    return () => window.clearInterval(timer)
   }, [load])
+
+  useEffect(() => {
+    const timer = window.setInterval(() => load(false), connected ? POLL_CONNECTED_MS : POLL_MS)
+    return () => window.clearInterval(timer)
+  }, [load, connected])
+
+  // Новое сообщение в этом чате пришло по сокету — дотягиваем его (заодно отмечается прочитанным)
+  useRealtime((event) => {
+    if (event.type === 'message' && event.kind === kind && event.chatId === id) load(false)
+  })
+
+  const toggleBlock = async () => {
+    setMenuOpen(false)
+    try {
+      if (blockedByMe) {
+        await unblockUser(id)
+        toast.success('Блокировка снята')
+      } else {
+        if (!window.confirm(`Заблокировать ${title}? Вы не сможете писать друг другу, пока не снимете блокировку.`))
+          return
+        await blockUser(id)
+        toast.success('Пользователь заблокирован')
+      }
+      await load(false)
+      const data = await getDirectMessages(id)
+      setCanWrite(data.canWrite !== false)
+      setBlockedByMe(!!data.blockedByMe)
+    } catch (blockError) {
+      toast.error(blockError instanceof ApiError ? blockError.message : 'Не получилось')
+    }
+  }
 
   // Новое сообщение — прокрутка вниз
   useEffect(() => {
@@ -108,8 +150,7 @@ function Room({ kind, id, me }: ChatRoomProps & { me: User }) {
 
     setSending(true)
     try {
-      const message =
-        kind === 'user' ? await sendDirectMessage(id, value) : await sendTeamMessage(id, value)
+      const message = kind === 'user' ? await sendDirectMessage(id, value) : await sendTeamMessage(id, value)
       append([{ ...message, sender: message.sender ?? { id: me.id, name: me.name } }])
       setText('')
     } catch (sendError) {
@@ -135,10 +176,34 @@ function Room({ kind, id, me }: ChatRoomProps & { me: User }) {
           <span className={ui.cardTitle}>{title || '…'}</span>
           <span className={ui.cardMeta}>{kind === 'team' ? 'Чат команды' : 'Личные сообщения'}</span>
         </div>
-        {kind === 'team' && (
+        {kind === 'team' ? (
           <button className={`${ui.ghost} ${ui.small}`} onClick={() => router.push(`/teams/${id}`)}>
             О команде
           </button>
+        ) : (
+          <div className={styles.menuWrap}>
+            <button
+              className={`${ui.ghost} ${ui.small} ${styles.menuButton}`}
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-expanded={menuOpen}
+              aria-label="Действия"
+            >
+              ⋯
+            </button>
+            {menuOpen && (
+              <div className={styles.menu}>
+                <button
+                  onClick={() => {
+                    setMenuOpen(false)
+                    setReport({ userId: id, label: title })
+                  }}
+                >
+                  Пожаловаться
+                </button>
+                <button onClick={toggleBlock}>{blockedByMe ? 'Разблокировать' : 'Заблокировать'}</button>
+              </div>
+            )}
+          </div>
         )}
       </header>
 
@@ -150,9 +215,13 @@ function Room({ kind, id, me }: ChatRoomProps & { me: User }) {
         ) : (
           messages.map((message) => {
             const mine = message.senderId === me.id
+            const selected = selectedId === message.id
             return (
               <div key={message.id} className={`${styles.bubbleRow} ${mine ? styles.mine : ''}`}>
-                <div className={styles.bubble}>
+                <div
+                  className={`${styles.bubble} ${!mine ? styles.bubbleSelectable : ''}`}
+                  onClick={() => !mine && setSelectedId(selected ? null : message.id)}
+                >
                   {kind === 'team' && !mine && <span className={styles.sender}>{message.sender?.name}</span>}
                   <span className={styles.bubbleText}>{message.text}</span>
                   <time className={styles.bubbleTime} dateTime={message.createdAt}>
@@ -162,37 +231,68 @@ function Room({ kind, id, me }: ChatRoomProps & { me: User }) {
                     })}
                   </time>
                 </div>
+                {selected && (
+                  <button
+                    className={styles.reportMessage}
+                    onClick={() => {
+                      setSelectedId(null)
+                      setReport({
+                        messageId: message.id,
+                        label: `${message.sender?.name ?? title}: «${message.text.slice(0, 80)}»`,
+                      })
+                    }}
+                  >
+                    Пожаловаться
+                  </button>
+                )}
               </div>
             )
           })
         )}
       </div>
 
-      <form className={styles.composer} onSubmit={send}>
-        <textarea
-          className={`${ui.textarea} ${styles.composerInput}`}
-          value={text}
-          onChange={(event) => setText(event.target.value)}
-          onKeyDown={(event) => {
-            // Enter — отправить, Shift+Enter — новая строка
-            if (event.key === 'Enter' && !event.shiftKey) send(event)
-          }}
-          placeholder="Сообщение"
-          rows={1}
-          maxLength={2000}
-          aria-label="Сообщение"
-        />
-        <button
-          className={`${ui.primary} ${styles.send}`}
-          type="submit"
-          disabled={sending || !text.trim()}
-          aria-label="Отправить"
-        >
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden>
-            <path d="M4 12 20 4l-6 16-2.5-6.5L4 12Z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" />
-          </svg>
-        </button>
-      </form>
+      {report && <ReportDialog target={report} onClose={() => setReport(null)} />}
+
+      {!canWrite ? (
+        <div className={styles.composerBlocked}>
+          {blockedByMe ? (
+            <>
+              Вы заблокировали собеседника.{' '}
+              <button className={styles.inlineAction} onClick={toggleBlock}>
+                Разблокировать
+              </button>
+            </>
+          ) : (
+            'Этому пользователю сейчас нельзя написать'
+          )}
+        </div>
+      ) : (
+        <form className={styles.composer} onSubmit={send}>
+          <textarea
+            className={`${ui.textarea} ${styles.composerInput}`}
+            value={text}
+            onChange={(event) => setText(event.target.value)}
+            onKeyDown={(event) => {
+              // Enter — отправить, Shift+Enter — новая строка
+              if (event.key === 'Enter' && !event.shiftKey) send(event)
+            }}
+            placeholder="Сообщение"
+            rows={1}
+            maxLength={2000}
+            aria-label="Сообщение"
+          />
+          <button
+            className={`${ui.primary} ${styles.send}`}
+            type="submit"
+            disabled={sending || !text.trim()}
+            aria-label="Отправить"
+          >
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path d="M4 12 20 4l-6 16-2.5-6.5L4 12Z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" />
+            </svg>
+          </button>
+        </form>
+      )}
     </div>
   )
 }

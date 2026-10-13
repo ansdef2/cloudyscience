@@ -3,6 +3,7 @@ import { authApi } from '@/utils/LegacyApi';
 import { clearAuthToken, getAuthToken, setAuthToken } from '@/utils/api';
 import { preventSilentSignIn, saveCredential, setRememberedLogin } from '@/utils/credentials';
 import { RegisterData, User } from '@/models/Api';
+import { disconnectRealtime } from '@/utils/realtime';
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -70,6 +71,7 @@ export const useAuth = () => {
 
   const logout = () => {
     clearAuthToken();
+    disconnectRealtime();
     preventSilentSignIn();
     setUser(null);
   };

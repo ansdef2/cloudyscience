@@ -8,8 +8,12 @@ import Equipment from '../models/Equipment';
 import Message from '../models/Message';
 import Team from '../models/Team';
 import TeamMember from '../models/TeamMember';
+import TeamInvitation from '../models/TeamInvitation';
 import User from '../models/User';
+import { pushTo } from '../realtime/hub';
+import { notify } from '../utils/notify';
 import { sendError } from '../utils/sendError';
+import { isBlockedBetween } from './safetyController';
 
 /** Что о человеке видят другие: без почты и пароля */
 export const PUBLIC_USER_ATTRIBUTES = ['id', 'name', 'avatar'];
@@ -126,26 +130,141 @@ export const deleteTeam = async (req: AuthRequest, res: Response) => {
   }
 };
 
-/** Добавить участника — создатель команды добавляет человека из поиска обучающихся */
-export const addMember = async (req: AuthRequest, res: Response) => {
+/**
+ * Пригласить в команду — создатель зовёт человека из поиска обучающихся.
+ * В команду человек попадает, только когда сам примет приглашение.
+ */
+export const inviteMember = async (req: AuthRequest, res: Response) => {
   try {
     const team = await Team.findByPk(req.params.id);
     if (!team) return res.status(404).json({ error: 'Команда не найдена' });
     if (team.ownerId !== req.user.id) {
-      return res.status(403).json({ error: 'Добавлять участников может только создатель команды' });
+      return res.status(403).json({ error: 'Приглашать может только создатель команды' });
     }
 
-    const user = await User.findByPk(req.body?.userId, { attributes: PUBLIC_USER_ATTRIBUTES });
-    if (!user) return res.status(404).json({ error: 'Пользователь не найден' });
-
-    const [, created] = await TeamMember.findOrCreate({
-      where: { teamId: team.id, userId: user.id },
-      defaults: { teamId: team.id, userId: user.id, role: 'member' },
+    const user = await User.findByPk(req.body?.userId, {
+      attributes: ['id', 'name', 'isBlocked', 'parentConsentStatus'],
     });
-    if (!created) return res.status(409).json({ error: 'Уже в команде' });
+    if (!user || user.isBlocked || user.parentConsentStatus === 'pending') {
+      return res.status(404).json({ error: 'Пользователь не найден' });
+    }
+    if (user.id === req.user.id) return res.status(400).json({ error: 'Вы уже в команде' });
+    if (await isBlockedBetween(req.user.id, user.id)) {
+      return res.status(403).json({ error: 'Этого человека нельзя пригласить' });
+    }
+    if (await findMembership(team.id, user.id)) return res.status(409).json({ error: 'Уже в команде' });
 
-    const full = await loadTeam(team.id);
-    res.status(201).json(full);
+    const existing = await TeamInvitation.findOne({
+      where: { teamId: team.id, inviteeId: user.id, status: 'pending' },
+    });
+    if (existing) return res.status(409).json({ error: 'Приглашение уже отправлено' });
+
+    const invitation = await TeamInvitation.create({
+      teamId: team.id,
+      inviterId: req.user.id,
+      inviteeId: user.id,
+    });
+
+    await notify(
+      user.id,
+      {
+        type: 'team_invitation',
+        title: `Приглашение в команду «${team.name}»`,
+        body: `${req.user.name} зовёт вас в исследовательскую команду`,
+        link: '/teams',
+      },
+      { email: true }
+    );
+
+    res.status(201).json({ id: invitation.id, status: invitation.status, invitee: { id: user.id, name: user.name } });
+  } catch (error) {
+    sendError(res, error);
+  }
+};
+
+/** Мои входящие приглашения */
+export const getMyInvitations = async (req: AuthRequest, res: Response) => {
+  try {
+    const invitations = await TeamInvitation.findAll({
+      where: { inviteeId: req.user.id, status: 'pending' },
+      include: [
+        { model: Team, attributes: ['id', 'name', 'description'] },
+        { model: User, as: 'inviter', attributes: PUBLIC_USER_ATTRIBUTES },
+      ],
+      order: [['createdAt', 'DESC']],
+    });
+    res.json(invitations);
+  } catch (error) {
+    sendError(res, error);
+  }
+};
+
+/** Ожидающие приглашения команды — её создателю */
+export const getTeamInvitations = async (req: AuthRequest, res: Response) => {
+  try {
+    const team = await Team.findByPk(req.params.id);
+    if (!team) return res.status(404).json({ error: 'Команда не найдена' });
+    if (team.ownerId !== req.user.id && req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Приглашения видит создатель команды' });
+    }
+    const invitations = await TeamInvitation.findAll({
+      where: { teamId: team.id, status: 'pending' },
+      include: [{ model: User, as: 'invitee', attributes: PUBLIC_USER_ATTRIBUTES }],
+      order: [['createdAt', 'DESC']],
+    });
+    res.json(invitations);
+  } catch (error) {
+    sendError(res, error);
+  }
+};
+
+/** Принять или отклонить приглашение */
+export const respondInvitation = async (req: AuthRequest, res: Response) => {
+  try {
+    const accept = req.params.action === 'accept';
+    const invitation = await TeamInvitation.findByPk(req.params.invitationId, { include: [{ model: Team }] });
+    if (!invitation || invitation.inviteeId !== req.user.id) {
+      return res.status(404).json({ error: 'Приглашение не найдено' });
+    }
+    if (invitation.status !== 'pending') return res.status(409).json({ error: 'Приглашение уже неактуально' });
+
+    const team = (invitation as any).Team as Team | null;
+    if (!team) return res.status(410).json({ error: 'Команды больше нет' });
+
+    await sequelize.transaction(async (transaction) => {
+      await invitation.update({ status: accept ? 'accepted' : 'declined' }, { transaction });
+      if (accept) {
+        await TeamMember.findOrCreate({
+          where: { teamId: team.id, userId: req.user.id },
+          defaults: { teamId: team.id, userId: req.user.id, role: 'member' },
+          transaction,
+        });
+      }
+    });
+
+    await notify(team.ownerId, {
+      type: accept ? 'team_invitation_accepted' : 'team_invitation_declined',
+      title: accept ? `${req.user.name} теперь в команде «${team.name}»` : `${req.user.name} отклонил(а) приглашение`,
+      link: `/teams/${team.id}`,
+    });
+
+    res.json({ status: invitation.status, teamId: team.id });
+  } catch (error) {
+    sendError(res, error);
+  }
+};
+
+/** Создатель отзывает приглашение */
+export const cancelInvitation = async (req: AuthRequest, res: Response) => {
+  try {
+    const team = await Team.findByPk(req.params.id);
+    if (!team || team.ownerId !== req.user.id) return res.status(404).json({ error: 'Команда не найдена' });
+    const updated = await TeamInvitation.update(
+      { status: 'cancelled' },
+      { where: { id: req.params.invitationId, teamId: team.id, status: 'pending' } }
+    );
+    if (!updated[0]) return res.status(404).json({ error: 'Приглашение не найдено' });
+    res.json({ status: 'cancelled' });
   } catch (error) {
     sendError(res, error);
   }
@@ -211,6 +330,13 @@ export const postTeamMessage = async (req: AuthRequest, res: Response) => {
     const full = await Message.findByPk(message.id, {
       include: [{ model: User, as: 'sender', attributes: PUBLIC_USER_ATTRIBUTES }],
     });
+
+    const members = await TeamMember.findAll({ where: { teamId: req.params.id }, attributes: ['userId'] });
+    pushTo(
+      members.map((member) => member.userId),
+      { type: 'message', kind: 'team', chatId: req.params.id, message: full!.toJSON() }
+    );
+
     res.status(201).json(full);
   } catch (error) {
     sendError(res, error);

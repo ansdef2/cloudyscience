@@ -7,6 +7,7 @@ import BottomNav from '@/components/BottomNav'
 import Avatar from '@/components/Avatar'
 import AuthGate from '@/components/AuthGate'
 import { ChatSummary, getChats } from '@/services/chatService'
+import { useRealtime } from '@/hooks/useRealtime'
 import ui from '@/styles/ui.module.css'
 import styles from './Chats.module.css'
 
@@ -41,6 +42,15 @@ export default function ChatsPage() {
 function ChatList() {
   const router = useRouter()
   const [chats, setChats] = useState<ChatSummary[] | null>(null)
+
+  // Новое сообщение в любом чате — список пересобирается сразу
+  useRealtime((event) => {
+    if (event.type === 'message') {
+      getChats()
+        .then(setChats)
+        .catch(() => undefined)
+    }
+  })
 
   useEffect(() => {
     let cancelled = false

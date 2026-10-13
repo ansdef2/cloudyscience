@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
@@ -21,8 +21,18 @@ export default function AccountNotice() {
   const pathname = usePathname()
   const { user, setUser } = useAuth()
   const [saving, setSaving] = useState(false)
+  const visible = !!user && !user.consentAt && !QUIET_PATHS.some((path) => pathname?.startsWith(path))
 
-  if (!user || user.consentAt || QUIET_PATHS.some((path) => pathname?.startsWith(path))) return null
+  // Пока плашка видна, низ страницы не должен прятаться под ней
+  useEffect(() => {
+    if (!visible) return
+    document.body.style.paddingBottom = '200px'
+    return () => {
+      document.body.style.paddingBottom = ''
+    }
+  }, [visible])
+
+  if (!visible) return null
 
   const accept = async () => {
     setSaving(true)

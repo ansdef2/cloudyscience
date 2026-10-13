@@ -7,6 +7,7 @@ import { siteUrl } from '../utils/mailer';
 import { issueToken } from '../utils/userTokens';
 import { adminView } from '../utils/userView';
 import { sendParentConsentLetter } from './authController';
+import { disconnectUser } from '../realtime/hub';
 
 /** Пользователи для админки: поиск по имени и почте, фильтр по статусу */
 export const listUsers = async (req: AuthRequest, res: Response) => {
@@ -63,6 +64,7 @@ export const updateUserByAdmin = async (req: AuthRequest, res: Response) => {
     }
 
     await user.update(changes);
+    if (changes.isBlocked) disconnectUser(user.id);
     res.json(adminView(user));
   } catch (error) {
     sendError(res, error);

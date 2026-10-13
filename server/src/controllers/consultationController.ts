@@ -5,6 +5,14 @@ import Institution from '../models/Institution';
 import Specialist from '../models/Specialist';
 import User from '../models/User';
 import { sendError } from '../utils/sendError';
+import { notify, notifyAdmins } from '../utils/notify';
+
+const STATUS_LABEL: Record<string, string> = {
+  new: 'принята',
+  confirmed: 'подтверждена',
+  done: 'проведена',
+  cancelled: 'отменена',
+};
 
 const STATUSES = ['new', 'confirmed', 'done', 'cancelled'] as const;
 
@@ -34,6 +42,17 @@ export const requestConsultation = async (req: AuthRequest, res: Response) => {
     });
 
     const full = await ConsultationRequest.findByPk(request.id, { include: withDetails(false) });
+
+    await notifyAdmins(
+      {
+        type: 'consultation_new',
+        title: 'Заявка на консультацию',
+        body: `${req.user.name} → ${specialist.name}${preferredDate ? `, ${preferredDate}` : ''}${preferredTime ? ` ${preferredTime}` : ''}`,
+        link: '/admin?tab=consultations',
+      },
+      { email: true }
+    );
+
     res.status(201).json(full);
   } catch (error) {
     sendError(res, error);
@@ -72,8 +91,23 @@ export const updateConsultation = async (req: AuthRequest, res: Response) => {
       return res.status(403).json({ error: 'Недостаточно прав' });
     }
 
+    const previous = request.status;
     await request.update({ status });
     const full = await ConsultationRequest.findByPk(request.id, { include: withDetails(isAdmin) });
+
+    if (isAdmin && request.userId !== req.user.id && previous !== status) {
+      await notify(
+        request.userId,
+        {
+          type: 'consultation_status',
+          title: `Консультация ${STATUS_LABEL[status]}`,
+          body: `${(full as any)?.Specialist?.name ?? 'Эксперт'}`,
+          link: '/profile',
+        },
+        { email: true }
+      );
+    }
+
     res.json(full);
   } catch (error) {
     sendError(res, error);

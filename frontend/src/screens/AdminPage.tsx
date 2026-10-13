@@ -17,8 +17,10 @@ import { downloadUpload, formatSize } from '@/services/uploadService'
 import { BOOKING_STATUS, pluralize } from '@/utils/format'
 import ui from '@/styles/ui.module.css'
 import styles from './AdminPage.module.css'
+import UsersTab from './admin/UsersTab'
+import ReportsTab from './admin/ReportsTab'
 
-type Tab = 'enrollments' | 'bookings' | 'consultations'
+type Tab = 'enrollments' | 'bookings' | 'consultations' | 'users' | 'reports'
 
 interface Enrollment {
   id: string
@@ -49,6 +51,8 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'enrollments', label: 'Записи на курс' },
   { id: 'bookings', label: 'Брони' },
   { id: 'consultations', label: 'Консультации' },
+  { id: 'users', label: 'Пользователи' },
+  { id: 'reports', label: 'Жалобы' },
 ]
 
 const formatDate = (iso: string) =>
@@ -73,7 +77,7 @@ export default function AdminPage() {
       <div className={ui.content}>
         <h1 className={ui.title}>Админка</h1>
         <AuthGate reason="Войдите под учётной записью администратора" adminOnly>
-          {() => (
+          {(me) => (
             <>
               <div className={`${ui.tabs} ${styles.tabs}`} role="tablist">
                 {TABS.map((item) => (
@@ -92,6 +96,8 @@ export default function AdminPage() {
               {tab === 'enrollments' && <Enrollments />}
               {tab === 'bookings' && <Bookings />}
               {tab === 'consultations' && <Consultations />}
+              {tab === 'users' && <UsersTab meId={me.id} />}
+              {tab === 'reports' && <ReportsTab />}
             </>
           )}
         </AuthGate>

@@ -5,6 +5,7 @@ import { AuthRequest } from '../middleware/auth';
 import { sendError } from '../utils/sendError';
 import { comparePassword } from '../utils/hashPassword';
 import { deleteAccount } from '../utils/deleteAccount';
+import { blockedPeerIds } from './safetyController';
 import { selfView } from '../utils/userView';
 import { removeStoredFile, PUBLIC_DIR } from '../config/uploads';
 import { storeImage } from './uploadController';
@@ -38,10 +39,12 @@ export const getAllUsers = async (req: any, res: Response) => {
  */
 export const getDirectory = async (req: AuthRequest, res: Response) => {
   try {
-    // Заблокированных и детей без согласия родителя в поиске нет: им нельзя писать
+    // Заблокированных, детей без согласия родителя и тех, с кем есть
+    // личная блокировка, в поиске нет: им всё равно нельзя написать
+    const hidden = [req.user.id, ...(await blockedPeerIds(req.user.id))];
     const where: any = {
       role: 'user',
-      id: { [Op.ne]: req.user.id },
+      id: { [Op.notIn]: hidden },
       isBlocked: false,
       parentConsentStatus: { [Op.ne]: 'pending' },
     };

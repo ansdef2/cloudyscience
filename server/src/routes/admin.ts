@@ -6,6 +6,8 @@ import {
   listUsers,
   updateUserByAdmin,
 } from '../controllers/adminUserController';
+import { listReports, resolveReport } from '../controllers/safetyController';
+import { deleteUser } from '../controllers/userController';
 import { authenticate, authorizeAdmin } from '../middleware/auth';
 
 /** Сводки для админки. Брони и заявки отдают свои ручки — админу там видно всё */
@@ -18,5 +20,8 @@ router.get('/users', listUsers);
 router.put('/users/:id', updateUserByAdmin);
 router.post('/users/:id/reset-link', createResetLink);
 router.post('/users/:id/parent-consent-link', createParentConsentLink);
+router.delete('/users/:id', deleteUser);
+router.get('/reports', listReports);
+router.put('/reports/:id', resolveReport);
 
 export default router;

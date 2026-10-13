@@ -19,6 +19,8 @@ import chatRoutes from './routes/chats';
 import consultationRoutes from './routes/consultations';
 import adminRoutes from './routes/admin';
 import uploadRoutes from './routes/uploads';
+import notificationRoutes from './routes/notifications';
+import safetyRoutes from './routes/safety';
 import { servePublicFile } from './controllers/uploadController';
 import { apiLimiter } from './middleware/rateLimit';
 
@@ -56,6 +58,8 @@ app.use('/api/chats', chatRoutes);
 app.use('/api/consultations', consultationRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/uploads', uploadRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/safety', safetyRoutes);
 app.get('/api/files/:name', servePublicFile);
 
 app.get('/api/health', (_req, res) => {
