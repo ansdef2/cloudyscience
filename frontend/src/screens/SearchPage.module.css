@@ -25,6 +25,35 @@
   margin-top: 24px;
 }
 
+/* Что искать — фильтр-«таблетки», прокручиваются на узком экране */
+.types {
+  display: flex;
+  margin-top: 12px;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.types::-webkit-scrollbar {
+  display: none;
+}
+
+.type {
+  flex: 0 0 auto;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 40px;
+  background: var(--proto-field);
+  color: var(--proto-text-70);
+  font-family: var(--proto-font-text);
+  font-size: 13px;
+}
+
+.typeActive {
+  background: #ffffff;
+  color: #000000;
+}
+
 /* Десктоп: заголовок и поле поиска в строку, выдача — сеткой */
 @media (min-width: 960px) {
   .content {
@@ -49,6 +78,10 @@
 
   .searchBox {
     max-width: 640px;
+  }
+
+  .types {
+    margin-top: 0;
   }
 
   .actions {

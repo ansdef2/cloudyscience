@@ -3,11 +3,19 @@
 #
 # Запуск:  docker compose -f deploy/docker-compose.timeweb.yml --env-file deploy/.env up -d --build
 
+# Логи контейнеров не разрастаются: до 5 файлов по 10 МБ на сервис
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
 services:
   caddy:
     image: caddy:2-alpine
     container_name: cloudco-caddy
     restart: unless-stopped
+    logging: *logging
     ports:
       - "80:80"
       - "443:443"
@@ -27,6 +35,13 @@ services:
       dockerfile: server/Dockerfile
     container_name: cloudco-backend
     restart: unless-stopped
+    logging: *logging
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
     environment:
       NODE_ENV: production
       PORT: 3001
@@ -47,12 +62,27 @@ services:
       JWT_SECRET: ${JWT_SECRET:?задайте JWT_SECRET в deploy/.env}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
       CORS_ORIGIN: ${PUBLIC_URL:?укажите PUBLIC_URL в deploy/.env}
+      # Адрес сайта — для ссылок в письмах (сброс пароля, согласие родителя)
+      PUBLIC_URL: ${PUBLIC_URL}
+
+      # Почта для писем. Без SMTP_HOST письма не уходят, ссылки выдаёт администратор
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-465}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      # Куда слать администратору письма о новых бронях, заявках и жалобах
+      ADMIN_NOTIFY_EMAIL: ${ADMIN_NOTIFY_EMAIL:-}
+
+      # Загруженные файлы (к броням, аватары, картинки) — в томе uploads
+      UPLOAD_DIR: /app/uploads
 
       # Сид пересоздаёт схему и стирает данные — запускается вручную, см. DEPLOY_TIMEWEB.md
       SEED_ON_START: "false"
     volumes:
       # Сертификаты БД: deploy/certs на сервере -> /certs в контейнере
       - ./certs:/certs:ro
+      - uploads:/app/uploads
 
   frontend:
     build:
@@ -62,8 +92,11 @@ services:
         # NEXT_PUBLIC_* вшивается в бандл на этапе сборки, а не читается в рантайме:
         # при смене домена образ нужно пересобрать
         NEXT_PUBLIC_API_URL: ${PUBLIC_URL:?укажите PUBLIC_URL в deploy/.env}/api
+        # Номер счётчика Яндекс Метрики; не задан — статистики нет
+        NEXT_PUBLIC_YM_ID: ${YM_ID:-}
     container_name: cloudco-frontend
     restart: unless-stopped
+    logging: *logging
     environment:
       NODE_ENV: production
       PORT: 3000
@@ -73,3 +106,4 @@ services:
 volumes:
   caddy_data:
   caddy_config:
+  uploads:

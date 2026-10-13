@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import Institution from '../models/Institution';
 import Course from '../models/Course';
 import { Op } from 'sequelize';
+import Equipment from '../models/Equipment';
+import Specialist from '../models/Specialist';
 import { sendError } from '../utils/sendError';
 
 export const getAllInstitutions = async (req: Request, res: Response) => {
@@ -104,6 +106,19 @@ export const deleteInstitution = async (req: Request, res: Response) => {
 
     if (!institution) {
       return res.status(404).json({ error: 'Institution not found' });
+    }
+
+    // Учреждение с оборудованием, курсами или экспертами удалить нельзя —
+    // иначе пропадут брони и записи. Сначала удаляются или переносятся они
+    const [equipment, courses, specialists] = await Promise.all([
+      Equipment.count({ where: { institutionId: id } }),
+      Course.count({ where: { institutionId: id } }),
+      Specialist.count({ where: { institutionId: id } }),
+    ]);
+    if (equipment || courses || specialists) {
+      return res.status(409).json({
+        error: `Сначала удалите или перенесите: оборудования ${equipment}, курсов ${courses}, экспертов ${specialists}`,
+      });
     }
 
     await institution.destroy();

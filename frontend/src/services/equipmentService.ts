@@ -83,3 +83,27 @@ export async function checkEquipmentAvailability(
     return false
   }
 }
+
+export interface AvailabilitySlot {
+  time: string
+  status: 'free' | 'taken' | 'past'
+  available: boolean
+}
+
+export interface Availability {
+  date: string
+  /** «Сегодня» и последний день брони — по времени площадок, а не браузера */
+  today: string
+  lastDate: string
+  /** Оборудование не принимает брони */
+  closed?: boolean
+  workingHours: { start: string; end: string }
+  slots: AvailabilitySlot[]
+}
+
+/** Слоты оборудования на день: занятые другими бронями и прошедшие недоступны */
+export async function getAvailability(equipmentId: string, date?: string): Promise<Availability> {
+  const query = date ? `?date=${encodeURIComponent(date)}` : ''
+  const response = await api.get<Availability>(`/equipment/${equipmentId}/availability${query}`)
+  return response.data
+}

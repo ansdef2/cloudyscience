@@ -2,7 +2,26 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  avatar?: string | null;
   role: 'user' | 'admin';
+  birthDate?: string | null;
+  /** Когда принята политика; null — аккаунт создан до согласий */
+  consentAt?: string | null;
+  consentVersion?: string | null;
+  /** Детям до 14 лет нужно согласие родителя */
+  parentConsentStatus?: 'not_required' | 'pending' | 'confirmed';
+  parentEmail?: string | null;
+  createdAt?: string;
+}
+
+export interface RegisterData {
+  name: string;
+  email: string;
+  password: string;
+  birthDate: string;
+  consent: boolean;
+  parentName?: string;
+  parentEmail?: string;
 }
 
 export interface Institution {

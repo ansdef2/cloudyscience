@@ -11,6 +11,7 @@ import User from '../models/User';
 import { AuthRequest } from '../middleware/auth';
 import { Op } from 'sequelize';
 import { sendError } from '../utils/sendError';
+import { notify } from '../utils/notify';
 
 /**
  * Свободные места считаются от записей, а не уменьшаются счётчиком:
@@ -147,6 +148,14 @@ export const deleteCourse = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Course not found' });
     }
 
+    const enrolled = await CourseEnrollment.count({ where: { courseId: id } });
+    if (enrolled && req.query.force !== 'true') {
+      return res.status(409).json({
+        error: `На курс записано ${enrolled} чел. — удаление снимет их с курса. Подтвердите удаление ещё раз`,
+        code: 'HAS_ENROLLMENTS',
+      });
+    }
+
     await course.destroy();
     res.json({ message: 'Course deleted successfully' });
   } catch (error: any) {
@@ -218,8 +227,17 @@ export const removeEnrollment = async (req: Request, res: Response) => {
       }
 
       const availableSpots = await syncAvailableSpots(course, transaction);
-      return { status: 200, body: { totalSpots: course.totalSpots, availableSpots } };
+      return { status: 200, body: { totalSpots: course.totalSpots, availableSpots }, title: course.title };
     });
+
+    if (result.status === 200 && 'title' in result) {
+      await notify(userId, {
+        type: 'enrollment_removed',
+        title: 'Вас сняли с курса',
+        body: `«${result.title}». Если это ошибка — напишите администратору площадки.`,
+        link: '/courses',
+      });
+    }
 
     res.status(result.status).json(result.body);
   } catch (error: any) {

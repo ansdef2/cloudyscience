@@ -5,12 +5,15 @@ import { useRouter } from 'next/navigation'
 import ProtoTopBar from '@/components/ProtoTopBar'
 import BottomNav from '@/components/BottomNav'
 import Avatar from '@/components/Avatar'
+import BookingCard from '@/components/BookingCard'
 import AuthGate from '@/components/AuthGate'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/useToast'
 import { User } from '@/models/Api'
 import { Booking, cancelBooking, getUserBookings } from '@/services/bookingService'
 import { getUnreadCount } from '@/services/chatService'
+import { resendParentConsent } from '@/services/accountService'
+import { getNotifications } from '@/services/notificationService'
 import {
   CONSULTATION_STATUS,
   Consultation,
@@ -19,7 +22,6 @@ import {
 } from '@/services/peopleService'
 import { getMyTeams, Team } from '@/services/teamService'
 import { ApiError } from '@/utils/api'
-import { BOOKING_STATUS } from '@/utils/format'
 import ui from '@/styles/ui.module.css'
 import styles from './ProfilePage.module.css'
 
@@ -43,12 +45,16 @@ function Profile({ user }: { user: User }) {
   const toast = useToast()
   const { logout } = useAuth()
   const [unread, setUnread] = useState(0)
+  const [notificationsUnread, setNotificationsUnread] = useState(0)
   const [teams, setTeams] = useState<Team[]>([])
   const [bookings, setBookings] = useState<Booking[] | null>(null)
   const [consultations, setConsultations] = useState<Consultation[]>([])
 
   useEffect(() => {
     getUnreadCount().then(setUnread).catch(() => setUnread(0))
+    getNotifications()
+      .then((data) => setNotificationsUnread(data.unread))
+      .catch(() => setNotificationsUnread(0))
     getMyTeams().then(setTeams).catch(() => setTeams([]))
     getUserBookings().then(setBookings).catch(() => setBookings([]))
     getConsultations().then(setConsultations).catch(() => setConsultations([]))
@@ -80,6 +86,19 @@ function Profile({ user }: { user: User }) {
     }
   }
 
+  const resendLetter = async () => {
+    try {
+      const result = await resendParentConsent()
+      toast.success(
+        result.sent
+          ? `Письмо отправлено на ${user.parentEmail}`
+          : 'Почта на сайте пока не настроена — согласие подтвердит администратор'
+      )
+    } catch (error) {
+      toast.error(error instanceof ApiError ? error.message : 'Не удалось отправить письмо')
+    }
+  }
+
   const handleLogout = () => {
     logout()
     router.push('/')
@@ -92,7 +111,7 @@ function Profile({ user }: { user: User }) {
   return (
     <div className={styles.layout}>
       <section className={`${ui.panel} ${styles.me}`}>
-        <Avatar name={user.name} size={64} />
+        <Avatar name={user.name} src={user.avatar} size={64} />
         <div className={ui.cardBody}>
           <h1 className={styles.name}>{user.name}</h1>
           <span className={ui.cardMeta}>{user.email}</span>
@@ -102,7 +121,28 @@ function Profile({ user }: { user: User }) {
         </div>
       </section>
 
+      {user.parentConsentStatus === 'pending' && (
+        <section className={`${ui.panel} ${styles.pending}`}>
+          <span className={styles.pendingTitle}>Ждём согласия родителя</span>
+          <span className={ui.cardMeta}>
+            Попросили согласие у родителя: {user.parentEmail}. До подтверждения недоступны чаты, команды и брони —
+            каталог и курсы можно смотреть.
+          </span>
+          <button className={`${ui.ghost} ${ui.small}`} onClick={resendLetter}>
+            Отправить письмо ещё раз
+          </button>
+        </section>
+      )}
+
       <nav className={styles.links} aria-label="Разделы профиля">
+        <button className={`${ui.card} ${ui.cardLink} ${styles.link}`} onClick={() => router.push('/notifications')}>
+          <span className={styles.linkTitle}>Уведомления</span>
+          {notificationsUnread > 0 ? (
+            <span className={styles.unread}>{notificationsUnread}</span>
+          ) : (
+            <span className={ui.muted}>›</span>
+          )}
+        </button>
         <button className={`${ui.card} ${ui.cardLink} ${styles.link}`} onClick={() => router.push('/chats')}>
           <span className={styles.linkTitle}>Чаты</span>
           {unread > 0 ? <span className={styles.unread}>{unread}</span> : <span className={ui.muted}>›</span>}
@@ -113,6 +153,10 @@ function Profile({ user }: { user: User }) {
         </button>
         <button className={`${ui.card} ${ui.cardLink} ${styles.link}`} onClick={() => router.push('/people')}>
           <span className={styles.linkTitle}>Эксперты и обучающиеся</span>
+          <span className={ui.muted}>›</span>
+        </button>
+        <button className={`${ui.card} ${ui.cardLink} ${styles.link}`} onClick={() => router.push('/settings')}>
+          <span className={styles.linkTitle}>Настройки</span>
           <span className={ui.muted}>›</span>
         </button>
         {user.role === 'admin' && (
@@ -132,24 +176,12 @@ function Profile({ user }: { user: User }) {
         ) : (
           <div className={ui.list}>
             {bookings.map((booking) => (
-              <div key={booking.id} className={`${ui.card} ${ui.cardWrap}`}>
-                <div className={ui.cardBody}>
-                  <span className={ui.cardTitle}>{booking.equipment?.name ?? 'Оборудование'}</span>
-                  <span className={ui.cardMeta}>
-                    {new Date(booking.date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })},{' '}
-                    {booking.time}
-                    {booking.team ? ` · команда «${booking.team.name}»` : ''}
-                  </span>
-                </div>
-                <div className={`${ui.cardActions} ${styles.statusActions}`}>
-                  <span className={ui.badge}>{BOOKING_STATUS[booking.status] ?? booking.status}</span>
-                  {canCancel(booking) && (
-                    <button className={`${ui.ghost} ${ui.small}`} onClick={() => cancel(booking)}>
-                      Отменить
-                    </button>
-                  )}
-                </div>
-              </div>
+              <BookingCard
+                key={booking.id}
+                booking={booking}
+                showAuthor={booking.userId !== user.id}
+                onCancel={canCancel(booking) ? cancel : undefined}
+              />
             ))}
           </div>
         )}

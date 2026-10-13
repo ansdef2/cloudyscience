@@ -5,8 +5,11 @@ import Message from '../models/Message';
 import Team from '../models/Team';
 import TeamMember from '../models/TeamMember';
 import User from '../models/User';
+import UserBlock from '../models/UserBlock';
+import { pushTo } from '../realtime/hub';
 import { sendError } from '../utils/sendError';
 import { PUBLIC_USER_ATTRIBUTES } from './teamController';
+import { isBlockedBetween } from './safetyController';
 
 const between = (a: string, b: string) => ({
   teamId: null,
@@ -109,7 +112,17 @@ export const getDirectMessages = async (req: AuthRequest, res: Response) => {
       { where: { senderId: peer.id, recipientId: me, teamId: null, readAt: null } }
     );
 
-    res.json({ peer, messages: messages.reverse() });
+    // Можно ли писать: нет блокировки ни с одной стороны, собеседник не заблокирован
+    // администратором и не ребёнок без согласия родителя
+    const [blockedByMe, blockedMe, peerState] = await Promise.all([
+      UserBlock.findOne({ where: { blockerId: me, blockedId: peer.id } }),
+      UserBlock.findOne({ where: { blockerId: peer.id, blockedId: me } }),
+      User.findByPk(peer.id, { attributes: ['isBlocked', 'parentConsentStatus'] }),
+    ]);
+    const canWrite =
+      !blockedByMe && !blockedMe && !peerState?.isBlocked && peerState?.parentConsentStatus !== 'pending';
+
+    res.json({ peer, messages: messages.reverse(), blockedByMe: !!blockedByMe, canWrite });
   } catch (error) {
     sendError(res, error);
   }
@@ -122,14 +135,28 @@ export const postDirectMessage = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: 'Нельзя написать самому себе' });
     }
 
-    const peer = await User.findByPk(req.params.userId, { attributes: ['id'] });
+    const peer = await User.findByPk(req.params.userId, {
+      attributes: ['id', 'isBlocked', 'parentConsentStatus'],
+    });
     if (!peer) return res.status(404).json({ error: 'Пользователь не найден' });
+    if (peer.isBlocked || peer.parentConsentStatus === 'pending') {
+      return res.status(403).json({ error: 'Этому пользователю сейчас нельзя написать' });
+    }
+    if (await isBlockedBetween(me, peer.id)) {
+      return res.status(403).json({ error: 'Переписка недоступна: один из вас заблокировал другого', code: 'BLOCKED_PEER' });
+    }
 
     const message = await Message.create({
       senderId: me,
       recipientId: peer.id,
       text: String(req.body?.text ?? '').trim(),
     });
+
+    // Собеседнику — сразу; себе — на другие открытые вкладки и устройства
+    const data = message.toJSON();
+    pushTo([peer.id], { type: 'message', kind: 'user', chatId: me, message: data });
+    pushTo([me], { type: 'message', kind: 'user', chatId: peer.id, message: data });
+
     res.status(201).json(message);
   } catch (error) {
     sendError(res, error);

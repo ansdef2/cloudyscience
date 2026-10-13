@@ -11,22 +11,13 @@ import { getInstitutions } from '@/services/institutionService'
 import { api } from '@/utils/api'
 import { pluralize } from '@/utils/format'
 import { APP_HOME } from '@/utils/navigation'
+import { COMPANY } from '@/utils/legal'
 import styles from './Landing.module.css'
 
 interface Stats {
   institutions: number
   equipment: number
   course: Course | null
-}
-
-/**
- * Реквизиты правообладателя для подвала. ОГРН и ИНН показываются,
- * только когда заполнены.
- */
-const COMPANY = {
-  name: 'ООО «Архада»',
-  ogrn: '1267700015791',
-  inn: '9729414609',
 }
 
 const FEATURES = [
@@ -229,11 +220,18 @@ export default function Landing() {
       </main>
 
       <footer className={styles.footer}>
-        <span>© {new Date().getFullYear()} Облако науки</span>
+        <div className={styles.footerStart}>
+          <span>© {new Date().getFullYear()} Облако науки</span>
+          <nav className={styles.docs} aria-label="Документы">
+            <Link href="/privacy">Политика конфиденциальности</Link>
+            <Link href="/terms">Пользовательское соглашение</Link>
+          </nav>
+        </div>
         <div className={styles.legal}>
           <span>{COMPANY.name}</span>
           {COMPANY.ogrn && <span>ОГРН {COMPANY.ogrn}</span>}
           {COMPANY.inn && <span>ИНН {COMPANY.inn}</span>}
+          {COMPANY.email && <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>}
         </div>
       </footer>
     </div>

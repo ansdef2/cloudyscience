@@ -71,13 +71,46 @@ export const likePost = async (req: Request, res: Response) => {
   }
 };
 
+/** Поля поста, которые задаёт администратор; автор, лайки — не из запроса */
+const postFields = (body: any) => {
+  const fields: Record<string, unknown> = {};
+  if (typeof body?.title === 'string') fields.title = body.title.trim();
+  if (typeof body?.text === 'string') fields.text = body.text.trim();
+  if (body?.image === null || typeof body?.image === 'string') fields.image = body.image || null;
+  if (typeof body?.isFeatured === 'boolean') fields.isFeatured = body.isFeatured;
+  if (typeof body?.publishedAt === 'string' && !Number.isNaN(Date.parse(body.publishedAt))) {
+    fields.publishedAt = new Date(body.publishedAt);
+  }
+  return fields;
+};
+
 export const createPost = async (req: any, res: Response) => {
   try {
-    const post = await Post.create({ ...req.body, authorId: req.user.id });
+    const fields = postFields(req.body);
+    if (!fields.title || !fields.text) return res.status(400).json({ error: 'Нужны заголовок и текст' });
+
+    const post = await Post.create({ publishedAt: new Date(), ...fields, authorId: req.user.id });
     const created = await Post.findByPk(post.id, {
       include: [{ model: User, as: 'author', attributes: AUTHOR_ATTRIBUTES }],
     });
     res.status(201).json(created);
+  } catch (error: any) {
+    sendError(res, error);
+  }
+};
+
+export const updatePost = async (req: any, res: Response) => {
+  try {
+    const post = await Post.findByPk(req.params.id);
+    if (!post) return res.status(404).json({ error: 'Post not found' });
+
+    const fields = postFields(req.body);
+    if (fields.title === '' || fields.text === '') return res.status(400).json({ error: 'Нужны заголовок и текст' });
+
+    await post.update(fields);
+    res.json(
+      await Post.findByPk(post.id, { include: [{ model: User, as: 'author', attributes: AUTHOR_ATTRIBUTES }] })
+    );
   } catch (error: any) {
     sendError(res, error);
   }

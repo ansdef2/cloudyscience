@@ -36,7 +36,14 @@ export async function getUnreadCount(): Promise<number> {
 export async function getDirectMessages(
   userId: string,
   since?: string
-): Promise<{ peer: { id: string; name: string; avatar?: string | null }; messages: ChatMessage[] }> {
+): Promise<{
+  peer: { id: string; name: string; avatar?: string | null }
+  messages: ChatMessage[]
+  /** Я заблокировал собеседника */
+  blockedByMe?: boolean
+  /** Можно ли сейчас писать: нет блокировок, собеседник доступен */
+  canWrite?: boolean
+}> {
   const response = await api.get<any>(`/chats/users/${userId}/messages${after(since)}`)
   return response.data
 }

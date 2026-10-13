@@ -20,6 +20,8 @@ class Booking extends Model {
   public files?: string[];
   public location?: string;
   public notes?: string;
+  /** Как подключиться к оборудованию при дистанционной аренде — заполняет администратор */
+  public accessInfo?: string | null;
   public createdAt!: Date;
   public updatedAt!: Date;
 
@@ -92,6 +94,9 @@ Booking.init(
       type: DataTypes.STRING,
     },
     notes: {
+      type: DataTypes.TEXT,
+    },
+    accessInfo: {
       type: DataTypes.TEXT,
     },
   },

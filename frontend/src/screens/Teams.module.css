@@ -108,3 +108,18 @@
     justify-content: flex-start;
   }
 }
+
+.invitations {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.invitation {
+  box-shadow: inset 0 0 0 1px rgba(150, 90, 255, 0.35);
+}
+
+.pendingMember {
+  opacity: 0.75;
+  border: 1px dashed rgba(255, 255, 255, 0.14);
+}

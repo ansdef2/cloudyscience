@@ -1,9 +1,6 @@
 import type { Metadata } from 'next'
 import PostDetail from '@/screens/PostDetail'
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
-/** Адрес сайта — из адреса API: https://cloudyscience.ru/api → https://cloudyscience.ru */
-const SITE_URL = API_URL.replace(/\/api\/?$/, '')
+import { API_URL, SITE_URL } from '@/utils/site'
 
 interface PostPreview {
   title: string

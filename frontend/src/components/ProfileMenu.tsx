@@ -4,6 +4,9 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import ImageWithFallback from '@/components/ImageWithFallback'
 import { useAuth } from '@/hooks/useAuth'
+import { useNotifications } from '@/hooks/useNotifications'
+import NotificationList from './NotificationList'
+import { fileUrl } from '@/services/uploadService'
 import { loginPathFromHere } from '@/utils/navigation'
 import styles from './ProfileMenu.module.css'
 
@@ -13,6 +16,7 @@ const MENU = [
   { href: '/profile', label: 'Профиль' },
   { href: '/chats', label: 'Чаты' },
   { href: '/teams', label: 'Команды' },
+  { href: '/settings', label: 'Настройки' },
   { href: '/admin', label: 'Админка', adminOnly: true },
 ]
 
@@ -24,6 +28,7 @@ export default function ProfileMenu() {
   const router = useRouter()
   const { user, loading, isAuthenticated, logout } = useAuth()
   const [panel, setPanel] = useState<OpenPanel>('none')
+  const notifications = useNotifications(isAuthenticated)
   const rootRef = useRef<HTMLDivElement>(null)
 
   // Клик мимо меню и Escape закрывают его
@@ -72,9 +77,9 @@ export default function ProfileMenu() {
       <button
         className={styles.iconButton}
         type="button"
-        aria-label="Уведомления"
+        aria-label={notifications.unread ? `Уведомления, новых: ${notifications.unread}` : 'Уведомления'}
         aria-expanded={panel === 'bell'}
-        onClick={() => toggle('bell')}
+        onClick={() => (isAuthenticated ? toggle('bell') : router.push(loginPathFromHere()))}
       >
         <svg viewBox="0 0 24 24" fill="none" aria-hidden>
           <path
@@ -85,6 +90,9 @@ export default function ProfileMenu() {
             strokeLinejoin="round"
           />
         </svg>
+        {notifications.unread > 0 && (
+          <span className={styles.bellBadge}>{notifications.unread > 99 ? '99+' : notifications.unread}</span>
+        )}
       </button>
 
       <button
@@ -95,7 +103,9 @@ export default function ProfileMenu() {
         aria-expanded={panel === 'profile'}
         onClick={handleAvatarClick}
       >
-        {isAuthenticated ? (
+        {isAuthenticated && user?.avatar ? (
+          <ImageWithFallback src={fileUrl(user.avatar)!} alt={user.name} className={styles.avatar} bare />
+        ) : isAuthenticated ? (
           <span className={styles.avatarFallback}>
             {user?.name?.trim().charAt(0).toUpperCase() || '?'}
           </span>
@@ -105,8 +115,23 @@ export default function ProfileMenu() {
       </button>
 
       {panel === 'bell' && (
-        <div className={styles.popover}>
-          <p className={styles.empty}>Уведомлений пока нет</p>
+        <div className={`${styles.popover} ${styles.bellPopover}`}>
+          <div className={styles.bellHead}>
+            <span className={styles.name}>Уведомления</span>
+            {notifications.unread > 0 && (
+              <button className={styles.markAll} type="button" onClick={notifications.markAll}>
+                Прочитать все
+              </button>
+            )}
+          </div>
+          <NotificationList
+            compact
+            items={notifications.items}
+            onOpen={(item) => {
+              notifications.markRead(item)
+              setPanel('none')
+            }}
+          />
         </div>
       )}
 

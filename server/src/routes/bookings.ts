@@ -6,13 +6,13 @@ import {
   updateBooking,
   deleteBooking,
 } from '../controllers/bookingController';
-import { authenticate } from '../middleware/auth';
+import { authenticate, requireParentConsent } from '../middleware/auth';
 
 const router = Router();
 
 router.get('/', authenticate, getAllBookings);
 router.get('/:id', authenticate, getBookingById);
-router.post('/', authenticate, createBooking);
+router.post('/', authenticate, requireParentConsent, createBooking);
 router.put('/:id', authenticate, updateBooking);
 router.delete('/:id', authenticate, deleteBooking);
 

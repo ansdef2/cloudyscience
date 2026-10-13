@@ -1,0 +1,82 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.compact {
+  max-height: min(60vh, 420px);
+  overflow-y: auto;
+  margin: 0 -8px;
+}
+
+.item {
+  position: relative;
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 3px;
+  padding: 12px 14px 12px 26px;
+  border-radius: 14px;
+  background: var(--proto-surface);
+  color: var(--proto-text-70);
+  font-family: var(--proto-font-text);
+  text-align: left;
+}
+
+.compact .item {
+  padding: 10px 10px 10px 24px;
+  background: transparent;
+}
+
+.compact .item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Точка непрочитанного — фиолетовая, как счётчики */
+.unread {
+  color: var(--proto-text);
+}
+
+.unread::before {
+  content: '';
+  position: absolute;
+  top: 17px;
+  left: 11px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgb(150, 90, 255);
+  box-shadow: 0 0 8px rgba(150, 90, 255, 0.8);
+}
+
+.compact .unread::before {
+  top: 15px;
+  left: 9px;
+}
+
+.title {
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.body {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--proto-text-60);
+  overflow-wrap: anywhere;
+}
+
+.time {
+  font-size: 11px;
+  color: var(--proto-text-50);
+}
+
+.empty {
+  margin: 0;
+  font-size: 13px;
+  color: var(--proto-text-50);
+}

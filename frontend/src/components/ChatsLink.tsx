@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { getUnreadCount } from '@/services/chatService'
 import { getAuthToken } from '@/utils/api'
+import { useRealtime } from '@/hooks/useRealtime'
 import styles from './SiteHeader.module.css'
 
 const REFRESH_MS = 30_000
@@ -11,6 +12,18 @@ const REFRESH_MS = 30_000
 /** Значок чатов в шапке с числом непрочитанных; гостю не показывается */
 export default function ChatsLink({ active }: { active: boolean }) {
   const [unread, setUnread] = useState<number | null>(null)
+
+  // Пришло личное сообщение — пересчитать непрочитанные сразу, не дожидаясь опроса
+  useRealtime(
+    (event) => {
+      if (event.type === 'message' && event.kind === 'user') {
+        getUnreadCount()
+          .then(setUnread)
+          .catch(() => undefined)
+      }
+    },
+    unread !== null
+  )
 
   useEffect(() => {
     if (!getAuthToken()) return

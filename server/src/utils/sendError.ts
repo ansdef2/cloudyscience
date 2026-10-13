@@ -5,6 +5,7 @@ import {
   UniqueConstraintError,
   ValidationError,
 } from 'sequelize';
+import { reportServerError } from './alerts';
 
 /**
  * Ошибка в данных запроса — это 4xx, а не 5xx. Раньше все ошибки
@@ -37,6 +38,8 @@ export const sendError = (res: Response, error: unknown) => {
   }
 
   const message = error instanceof Error ? error.message : 'Внутренняя ошибка сервера';
-  console.error('Необработанная ошибка:', message);
-  return res.status(500).json({ error: message });
+  console.error('Необработанная ошибка:', error instanceof Error ? error.stack : message);
+  reportServerError(error, `${res.req?.method ?? ''} ${res.req?.originalUrl ?? ''}`.trim());
+  // Текст внутренней ошибки (SQL, пути) наружу не отдаём
+  return res.status(500).json({ error: 'Внутренняя ошибка сервера' });
 };

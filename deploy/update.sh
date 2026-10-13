@@ -12,7 +12,8 @@
 #      Старая папка остаётся как /root/cloudco-old-<дата> — для отката;
 #   3. пересборка и перезапуск контейнеров;
 #   4. проверка, что бэкенд поднялся, и вывод применённых патчей данных;
-#   5. по желанию — уточнение координат учреждений (нужен пароль админа).
+#   5. ежедневный бэкап базы и загруженных файлов в cron (deploy/backup.sh);
+#   6. по желанию — уточнение координат учреждений (нужен пароль админа).
 #
 # Повторный запуск безопасен: если всё уже обновлено, он просто
 # пересоберёт текущую версию.
@@ -170,7 +171,25 @@ else
   exit 1
 fi
 
-# ── 5. Координаты учреждений (по желанию) ───────────────────────────────────
+# ── 5. Ежедневный бэкап ─────────────────────────────────────────────────────
+
+CRON_FILE=/etc/cron.d/cloudco-backup
+CRON_LINE="30 3 * * * root APP_DIR=$APP_DIR bash $APP_DIR/deploy/backup.sh >> /var/log/cloudco-backup.log 2>&1"
+if [ -d /etc/cron.d ]; then
+  if [ "$(cat "$CRON_FILE" 2>/dev/null)" != "$CRON_LINE" ]; then
+    printf '%s\n' "$CRON_LINE" >"$CRON_FILE"
+    chmod 644 "$CRON_FILE"
+    ok "Бэкап каждую ночь в 03:30 → /root/backups (база — 14 дней, файлы — 7)"
+  else
+    ok "Ночной бэкап уже настроен (/root/backups)"
+  fi
+  command -v cron >/dev/null || command -v crond >/dev/null ||
+    { apt-get install -y -qq cron >/dev/null 2>&1 && ok "Поставил cron"; } || true
+else
+  echo "Нет /etc/cron.d — бэкап запускайте вручную: bash $APP_DIR/deploy/backup.sh"
+fi
+
+# ── 6. Координаты учреждений (по желанию) ───────────────────────────────────
 
 PUBLIC_URL="$(env_value PUBLIC_URL || true)"
 BASE="${PUBLIC_URL:-https://cloudyscience.ru}/api"

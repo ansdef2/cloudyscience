@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import ProtoTopBar from '@/components/ProtoTopBar'
 import { useAuth } from '@/hooks/useAuth'
@@ -125,6 +126,12 @@ export default function Login() {
                 </svg>
               </button>
             </div>
+          </div>
+
+          <div className={styles.aside}>
+            <Link href="/forgot" className={styles.link}>
+              Забыли пароль?
+            </Link>
           </div>
 
           <label className={styles.remember}>

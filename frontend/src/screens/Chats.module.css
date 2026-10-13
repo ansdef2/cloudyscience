@@ -140,6 +140,78 @@
   color: rgba(255, 255, 255, 0.65);
 }
 
+.bubbleSelectable {
+  cursor: pointer;
+}
+
+/* Жалоба на сообщение — появляется по нажатию на чужое сообщение */
+.reportMessage {
+  align-self: center;
+  margin-left: 8px;
+  padding: 6px 10px;
+  border-radius: 12px;
+  background: rgba(232, 69, 69, 0.14);
+  color: #ff8a8a;
+  font-family: var(--proto-font-text);
+  font-size: 12px;
+}
+
+.menuWrap {
+  position: relative;
+}
+
+.menuButton {
+  width: 38px;
+  padding: 0;
+  font-size: 18px;
+}
+
+.menu {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 8px);
+  right: 0;
+  display: flex;
+  min-width: 180px;
+  flex-direction: column;
+  padding: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  background: var(--proto-surface);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+}
+
+.menu button {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: none;
+  color: var(--proto-text-70);
+  font-family: var(--proto-font-text);
+  font-size: 14px;
+  text-align: left;
+}
+
+.menu button:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--proto-text);
+}
+
+.composerBlocked {
+  padding: 16px 0 max(16px, env(safe-area-inset-bottom));
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 14px;
+  text-align: center;
+  color: var(--proto-text-60);
+}
+
+.inlineAction {
+  background: none;
+  color: var(--proto-text);
+  font-family: var(--proto-font-text);
+  font-size: 14px;
+  text-decoration: underline;
+}
+
 .composer {
   display: flex;
   align-items: flex-end;

@@ -2,14 +2,25 @@ import type { Metadata } from 'next'
 import { Onest, Playfair_Display } from 'next/font/google'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { ToastProvider } from '@/components/ToastProvider'
+import AccountNotice from '@/components/AccountNotice'
+import Analytics from '@/components/Analytics'
 import '@/styles/globals.css'
+import { SITE_URL } from '@/utils/site'
 
 const onest = Onest({ subsets: ['latin', 'cyrillic'], variable: '--font-onest' })
 const playfair = Playfair_Display({ subsets: ['latin', 'cyrillic'], variable: '--font-playfair' })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: 'Облако науки',
   description: 'Оборудование и курсы образовательных учреждений: каталог, запись и бронирование',
+  openGraph: {
+    type: 'website',
+    locale: 'ru_RU',
+    siteName: 'Облако науки',
+    title: 'Облако науки',
+    description: 'Оборудование и курсы образовательных учреждений Великого Новгорода: бронь, запись, команды',
+  },
 }
 
 export default function RootLayout({
@@ -23,6 +34,8 @@ export default function RootLayout({
         <ErrorBoundary>
           <ToastProvider>
             {children}
+            <AccountNotice />
+            <Analytics />
           </ToastProvider>
         </ErrorBoundary>
       </body>
