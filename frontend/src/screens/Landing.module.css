@@ -63,13 +63,6 @@
   gap: 18px;
 }
 
-.eyebrow {
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--proto-text-60);
-}
-
 .heroTitle {
   margin: 0;
   font-family: var(--proto-font-display);
