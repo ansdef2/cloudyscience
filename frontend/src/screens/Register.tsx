@@ -44,7 +44,7 @@ export default function Register() {
   }
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} protoPage`}>
       <ProtoTopBar />
 
       <div className={styles.content}>

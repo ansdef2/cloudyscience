@@ -197,3 +197,22 @@
   flex: 0 0 auto;
   color: var(--proto-text);
 }
+
+/* Десктоп: выдача сеткой; специалисты и строки занимают ячейку целиком */
+@media (min-width: 960px) {
+  .list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+    align-items: stretch;
+  }
+
+  .tile {
+    height: 100%;
+    padding-bottom: 10px;
+  }
+
+  .tileAction {
+    margin-top: auto;
+  }
+}

@@ -204,16 +204,18 @@
 }
 
 /* В низкой карточке кружки меньше, иначе соседние учреждения уходят за край */
-.window:not(.expanded) .cluster {
-  width: calc(var(--size, 40px) * 0.68);
-  height: calc(var(--size, 40px) * 0.68);
-  box-shadow:
-    0 0 0 4px rgba(120, 30, 200, 0.18),
-    0 4px 16px rgba(105, 0, 143, 0.65);
-}
+@media (max-width: 959px) {
+  .window:not(.expanded) .cluster {
+    width: calc(var(--size, 40px) * 0.68);
+    height: calc(var(--size, 40px) * 0.68);
+    box-shadow:
+      0 0 0 4px rgba(120, 30, 200, 0.18),
+      0 4px 16px rgba(105, 0, 143, 0.65);
+  }
 
-.window:not(.expanded) .clusterCount {
-  font-size: 11px;
+  .window:not(.expanded) .clusterCount {
+    font-size: 11px;
+  }
 }
 
 /* Свёрнутая карта — превью: кластеры видны, но не кликаются */
@@ -365,5 +367,72 @@
 @media (prefers-reduced-motion: reduce) {
   .sheet {
     animation: none;
+  }
+}
+
+/*
+ * Десктоп: карточка карты крупная, а список объектов кластера открывается
+ * панелью справа, а не шторкой снизу — так карта остаётся видна.
+ */
+@media (min-width: 960px) {
+  .slot {
+    height: 440px;
+  }
+
+  .window {
+    border-radius: 28px;
+  }
+
+  .toggle {
+    top: 16px;
+    right: 16px;
+    width: 44px;
+    height: 44px;
+  }
+
+  .toggle:hover {
+    background: rgba(30, 20, 50, 0.92);
+  }
+
+  .window:not(.expanded) .caption {
+    display: block;
+  }
+
+  .caption {
+    max-width: 260px;
+  }
+
+  .heading {
+    right: auto;
+    width: 360px;
+  }
+
+  .sheet {
+    top: 16px;
+    right: 16px;
+    bottom: 16px;
+    left: auto;
+    width: 400px;
+    max-height: none;
+    padding: 24px;
+    border-radius: 28px;
+    animation-name: panel-in;
+  }
+
+  .expanded .toggle,
+  .expanded .heading {
+    top: 16px;
+  }
+
+  /* Пока открыта панель, кнопка свернуть уходит влево от неё */
+  .expanded:has(.sheet) .toggle {
+    right: 432px;
+  }
+}
+
+@keyframes panel-in {
+  from {
+    transform: translateX(24px);
+    opacity: 0;
   }
 }

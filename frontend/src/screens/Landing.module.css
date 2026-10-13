@@ -21,6 +21,17 @@
   padding-right: var(--proto-gutter);
 }
 
+/* Закреплённая плашка: фон на всю ширину, содержимое — по сетке страницы */
+.navBar {
+  position: sticky;
+  z-index: 50;
+  top: 0;
+  background: rgba(12, 0, 32, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
 .nav {
   display: flex;
   height: 68px;
@@ -436,5 +447,12 @@
   .final .actions {
     width: 100%;
     justify-content: center;
+  }
+}
+
+@media (min-width: 768px) {
+  /* Одна кнопка в герое — не тянем её на всю ширину колонки */
+  .hero .primary {
+    flex: 0 1 280px;
   }
 }

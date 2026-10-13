@@ -17,6 +17,35 @@
   padding-top: 22px;
 }
 
+/*
+ * Колонки десктопа. На телефоне их нет: обёртки прозрачны для раскладки,
+ * а order возвращает мобильный порядок — герой, описание, запись, модули.
+ */
+.side,
+.main {
+  display: contents;
+}
+
+.hero {
+  order: 1;
+}
+
+.description {
+  order: 2;
+}
+
+.booking {
+  order: 3;
+}
+
+.modules {
+  order: 4;
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 40px;
+}
+
 /* Карточка-герой направления */
 .hero {
   --glow: 0, 38, 128;
@@ -238,4 +267,53 @@
   padding: 60px 20px;
   text-align: center;
   color: var(--proto-text-50);
+}
+
+/*
+ * Десктоп: слева карточка курса и запись (не уезжают при прокрутке),
+ * справа описание и модули.
+ */
+@media (min-width: 960px) {
+  .content {
+    display: grid;
+    grid-template-columns: 400px minmax(0, 1fr);
+    gap: 56px;
+    align-items: start;
+    padding-top: 32px;
+  }
+
+  .side {
+    position: sticky;
+    top: 104px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .main {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .description {
+    width: auto;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--proto-text-70);
+  }
+
+  .title {
+    font-size: 22px;
+  }
+
+  .booking {
+    gap: 22px;
+    padding: 28px 24px 24px;
+  }
+
+  .bookingTitle {
+    font-size: 22px;
+  }
 }

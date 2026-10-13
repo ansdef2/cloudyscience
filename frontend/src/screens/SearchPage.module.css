@@ -24,3 +24,34 @@
 .loader {
   margin-top: 24px;
 }
+
+/* Десктоп: заголовок и поле поиска в строку, выдача — сеткой */
+@media (min-width: 960px) {
+  .content {
+    gap: 32px;
+    padding: 40px 0 0;
+  }
+
+  .head {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .pageTitle {
+    margin: 0;
+    font-family: var(--proto-font-display);
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--proto-text);
+  }
+
+  .searchBox {
+    max-width: 640px;
+  }
+
+  .actions {
+    max-width: 640px;
+  }
+}

@@ -91,15 +91,18 @@ export default function Landing() {
 
   return (
     <div className={styles.page}>
-      <header className={styles.nav}>
-        <BrandLogo height={28} className={styles.logo} />
-        <Link
-          href={primaryHref}
-          className={`${styles.navButton} ${loading ? styles.pending : ''}`}
-          aria-busy={loading}
-        >
-          {primaryLabel}
-        </Link>
+      {/* Плашка с логотипом и входом закреплена сверху при прокрутке */}
+      <header className={styles.navBar}>
+        <div className={styles.nav}>
+          <BrandLogo height={28} className={styles.logo} />
+          <Link
+            href={primaryHref}
+            className={`${styles.navButton} ${loading ? styles.pending : ''}`}
+            aria-busy={loading}
+          >
+            {primaryLabel}
+          </Link>
+        </div>
       </header>
 
       <main>
@@ -116,9 +119,6 @@ export default function Landing() {
             <div className={styles.actions}>
               <Link href={primaryHref} className={styles.primary}>
                 {primaryLabel}
-              </Link>
-              <Link href={APP_HOME} className={styles.secondary}>
-                Открыть карту
               </Link>
             </div>
           </div>

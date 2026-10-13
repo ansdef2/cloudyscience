@@ -189,3 +189,49 @@
   text-align: center;
   color: var(--proto-text-50);
 }
+
+/*
+ * Десктоп: карточка учреждения слева, направления обучения справа
+ * сеткой карточек.
+ */
+@media (min-width: 960px) {
+  .content {
+    display: grid;
+    grid-template-columns: 440px minmax(0, 1fr);
+    gap: 56px;
+    align-items: start;
+    padding-top: 32px;
+  }
+
+  .hero {
+    position: sticky;
+    top: 104px;
+  }
+
+  .photo {
+    height: 280px;
+  }
+
+  .section {
+    width: auto;
+    gap: 20px;
+  }
+
+  .sectionTitle {
+    width: auto;
+    font-size: 28px;
+  }
+
+  .carousel {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+  }
+
+  .section .carousel > * {
+    width: 100%;
+  }
+}

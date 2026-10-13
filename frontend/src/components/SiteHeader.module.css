@@ -1,0 +1,88 @@
+/* На телефоне шапки нет — там мобильная панель из макета */
+.header,
+.spacer {
+  display: none;
+}
+
+@media (min-width: 960px) {
+  .header {
+    position: fixed;
+    z-index: 60;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: block;
+    height: 72px;
+    background: rgba(12, 0, 32, 0.78);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .inner {
+    display: flex;
+    height: 100%;
+    max-width: calc(1200px + 64px);
+    align-items: center;
+    gap: 48px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  .logo {
+    display: inline-flex;
+    flex: 0 0 auto;
+  }
+
+  .nav {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .link {
+    position: relative;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-family: var(--proto-font-text);
+    font-size: 15px;
+    color: var(--proto-text-60);
+    transition:
+      color 0.15s ease,
+      background 0.15s ease;
+  }
+
+  .link:hover {
+    color: var(--proto-text);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .link:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.6);
+    outline-offset: 2px;
+  }
+
+  /* Текущий раздел — белый текст и фиолетовая черта, как свечение карточек */
+  .active {
+    color: var(--proto-text);
+  }
+
+  .active::after {
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 2px;
+    height: 2px;
+    border-radius: 1px;
+    background: rgb(150, 90, 255);
+    box-shadow: 0 0 10px rgba(150, 90, 255, 0.9);
+    content: '';
+  }
+
+  /* Место под закреплённую шапку */
+  .spacer {
+    display: block;
+    height: 72px;
+  }
+}

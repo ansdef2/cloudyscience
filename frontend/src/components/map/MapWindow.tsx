@@ -77,9 +77,10 @@ const frame = (rect: { top: number; left: number; width: number; height: number 
 const viewport = () => ({ top: 0, left: 0, width: window.innerWidth, height: window.innerHeight })
 
 /**
- * Вид «все учреждения». Карточка низкая (126 px), поэтому отступы в ней
- * минимальные: при обычных 36 px две точки на Большой Московской влезают
- * только на зуме ~10.9, где кластеры уже сливаются в один.
+ * Вид «все учреждения». На телефоне карточка низкая (126 px), поэтому
+ * отступы в ней минимальные: при обычных 36 px две точки на Большой
+ * Московской влезают только на зуме ~10.9, где кластеры уже сливаются.
+ * На десктопе карточка высокая (440 px) — там поля просторнее.
  */
 const fitToPlaces = (map: MapLibreMap, places: MapPlace[], expanded: boolean, duration = 0) => {
   if (!places.length) return
@@ -95,7 +96,9 @@ const fitToPlaces = (map: MapLibreMap, places: MapPlace[], expanded: boolean, du
       // В полном экране поля шире — под подписи учреждений и плашку сверху
       padding: expanded
         ? { top: 150, bottom: 110, left: 110, right: 110 }
-        : { top: 26, bottom: 26, left: 40, right: 64 },
+        : map.getContainer().clientHeight > 250
+          ? { top: 70, bottom: 70, left: 110, right: 110 }
+          : { top: 26, bottom: 26, left: 40, right: 64 },
       maxZoom: expanded ? 15.5 : 15,
       duration,
     }

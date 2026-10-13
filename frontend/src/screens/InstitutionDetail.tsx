@@ -23,7 +23,7 @@ export default function InstitutionDetail({ institutionId }: InstitutionDetailPr
 
   if (institution === 'loading') {
     return (
-      <div className={styles.container}>
+      <div className={`${styles.container} protoPage`}>
         <ProtoTopBar />
         <div className="bigLoader" style={{ marginTop: 60 }} />
       </div>
@@ -32,7 +32,7 @@ export default function InstitutionDetail({ institutionId }: InstitutionDetailPr
 
   if (!institution) {
     return (
-      <div className={styles.container}>
+      <div className={`${styles.container} protoPage`}>
         <ProtoTopBar />
         <div className={styles.notFound}>Учреждение не найдено</div>
       </div>
@@ -43,7 +43,7 @@ export default function InstitutionDetail({ institutionId }: InstitutionDetailPr
   const statusText = institution.isOpen ? `Открыто до ${hours?.split('-')[1] ?? ''}` : 'Закрыто'
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} protoPage`}>
       <ProtoTopBar />
 
       <div className={styles.content}>

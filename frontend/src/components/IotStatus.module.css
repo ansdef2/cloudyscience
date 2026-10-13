@@ -2,8 +2,23 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-top: 28px;
+  margin-top: 32px;
   padding: 0 24px;
+}
+
+/* Заголовок в стиль «Характеристик» рядом */
+.heading {
+  margin: 0 0 20px;
+  font-family: var(--proto-font-display);
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--proto-text);
+}
+
+/* Резерв без подключённых устройств — пунктирная рамка вместо заливки */
+.empty {
+  border: 1px dashed rgba(255, 255, 255, 0.16);
+  background: transparent;
 }
 
 .channel {
@@ -40,14 +55,18 @@
   color: var(--proto-text);
 }
 
-.provider {
+.badge {
+  padding: 3px 8px;
+  border-radius: 8px;
+  background: var(--proto-field);
   font-size: 11px;
-  color: var(--proto-text-50);
+  color: var(--proto-text-60);
 }
 
 .state {
   margin: 0;
   font-size: 13px;
+  line-height: 1.45;
   color: var(--proto-text-70);
 }
 
@@ -81,4 +100,16 @@
 .link {
   color: var(--proto-text);
   text-decoration: underline;
+}
+
+@media (min-width: 960px) {
+  .root {
+    margin-top: 24px;
+    padding: 0;
+  }
+
+  .heading {
+    margin-bottom: 16px;
+    font-size: 24px;
+  }
 }

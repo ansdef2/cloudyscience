@@ -44,6 +44,10 @@
   cursor: pointer;
 }
 
+.actions {
+  margin-top: 21px;
+}
+
 .searchIcon {
   width: 20px;
   height: 20px;
@@ -109,4 +113,73 @@
   padding: 24px 8px;
   color: var(--proto-text-50);
   font-size: 14px;
+}
+
+/*
+ * Десктоп: слева карта и лента постов в две колонки, справа — поиск,
+ * карточки действий, курсы и «Актуальное».
+ */
+@media (min-width: 960px) {
+  .content {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    grid-template-areas:
+      'map side'
+      'feed side';
+    column-gap: 40px;
+    row-gap: 40px;
+    align-items: start;
+    padding: 32px 0 0;
+  }
+
+  .mapArea {
+    grid-area: map;
+  }
+
+  .side {
+    grid-area: side;
+  }
+
+  .search {
+    margin-top: 0;
+  }
+
+  .search:hover {
+    background: rgba(107, 107, 107, 0.16);
+  }
+
+  .section {
+    margin-top: 36px;
+  }
+
+  /* В узкой колонке карусели не вылезают за поля — там нечего прокручивать */
+  .carousel {
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Курс — на всю ширину колонки, а не 320 px с хвостом */
+  .side .courseList > * {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  /* Две карточки «Актуального» делят колонку поровну */
+  .side .carousel:not(.courseList) > * {
+    flex: 1 1 0;
+    width: auto;
+  }
+
+  .feed {
+    grid-area: feed;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    margin-top: 0;
+  }
+
+  .feedFilters {
+    grid-column: 1 / -1;
+    margin-bottom: 0;
+  }
 }
