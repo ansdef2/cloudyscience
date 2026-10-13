@@ -15,6 +15,7 @@ import TeamMember from './TeamMember';
 import Message from './Message';
 import ConsultationRequest from './ConsultationRequest';
 import FileUpload from './FileUpload';
+import UserToken from './UserToken';
 
 // Define associations
 Institution.hasMany(Course, { foreignKey: 'institutionId', as: 'courses' });
@@ -46,4 +47,5 @@ export {
   Message,
   ConsultationRequest,
   FileUpload,
+  UserToken,
 };

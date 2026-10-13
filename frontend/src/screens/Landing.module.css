@@ -379,6 +379,24 @@
   color: var(--proto-text-50);
 }
 
+.footerStart {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.docs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+}
+
+.docs a {
+  color: var(--proto-text-60);
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.2);
+}
+
 /* Реквизиты — в правом нижнем углу */
 .legal {
   display: flex;

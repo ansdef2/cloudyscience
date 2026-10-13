@@ -128,8 +128,9 @@
   display: flex;
   min-width: 0;
   flex: 1;
+  flex-wrap: wrap;
   align-items: baseline;
-  gap: 10px;
+  gap: 2px 10px;
 }
 
 .fileName {
@@ -146,7 +147,14 @@
   color: var(--proto-text-50);
 }
 
+.fileName {
+  flex: 1 1 0;
+}
+
+/* Причина отказа — отдельной строкой под именем, чтобы имя не сжималось */
 .fileError .fileSize {
+  flex-basis: 100%;
+  margin-left: 0;
   color: rgb(255, 120, 120);
 }
 

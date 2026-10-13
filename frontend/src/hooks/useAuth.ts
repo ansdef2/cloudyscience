@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { authApi } from '@/utils/LegacyApi';
 import { clearAuthToken, getAuthToken, setAuthToken } from '@/utils/api';
 import { preventSilentSignIn, saveCredential, setRememberedLogin } from '@/utils/credentials';
-import { User } from '@/models/Api';
+import { RegisterData, User } from '@/models/Api';
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -51,16 +51,16 @@ export const useAuth = () => {
     }
   };
 
-  const register = async (name: string, email: string, password: string) => {
+  const register = async (form: RegisterData) => {
     try {
-      const response = await authApi.register(email, password, name);
+      const response = await authApi.register(form);
       if (response.data) {
-        const data = response.data as { user: User; token: string };
+        const data = response.data as { user: User; token: string; parentLetterSent?: boolean };
         setAuthToken(data.token, true);
-        setRememberedLogin(email, true);
-        void saveCredential(email, password, name);
+        setRememberedLogin(form.email, true);
+        void saveCredential(form.email, form.password, form.name);
         setUser(data.user);
-        return { success: true };
+        return { success: true, user: data.user, parentLetterSent: data.parentLetterSent };
       }
       return { success: false, error: response.error };
     } catch (error) {
@@ -76,6 +76,8 @@ export const useAuth = () => {
 
   return {
     user,
+    setUser,
+    reload: loadUser,
     loading,
     login,
     register,

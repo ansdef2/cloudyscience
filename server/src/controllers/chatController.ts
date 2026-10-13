@@ -122,8 +122,13 @@ export const postDirectMessage = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: 'Нельзя написать самому себе' });
     }
 
-    const peer = await User.findByPk(req.params.userId, { attributes: ['id'] });
+    const peer = await User.findByPk(req.params.userId, {
+      attributes: ['id', 'isBlocked', 'parentConsentStatus'],
+    });
     if (!peer) return res.status(404).json({ error: 'Пользователь не найден' });
+    if (peer.isBlocked || peer.parentConsentStatus === 'pending') {
+      return res.status(403).json({ error: 'Этому пользователю сейчас нельзя написать' });
+    }
 
     const message = await Message.create({
       senderId: me,

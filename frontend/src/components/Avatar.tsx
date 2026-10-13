@@ -1,5 +1,6 @@
 'use client'
 
+import { fileUrl } from '@/services/uploadService'
 import ImageWithFallback from './ImageWithFallback'
 import styles from './Avatar.module.css'
 
@@ -16,7 +17,7 @@ export default function Avatar({ name, src, size = 40 }: AvatarProps) {
   if (src) {
     return (
       <span className={styles.avatar} style={style}>
-        <ImageWithFallback src={src} alt={name} className={styles.image} bare />
+        <ImageWithFallback src={fileUrl(src)!} alt={name} className={styles.image} bare />
       </span>
     )
   }

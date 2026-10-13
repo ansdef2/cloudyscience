@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { Onest, Playfair_Display } from 'next/font/google'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { ToastProvider } from '@/components/ToastProvider'
+import AccountNotice from '@/components/AccountNotice'
+import Analytics from '@/components/Analytics'
 import '@/styles/globals.css'
 
 const onest = Onest({ subsets: ['latin', 'cyrillic'], variable: '--font-onest' })
@@ -23,6 +25,8 @@ export default function RootLayout({
         <ErrorBoundary>
           <ToastProvider>
             {children}
+            <AccountNotice />
+            <Analytics />
           </ToastProvider>
         </ErrorBoundary>
       </body>

@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/useToast'
 import { User } from '@/models/Api'
 import { Booking, cancelBooking, getUserBookings } from '@/services/bookingService'
 import { getUnreadCount } from '@/services/chatService'
+import { resendParentConsent } from '@/services/accountService'
 import {
   CONSULTATION_STATUS,
   Consultation,
@@ -80,6 +81,19 @@ function Profile({ user }: { user: User }) {
     }
   }
 
+  const resendLetter = async () => {
+    try {
+      const result = await resendParentConsent()
+      toast.success(
+        result.sent
+          ? `Письмо отправлено на ${user.parentEmail}`
+          : 'Почта на сайте пока не настроена — согласие подтвердит администратор'
+      )
+    } catch (error) {
+      toast.error(error instanceof ApiError ? error.message : 'Не удалось отправить письмо')
+    }
+  }
+
   const handleLogout = () => {
     logout()
     router.push('/')
@@ -92,7 +106,7 @@ function Profile({ user }: { user: User }) {
   return (
     <div className={styles.layout}>
       <section className={`${ui.panel} ${styles.me}`}>
-        <Avatar name={user.name} size={64} />
+        <Avatar name={user.name} src={user.avatar} size={64} />
         <div className={ui.cardBody}>
           <h1 className={styles.name}>{user.name}</h1>
           <span className={ui.cardMeta}>{user.email}</span>
@@ -101,6 +115,19 @@ function Profile({ user }: { user: User }) {
           )}
         </div>
       </section>
+
+      {user.parentConsentStatus === 'pending' && (
+        <section className={`${ui.panel} ${styles.pending}`}>
+          <span className={styles.pendingTitle}>Ждём согласия родителя</span>
+          <span className={ui.cardMeta}>
+            Попросили согласие у родителя: {user.parentEmail}. До подтверждения недоступны чаты, команды и брони —
+            каталог и курсы можно смотреть.
+          </span>
+          <button className={`${ui.ghost} ${ui.small}`} onClick={resendLetter}>
+            Отправить письмо ещё раз
+          </button>
+        </section>
+      )}
 
       <nav className={styles.links} aria-label="Разделы профиля">
         <button className={`${ui.card} ${ui.cardLink} ${styles.link}`} onClick={() => router.push('/chats')}>
@@ -113,6 +140,10 @@ function Profile({ user }: { user: User }) {
         </button>
         <button className={`${ui.card} ${ui.cardLink} ${styles.link}`} onClick={() => router.push('/people')}>
           <span className={styles.linkTitle}>Эксперты и обучающиеся</span>
+          <span className={ui.muted}>›</span>
+        </button>
+        <button className={`${ui.card} ${ui.cardLink} ${styles.link}`} onClick={() => router.push('/settings')}>
+          <span className={styles.linkTitle}>Настройки</span>
           <span className={ui.muted}>›</span>
         </button>
         {user.role === 'admin' && (

@@ -10,7 +10,7 @@ import {
   getCourseEnrollments,
 } from '../controllers/courseController';
 import { authenticate } from '../middleware/auth';
-import { authorizeAdmin, optionalAuthenticate } from '../middleware/auth';
+import { authorizeAdmin, optionalAuthenticate, requireParentConsent } from '../middleware/auth';
 
 const router = Router();
 
@@ -20,7 +20,7 @@ router.post('/', authenticate, authorizeAdmin, createCourse);
 router.put('/:id', authenticate, authorizeAdmin, updateCourse);
 router.delete('/:id', authenticate, authorizeAdmin, deleteCourse);
 
-router.post('/:id/enroll', authenticate, enrollInCourse);
+router.post('/:id/enroll', authenticate, requireParentConsent, enrollInCourse);
 router.get('/:id/enrollments', authenticate, authorizeAdmin, getCourseEnrollments);
 router.delete('/:id/enrollments/:userId', authenticate, authorizeAdmin, removeEnrollment);
 

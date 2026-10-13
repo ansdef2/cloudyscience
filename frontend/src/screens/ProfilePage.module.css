@@ -53,6 +53,20 @@
   font-size: 12px;
 }
 
+.pending {
+  grid-area: pending;
+  gap: 8px;
+  box-shadow: inset 0 0 0 1px rgba(150, 90, 255, 0.4);
+}
+
+.pending > button {
+  align-self: flex-start;
+}
+
+.pendingTitle {
+  font-size: 15px;
+}
+
 .block {
   display: flex;
   flex-direction: column;
@@ -69,10 +83,11 @@
     grid-template-columns: 360px minmax(0, 1fr);
     grid-template-areas:
       'me bookings'
+      'pending bookings'
       'links bookings'
       'links consultations'
       'logout consultations';
-    grid-template-rows: auto auto auto 1fr;
+    grid-template-rows: auto auto auto auto 1fr;
     column-gap: 48px;
     row-gap: 16px;
     align-items: start;

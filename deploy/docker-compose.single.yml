@@ -59,6 +59,17 @@ services:
       JWT_SECRET: ${JWT_SECRET:?задайте JWT_SECRET в deploy/.env}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
       CORS_ORIGIN: ${PUBLIC_URL:?укажите PUBLIC_URL в deploy/.env}
+      # Адрес сайта — для ссылок в письмах (сброс пароля, согласие родителя)
+      PUBLIC_URL: ${PUBLIC_URL}
+
+      # Почта для писем. Без SMTP_HOST письма не уходят, ссылки выдаёт администратор
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-465}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+      # Куда слать администратору письма о новых бронях, заявках и жалобах
+      ADMIN_NOTIFY_EMAIL: ${ADMIN_NOTIFY_EMAIL:-}
 
       # Загруженные файлы (к броням, аватары, картинки) — в томе uploads
       UPLOAD_DIR: /app/uploads
@@ -77,6 +88,8 @@ services:
       dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_API_URL: ${PUBLIC_URL:?укажите PUBLIC_URL в deploy/.env}/api
+        # Номер счётчика Яндекс Метрики; не задан — статистики нет
+        NEXT_PUBLIC_YM_ID: ${YM_ID:-}
     container_name: cloudco-frontend
     restart: unless-stopped
     environment:

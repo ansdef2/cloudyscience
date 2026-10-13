@@ -1,4 +1,4 @@
-import { Course } from "@/models/Api";
+import { Course, RegisterData } from "@/models/Api";
 import { getAuthToken } from "@/utils/api";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
@@ -79,8 +79,8 @@ export const authApi = {
     return apiClient.post('/auth/login', { email, password });
   },
   
-  register: async (email: string, password: string, name: string) => {
-    return apiClient.post('/auth/register', { email, password, name });
+  register: async (data: RegisterData) => {
+    return apiClient.post('/auth/register', data);
   },
   
   getProfile: async () => {

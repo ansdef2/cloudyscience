@@ -214,3 +214,61 @@
     background: #ececec;
   }
 }
+
+/* Дата рождения: иконка календаря в тон тёмной теме */
+.dateInput {
+  color-scheme: dark;
+}
+
+.inlineLink {
+  color: var(--proto-text);
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Блок для детей до 14 лет */
+.parent {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 16px;
+  border: 1px solid rgba(150, 90, 255, 0.35);
+  border-radius: var(--proto-radius-field);
+  background: rgba(150, 90, 255, 0.08);
+}
+
+.parentTitle {
+  padding: 0 6px;
+  font-size: 14px;
+  color: var(--proto-text);
+}
+
+.parentText {
+  margin: 0 0 4px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--proto-text-60);
+}
+
+/* Строка под полем пароля: «Забыли пароль?» */
+.aside {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -6px;
+}
+
+.note {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: var(--proto-radius-field);
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--proto-text-70);
+}
+
+.noteOk {
+  background: rgba(0, 179, 125, 0.12);
+  color: rgb(150, 230, 200);
+}
