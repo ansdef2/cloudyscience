@@ -10,8 +10,15 @@ import { startIotPolling } from './controllers/iotController';
 import { startUploadCleanup } from './controllers/uploadController';
 import { startNotificationCleanup } from './controllers/notificationController';
 import { attachRealtime } from './realtime/hub';
+import { reportServerError } from './utils/alerts';
 
 const PORT = process.env.PORT || 3001;
+
+// Ошибка вне запроса (таймер, опрос IoT) не должна пройти незамеченной
+process.on('unhandledRejection', (reason) => {
+  console.error('Необработанный отказ промиса:', reason);
+  reportServerError(reason, 'unhandledRejection');
+});
 
 const startServer = async () => {
   try {

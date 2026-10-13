@@ -23,6 +23,7 @@ import notificationRoutes from './routes/notifications';
 import safetyRoutes from './routes/safety';
 import { servePublicFile } from './controllers/uploadController';
 import { apiLimiter } from './middleware/rateLimit';
+import { reportServerError } from './utils/alerts';
 
 /**
  * Express-приложение без запуска: index.ts поднимает его на порту,
@@ -75,6 +76,7 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
   if (err?.type === 'entity.too.large') return res.status(413).json({ error: 'Слишком большой запрос' });
   if (err?.type === 'entity.parse.failed') return res.status(400).json({ error: 'Некорректный JSON' });
   console.error(err?.stack ?? err);
+  if (!err?.status || err.status >= 500) reportServerError(err, 'express');
   res.status(err?.status || 500).json({ error: err?.status ? err.message : 'Internal Server Error' });
 });
 

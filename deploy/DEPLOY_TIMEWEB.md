@@ -199,11 +199,12 @@ docker compose -f deploy/docker-compose.single.yml --env-file deploy/.env \
   exec -T postgres pg_dump -U postgres cloudco | gzip > ~/cloudco-$(date +%F).sql.gz
 ```
 
-Ежедневно в 4 утра — добавьте в `crontab -e`:
-
-```
-0 4 * * * cd /root/cloudco && docker compose -f deploy/docker-compose.single.yml --env-file deploy/.env exec -T postgres pg_dump -U postgres cloudco | gzip > /root/backup-$(date +\%F).sql.gz
-```
+Ежедневный бэкап ставит `update.sh` сам: каждую ночь в 03:30
+[`deploy/backup.sh`](backup.sh) сохраняет базу (хранит 14 дней) и загруженные
+пользователями файлы (7 дней) в `/root/backups`, журнал — в
+`/var/log/cloudco-backup.log`. Запустить вручную: `bash /root/cloudco/deploy/backup.sh`.
+Бэкапы лежат на том же сервере — раз в неделю-месяц скачивайте свежий к себе
+(`scp root@IP:/root/backups/db-*.sql.gz .`) или включите снимки диска в панели.
 
 Восстановление:
 
@@ -211,6 +212,24 @@ docker compose -f deploy/docker-compose.single.yml --env-file deploy/.env \
 gunzip -c ~/cloudco-2026-09-20.sql.gz | docker compose -f deploy/docker-compose.single.yml \
   --env-file deploy/.env exec -T postgres psql -U postgres cloudco
 ```
+
+## Почта (необязательно)
+
+Без почты сайт работает, но ссылку для сброса пароля и согласия родителя
+администратор выдаёт сам (админка → «Пользователи»). Чтобы письма уходили
+автоматически, добавьте в `deploy/.env` настройки SMTP — например, Яндекс 360:
+
+```
+SMTP_HOST=smtp.yandex.ru
+SMTP_PORT=465
+SMTP_USER=noreply@ваш-домен.ru
+SMTP_PASS=пароль-приложения
+SMTP_FROM="Облако науки <noreply@ваш-домен.ru>"
+ADMIN_NOTIFY_EMAIL=ваша-почта@ваш-домен.ru
+```
+
+и выполните `bash /root/update.sh`. `ADMIN_NOTIFY_EMAIL` получает письма о
+новых бронях, заявках, жалобах и ошибках сервера.
 
 ## Обновление
 

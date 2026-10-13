@@ -7,15 +7,50 @@ import ImageWithFallback from '@/components/ImageWithFallback'
 import CourseCard from '@/components/CourseCard'
 import { Institution } from '@/models/Api'
 import { getInstitutionById } from '@/services/institutionService'
+import { useToast } from '@/hooks/useToast'
+import { shareLink } from '@/utils/share'
 import styles from './InstitutionDetail.module.css'
 
 interface InstitutionDetailProps {
   institutionId: string
 }
 
+/** Точка для карт: координаты, если есть, иначе адрес в Великом Новгороде */
+const coordinatesOrAddress = (institution: Institution) =>
+  institution.latitude != null && institution.longitude != null
+    ? `${institution.latitude},${institution.longitude}`
+    : `Великий Новгород, ${institution.address}`
+
+const mapsUrl = (institution: Institution) =>
+  institution.latitude != null && institution.longitude != null
+    ? `https://yandex.ru/maps/?pt=${institution.longitude},${institution.latitude}&z=17&l=map`
+    : `https://yandex.ru/maps/?text=${encodeURIComponent(coordinatesOrAddress(institution))}`
+
 export default function InstitutionDetail({ institutionId }: InstitutionDetailProps) {
   const router = useRouter()
+  const toast = useToast()
   const [institution, setInstitution] = useState<Institution | 'loading' | null>('loading')
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  // Меню «Ещё» закрывается кликом мимо и Escape
+  useEffect(() => {
+    if (!menuOpen) return
+    const close = (event: MouseEvent | KeyboardEvent) => {
+      if (
+        event instanceof KeyboardEvent
+          ? event.key === 'Escape'
+          : !(event.target as Element).closest('[role=menu], [aria-label="Ещё"]')
+      ) {
+        setMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', close)
+    document.addEventListener('keydown', close)
+    return () => {
+      document.removeEventListener('mousedown', close)
+      document.removeEventListener('keydown', close)
+    }
+  }, [menuOpen])
 
   useEffect(() => {
     getInstitutionById(institutionId).then((found) => setInstitution(found || null))
@@ -37,6 +72,23 @@ export default function InstitutionDetail({ institutionId }: InstitutionDetailPr
         <div className={styles.notFound}>Учреждение не найдено</div>
       </div>
     )
+  }
+
+  const share = async () => {
+    setMenuOpen(false)
+    const result = await shareLink(institution.name, `/institution/${institution.id}`)
+    if (result === 'copied') toast.success('Ссылка скопирована')
+    if (result === 'failed') toast.error('Не удалось поделиться')
+  }
+
+  const copyAddress = async () => {
+    setMenuOpen(false)
+    try {
+      await navigator.clipboard.writeText(`Великий Новгород, ${institution.address}`)
+      toast.success('Адрес скопирован')
+    } catch {
+      toast.error('Не удалось скопировать')
+    }
   }
 
   const hours = institution.hours || institution.workingHours
@@ -120,13 +172,48 @@ export default function InstitutionDetail({ institutionId }: InstitutionDetailPr
               </a>
             )}
 
-            <button className={styles.iconAction} aria-label="Ещё">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden>
-                <circle cx="5.5" cy="12" r="1.6" fill="currentColor" />
-                <circle cx="12" cy="12" r="1.6" fill="currentColor" />
-                <circle cx="18.5" cy="12" r="1.6" fill="currentColor" />
-              </svg>
-            </button>
+            <div className={styles.moreWrap}>
+              <button
+                className={styles.iconAction}
+                aria-label="Ещё"
+                aria-expanded={menuOpen}
+                onClick={() => setMenuOpen(!menuOpen)}
+              >
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden>
+                  <circle cx="5.5" cy="12" r="1.6" fill="currentColor" />
+                  <circle cx="12" cy="12" r="1.6" fill="currentColor" />
+                  <circle cx="18.5" cy="12" r="1.6" fill="currentColor" />
+                </svg>
+              </button>
+              {menuOpen && (
+                <div className={styles.moreMenu} role="menu">
+                  <button role="menuitem" onClick={share}>
+                    Поделиться
+                  </button>
+                  <a
+                    role="menuitem"
+                    href={mapsUrl(institution)}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Открыть в Яндекс Картах
+                  </a>
+                  <a
+                    role="menuitem"
+                    href={`https://yandex.ru/maps/?rtext=~${encodeURIComponent(coordinatesOrAddress(institution))}&rtt=auto`}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Построить маршрут
+                  </a>
+                  <button role="menuitem" onClick={copyAddress}>
+                    Скопировать адрес
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -152,9 +239,7 @@ export default function InstitutionDetail({ institutionId }: InstitutionDetailPr
 
           <div className={styles.carousel}>
             {institution.courses && institution.courses.length > 0 ? (
-              institution.courses.map((course, index) => (
-                <CourseCard key={course.id} course={course} index={index} />
-              ))
+              institution.courses.map((course, index) => <CourseCard key={course.id} course={course} index={index} />)
             ) : (
               <p className={styles.empty}>Направления пока не добавлены</p>
             )}
