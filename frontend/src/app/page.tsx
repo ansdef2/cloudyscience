@@ -1,11 +1,5 @@
-import { Suspense } from 'react'
-import LoadingScreen from '@/components/LoadingScreen'
-import HomePage from '@/screens/HomePage'
+import Landing from '@/screens/Landing'
 
 export default function Home() {
-  return (
-    <Suspense fallback={<LoadingScreen />}>
-      <HomePage />
-    </Suspense>
-  )
+  return <Landing />
 }

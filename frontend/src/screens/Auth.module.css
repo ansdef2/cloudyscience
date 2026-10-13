@@ -103,3 +103,97 @@
   font-size: 14px;
 }
 
+
+/* Поле пароля с кнопкой «показать» */
+.passwordWrap {
+  position: relative;
+  display: flex;
+}
+
+.passwordInput {
+  flex: 1;
+  padding-right: 48px;
+}
+
+.reveal {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  transform: translateY(-50%);
+  border-radius: 8px;
+  background: none;
+  color: var(--proto-text-60);
+}
+
+.reveal svg {
+  width: 20px;
+  height: 20px;
+}
+
+.reveal:focus-visible {
+  outline: 2px solid var(--proto-text-60);
+}
+
+/* «Запомнить меня»: настоящий чекбокс, нарисованный в стиле макета */
+.remember {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.rememberInput {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.rememberBox {
+  display: flex;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1.4px solid #ffffff;
+  border-radius: 8px;
+  color: var(--proto-text);
+}
+
+.rememberBox svg {
+  width: 14px;
+  height: 14px;
+  opacity: 0;
+}
+
+.rememberInput:checked + .rememberBox svg {
+  opacity: 1;
+}
+
+.rememberInput:focus-visible + .rememberBox {
+  outline: 2px solid var(--proto-text-60);
+  outline-offset: 2px;
+}
+
+.rememberText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  color: var(--proto-text);
+}
+
+.rememberHint {
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--proto-text-50);
+}

@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import ImageWithFallback from '@/components/ImageWithFallback'
+import MapWindow, { MapPlace } from '@/components/map/MapWindow'
 import ProfileMenu from '@/components/ProfileMenu'
 import ActionCards from '@/components/ActionCards'
 import CourseCard from '@/components/CourseCard'
@@ -10,9 +10,12 @@ import HighlightCard from '@/components/HighlightCard'
 import PostCard from '@/components/PostCard'
 import FeedFilters from '@/components/FeedFilters'
 import { Course, Institution } from '@/models/Api'
+import { Equipment } from '@/models/Equipment'
 import { getInstitutions } from '@/services/institutionService'
+import { getEquipmentList } from '@/services/equipmentService'
 import { getPosts, Post, PostSort } from '@/services/postService'
 import { api } from '@/utils/api'
+import { pluralize } from '@/utils/format'
 import styles from './HomePage.module.css'
 
 export default function HomePage() {
@@ -20,25 +23,75 @@ export default function HomePage() {
   const [courses, setCourses] = useState<Course[]>([])
   const [highlights, setHighlights] = useState<Post[]>([])
   const [posts, setPosts] = useState<Post[]>([])
-  const [institution, setInstitution] = useState<Institution | null>(null)
+  const [allCourses, setAllCourses] = useState<Course[]>([])
+  const [institutions, setInstitutions] = useState<Institution[]>([])
+  const [equipment, setEquipment] = useState<Equipment[]>([])
   const [sort, setSort] = useState<PostSort>('popular')
 
-  // Курсы, «Актуальное» и метка на карте грузятся один раз
+  // Курсы, «Актуальное» и точки карты грузятся один раз
   useEffect(() => {
     const load = async () => {
-      const [coursesResponse, featured, institutions] = await Promise.all([
+      const [coursesResponse, featured, institutionList, equipmentList] = await Promise.all([
         api.get<Course[]>('/courses').catch(() => ({ data: [] as Course[] })),
         getPosts({ featured: true }),
         getInstitutions(),
+        getEquipmentList(),
       ])
 
+      setAllCourses(coursesResponse.data)
       setCourses(coursesResponse.data.filter((course) => (course.availableSpots ?? 0) > 0))
       setHighlights(featured)
-      setInstitution(institutions[0] ?? null)
+      setInstitutions(institutionList)
+      setEquipment(equipmentList)
     }
 
     load()
   }, [])
+
+  // Кластеры карты: учреждение с координатами и всё, что в нём можно взять или пройти
+  const places = useMemo<MapPlace[]>(
+    () =>
+      institutions
+        .filter((institution) => institution.latitude != null && institution.longitude != null)
+        .map((institution) => ({
+          id: institution.id,
+          name: institution.name,
+          address: institution.address,
+          latitude: institution.latitude!,
+          longitude: institution.longitude!,
+          href: `/institution/${institution.id}`,
+          items: [
+            ...allCourses
+              .filter((course) => course.institutionId === institution.id)
+              .map((course) => ({
+                id: course.id,
+                kind: 'course' as const,
+                title: course.title,
+                caption: `${course.availableSpots} ${pluralize(course.availableSpots, [
+                  'свободное место',
+                  'свободных места',
+                  'свободных мест',
+                ])}`,
+                href: `/course/${course.id}`,
+              })),
+            ...equipment
+              .filter((item) => item.institutionId === institution.id)
+              .map((item) => ({
+                id: item.id,
+                kind: 'equipment' as const,
+                title: item.name,
+                caption: [
+                  item.type !== item.name ? item.type : null,
+                  item.status === 'open' ? 'открыто' : 'закрыто',
+                ]
+                  .filter(Boolean)
+                  .join(' · '),
+                href: `/equipment/${item.id}`,
+              })),
+          ],
+        })),
+    [institutions, allCourses, equipment]
+  )
 
   // Лента перезапрашивается при смене сортировки
   useEffect(() => {
@@ -55,32 +108,13 @@ export default function HomePage() {
 
   return (
     <div className={styles.container}>
-      <ImageWithFallback
-        src="/prototype/map.png"
-        alt="Карта"
-        className={styles.map}
-        bare
-      />
-
       <header className={styles.topBar}>
         <span className={styles.logo}>Облако науки</span>
         <ProfileMenu />
       </header>
 
-      {institution && (
-        <div className={styles.mapPin}>
-          <div className={styles.mapPinCard}>
-            <div>
-              <div className={styles.mapPinTitle}>{institution.name}</div>
-              <div className={styles.mapPinAddress}>{institution.address}</div>
-            </div>
-          </div>
-          <span className={styles.mapPinDot} />
-        </div>
-      )}
-
-      <div className={styles.sheet}>
-        <div className={styles.handle} />
+      <div className={styles.content}>
+        <MapWindow places={places} />
 
         <button className={styles.search} onClick={() => router.push('/search')}>
           <svg className={styles.searchIcon} viewBox="0 0 20 20" fill="none" aria-hidden>
@@ -90,7 +124,7 @@ export default function HomePage() {
           Поиск
         </button>
 
-        <div style={{ marginTop: 20 }}>
+        <div style={{ marginTop: 21 }}>
           <ActionCards />
         </div>
 

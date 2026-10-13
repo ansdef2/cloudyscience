@@ -13,6 +13,7 @@ function normalizeCourse(course: any): Course {
     images: course.images ?? [],
     spotsLeft: course.availableSpots ?? 0,
     modules: course.modules ?? [],
+    isEnrolled: course.isEnrolled ?? false,
     completedStageIds: course.completedStageIds ?? [],
     address: course.address ?? course.Institution?.address ?? '',
   }
@@ -79,46 +80,19 @@ export async function getCourseById(id: string): Promise<Course | null> {
   }
 }
 
-/**
- * Записаться на курс
- */
-export interface CourseBookingRequest {
-  courseId: string
-  date: string
-  time: string
-  agreeToDataProcessing: boolean
-  wantReminder?: boolean
-  addToCalendar?: boolean
+export interface EnrollmentResult {
+  isEnrolled: boolean
+  totalSpots: number
+  availableSpots: number
 }
 
-export async function bookCourse(
-  data: CourseBookingRequest
-): Promise<{ success: boolean; bookingId?: string }> {
-  if (!data.agreeToDataProcessing) {
-    throw new Error('Требуется согласие на обработку персональных данных')
-  }
-
-  // Запись на курс — то же бронирование, что и для оборудования, только с courseId.
-  // Напоминание и календарь бэкендом не моделируются, поэтому уходят в notes.
-  const notes = [
-    data.wantReminder ? 'Напомнить о занятии' : null,
-    data.addToCalendar ? 'Добавить в календарь' : null,
-  ]
-    .filter(Boolean)
-    .join('; ')
-
-  try {
-    const response = await api.post<{ id: string }>('/bookings', {
-      courseId: data.courseId,
-      date: data.date,
-      time: data.time,
-      notes: notes || undefined,
-    })
-    return { success: true, bookingId: response.data.id }
-  } catch (error) {
-    console.error('Ошибка записи на курс:', error)
-    throw error
-  }
+/**
+ * Записаться на курс. Повторная запись и запись без мест отклоняются
+ * сервером с 409 — код причины в ApiError.data.code.
+ */
+export async function enrollInCourse(courseId: string): Promise<EnrollmentResult> {
+  const response = await api.post<EnrollmentResult>(`/courses/${courseId}/enroll`)
+  return response.data
 }
 
 /**

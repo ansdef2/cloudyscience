@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { authApi } from '@/utils/LegacyApi';
-import { AUTH_TOKEN_KEY } from '@/utils/api';
+import { clearAuthToken, getAuthToken, setAuthToken } from '@/utils/api';
+import { preventSilentSignIn, saveCredential, setRememberedLogin } from '@/utils/credentials';
 import { User } from '@/models/Api';
 
 export const useAuth = () => {
@@ -8,7 +9,7 @@ export const useAuth = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem(AUTH_TOKEN_KEY);
+    const token = getAuthToken();
     if (token) {
       loadUser();
     } else {
@@ -31,12 +32,16 @@ export const useAuth = () => {
     }
   };
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, remember = true) => {
     try {
       const response = await authApi.login(email, password);
       if (response.data) {
         const data = response.data as { user: User; token: string };
-        localStorage.setItem(AUTH_TOKEN_KEY, data.token);
+        setAuthToken(data.token, remember);
+        setRememberedLogin(email, remember);
+        // Пароль хранит браузер, а не сайт: только если человек просил запомнить.
+        // Не ждём — диалог браузера не должен задерживать вход
+        if (remember) void saveCredential(email, password, data.user.name);
         setUser(data.user);
         return { success: true };
       }
@@ -51,7 +56,9 @@ export const useAuth = () => {
       const response = await authApi.register(email, password, name);
       if (response.data) {
         const data = response.data as { user: User; token: string };
-        localStorage.setItem(AUTH_TOKEN_KEY, data.token);
+        setAuthToken(data.token, true);
+        setRememberedLogin(email, true);
+        void saveCredential(email, password, name);
         setUser(data.user);
         return { success: true };
       }
@@ -62,7 +69,8 @@ export const useAuth = () => {
   };
 
   const logout = () => {
-    localStorage.removeItem(AUTH_TOKEN_KEY);
+    clearAuthToken();
+    preventSilentSignIn();
     setUser(null);
   };
 

@@ -15,6 +15,9 @@ export interface Institution {
   logo?: string;
   images: string[];
   isOpen: boolean;
+  /** Точка на карте; без неё учреждение на карту не попадает */
+  latitude?: number | null;
+  longitude?: number | null;
   hours?: string;
   courses?: Course[];
   createdAt: string;
@@ -55,7 +58,9 @@ export interface Course {
   address?: string;
   Institution?: Institution;
   modules?: CourseModule[];
-  /** Этапы, отмеченные текущим пользователем; у гостя пусто */
+  /** Записан ли текущий пользователь на курс; у гостя false */
+  isEnrolled?: boolean;
+  /** Этапы, отмеченные текущим пользователем; пусто, пока он не записан */
   completedStageIds?: string[];
   createdAt: string;
   updatedAt: string;

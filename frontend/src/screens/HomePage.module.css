@@ -10,17 +10,6 @@
   overflow-x: hidden;
 }
 
-/* Карта занимает верх экрана и уходит под шторку с контентом */
-.map {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 811px;
-  height: 746px;
-  object-fit: cover;
-}
-
 .topBar {
   position: relative;
   z-index: 3;
@@ -38,66 +27,14 @@
   color: var(--proto-text);
 }
 
-/* Метка учреждения на карте */
-.mapPin {
-  position: absolute;
-  top: 276px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
-
-.mapPinCard {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  border-radius: 16px;
-  background: rgba(14, 14, 22, 0.85);
-  backdrop-filter: blur(10px);
-}
-
-.mapPinTitle {
-  font-size: 13px;
-  font-weight: 500;
-}
-
-.mapPinAddress {
-  font-size: 11px;
-  color: var(--proto-text-60);
-}
-
-.mapPinDot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--proto-text);
-}
-
-/* Шторка с контентом поверх карты */
-.sheet {
-  position: relative;
-  z-index: 2;
-  margin-top: 468px;
-  padding: 14px var(--proto-gutter) 40px;
-  border-radius: 28px 28px 0 0;
-  background: var(--proto-bg-bottom);
-}
-
-.handle {
-  width: 120px;
-  height: 2px;
-  margin: 0 auto 20px;
-  border-radius: 1px;
-  background: rgba(255, 255, 255, 0.3);
+/* Лента под шапкой: карта-карточка, поиск, действия, курсы */
+.content {
+  padding: 0 var(--proto-gutter) 40px;
 }
 
 .search {
   display: flex;
+  margin-top: 40px;
   align-items: center;
   gap: 12px;
   height: 46px;

@@ -1,5 +1,5 @@
 import { Course } from "@/models/Api";
-import { AUTH_TOKEN_KEY } from "@/utils/api";
+import { getAuthToken } from "@/utils/api";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
@@ -19,7 +19,7 @@ class ApiClient {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
-    const token = localStorage.getItem(AUTH_TOKEN_KEY);
+    const token = getAuthToken();
     
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
