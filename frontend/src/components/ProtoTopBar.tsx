@@ -30,15 +30,10 @@ export default function ProtoTopBar({ onBack }: ProtoTopBarProps) {
         </svg>
       </button>
 
+      {/* Знак логотипа справа — как в макете */}
       <button className={styles.button} aria-label="На главную" onClick={() => router.push(APP_HOME)}>
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden>
-          <path
-            d="M4 15a4 4 0 0 1 .9-7.9 5.5 5.5 0 0 1 10.5-1.3A4.4 4.4 0 1 1 16 15H4Z"
-            stroke="currentColor"
-            strokeWidth="1.6"
-            strokeLinejoin="round"
-          />
-        </svg>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img className={styles.mark} src="/brand/mark.webp" alt="" width={24} height={24} />
       </button>
     </div>
   )

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import BrandLogo from '@/components/BrandLogo'
 import ImageWithFallback from '@/components/ImageWithFallback'
 import { useAuth } from '@/hooks/useAuth'
 import { Course } from '@/models/Api'
@@ -16,6 +17,16 @@ interface Stats {
   institutions: number
   equipment: number
   course: Course | null
+}
+
+/**
+ * Реквизиты правообладателя для подвала. ОГРН и ИНН показываются,
+ * только когда заполнены.
+ */
+const COMPANY = {
+  name: 'ООО «Архада»',
+  ogrn: '',
+  inn: '',
 }
 
 const FEATURES = [
@@ -81,7 +92,7 @@ export default function Landing() {
   return (
     <div className={styles.page}>
       <header className={styles.nav}>
-        <span className={styles.logo}>Облако науки</span>
+        <BrandLogo height={28} className={styles.logo} />
         <Link
           href={primaryHref}
           className={`${styles.navButton} ${loading ? styles.pending : ''}`}
@@ -219,6 +230,11 @@ export default function Landing() {
 
       <footer className={styles.footer}>
         <span>© {new Date().getFullYear()} Облако науки</span>
+        <div className={styles.legal}>
+          <span>{COMPANY.name}</span>
+          {COMPANY.ogrn && <span>ОГРН {COMPANY.ogrn}</span>}
+          {COMPANY.inn && <span>ИНН {COMPANY.inn}</span>}
+        </div>
       </footer>
     </div>
   )

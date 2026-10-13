@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import BrandLogo from '@/components/BrandLogo'
 import MapWindow, { MapPlace } from '@/components/map/MapWindow'
 import ProfileMenu from '@/components/ProfileMenu'
 import ActionCards from '@/components/ActionCards'
@@ -109,7 +110,7 @@ export default function HomePage() {
   return (
     <div className={styles.container}>
       <header className={styles.topBar}>
-        <span className={styles.logo}>Облако науки</span>
+        <BrandLogo height={26} className={styles.logo} />
         <ProfileMenu />
       </header>
 
