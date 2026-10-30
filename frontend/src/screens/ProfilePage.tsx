@@ -14,12 +14,7 @@ import { Booking, cancelBooking, getUserBookings } from '@/services/bookingServi
 import { getUnreadCount } from '@/services/chatService'
 import { resendParentConsent } from '@/services/accountService'
 import { getNotifications } from '@/services/notificationService'
-import {
-  CONSULTATION_STATUS,
-  Consultation,
-  getConsultations,
-  setConsultationStatus,
-} from '@/services/peopleService'
+import { CONSULTATION_STATUS, Consultation, getConsultations, setConsultationStatus } from '@/services/peopleService'
 import { getMyTeams, Team } from '@/services/teamService'
 import { ApiError } from '@/utils/api'
 import ui from '@/styles/ui.module.css'
@@ -51,13 +46,21 @@ function Profile({ user }: { user: User }) {
   const [consultations, setConsultations] = useState<Consultation[]>([])
 
   useEffect(() => {
-    getUnreadCount().then(setUnread).catch(() => setUnread(0))
+    getUnreadCount()
+      .then(setUnread)
+      .catch(() => setUnread(0))
     getNotifications()
       .then((data) => setNotificationsUnread(data.unread))
       .catch(() => setNotificationsUnread(0))
-    getMyTeams().then(setTeams).catch(() => setTeams([]))
-    getUserBookings().then(setBookings).catch(() => setBookings([]))
-    getConsultations().then(setConsultations).catch(() => setConsultations([]))
+    getMyTeams()
+      .then(setTeams)
+      .catch(() => setTeams([]))
+    getUserBookings()
+      .then(setBookings)
+      .catch(() => setBookings([]))
+    getConsultations()
+      .then(setConsultations)
+      .catch(() => setConsultations([]))
   }, [])
 
   const cancel = async (booking: Booking) => {
@@ -65,8 +68,7 @@ function Profile({ user }: { user: User }) {
     try {
       await cancelBooking(booking.id)
       setBookings(
-        (current) =>
-          current?.map((row) => (row.id === booking.id ? { ...row, status: 'cancelled' } : row)) ?? null
+        (current) => current?.map((row) => (row.id === booking.id ? { ...row, status: 'cancelled' } : row)) ?? null,
       )
       toast.success('Бронь отменена')
     } catch (error) {
@@ -77,9 +79,7 @@ function Profile({ user }: { user: User }) {
   const cancelConsultation = async (item: Consultation) => {
     try {
       await setConsultationStatus(item.id, 'cancelled')
-      setConsultations((current) =>
-        current.map((row) => (row.id === item.id ? { ...row, status: 'cancelled' } : row))
-      )
+      setConsultations((current) => current.map((row) => (row.id === item.id ? { ...row, status: 'cancelled' } : row)))
       toast.success('Заявка отменена')
     } catch (error) {
       toast.error(error instanceof ApiError ? error.message : 'Не удалось отменить')
@@ -92,7 +92,7 @@ function Profile({ user }: { user: User }) {
       toast.success(
         result.sent
           ? `Письмо отправлено на ${user.parentEmail}`
-          : 'Почта на сайте пока не настроена — согласие подтвердит администратор'
+          : 'Почта на сайте пока не настроена — согласие подтвердит администратор',
       )
     } catch (error) {
       toast.error(error instanceof ApiError ? error.message : 'Не удалось отправить письмо')
@@ -110,115 +110,119 @@ function Profile({ user }: { user: User }) {
 
   return (
     <div className={styles.layout}>
-      <section className={`${ui.panel} ${styles.me}`}>
-        <Avatar name={user.name} src={user.avatar} size={64} />
-        <div className={ui.cardBody}>
-          <h1 className={styles.name}>{user.name}</h1>
-          <span className={ui.cardMeta}>{user.email}</span>
+      <div className={styles.side}>
+        <section className={`${ui.panel} ${styles.me}`}>
+          <Avatar name={user.name} src={user.avatar} size={64} />
+          <div className={ui.cardBody}>
+            <h1 className={styles.name}>{user.name}</h1>
+            <span className={ui.cardMeta}>{user.email}</span>
+            {user.role === 'admin' && (
+              <span className={`${ui.badge} ${ui.badgeGreen} ${styles.role}`}>администратор</span>
+            )}
+          </div>
+        </section>
+
+        {user.parentConsentStatus === 'pending' && (
+          <section className={`${ui.panel} ${styles.pending}`}>
+            <span className={styles.pendingTitle}>Ждём согласия родителя</span>
+            <span className={ui.cardMeta}>
+              Попросили согласие у родителя: {user.parentEmail}. До подтверждения недоступны чаты, команды и брони —
+              каталог и курсы можно смотреть.
+            </span>
+            <button className={`${ui.ghost} ${ui.small}`} onClick={resendLetter}>
+              Отправить письмо ещё раз
+            </button>
+          </section>
+        )}
+
+        <nav className={styles.links} aria-label="Разделы профиля">
+          <button className={`${ui.card} ${ui.cardLink} ${styles.link}`} onClick={() => router.push('/notifications')}>
+            <span className={styles.linkTitle}>Уведомления</span>
+            {notificationsUnread > 0 ? (
+              <span className={styles.unread}>{notificationsUnread}</span>
+            ) : (
+              <span className={ui.muted}>›</span>
+            )}
+          </button>
+          <button className={`${ui.card} ${ui.cardLink} ${styles.link}`} onClick={() => router.push('/chats')}>
+            <span className={styles.linkTitle}>Чаты</span>
+            {unread > 0 ? <span className={styles.unread}>{unread}</span> : <span className={ui.muted}>›</span>}
+          </button>
+          <button className={`${ui.card} ${ui.cardLink} ${styles.link}`} onClick={() => router.push('/teams')}>
+            <span className={styles.linkTitle}>Команды</span>
+            <span className={ui.muted}>{teams.length || '›'}</span>
+          </button>
+          <button className={`${ui.card} ${ui.cardLink} ${styles.link}`} onClick={() => router.push('/people')}>
+            <span className={styles.linkTitle}>Эксперты и обучающиеся</span>
+            <span className={ui.muted}>›</span>
+          </button>
+          <button className={`${ui.card} ${ui.cardLink} ${styles.link}`} onClick={() => router.push('/settings')}>
+            <span className={styles.linkTitle}>Настройки</span>
+            <span className={ui.muted}>›</span>
+          </button>
           {user.role === 'admin' && (
-            <span className={`${ui.badge} ${ui.badgeGreen} ${styles.role}`}>администратор</span>
+            <button className={`${ui.card} ${ui.cardLink} ${styles.link}`} onClick={() => router.push('/admin')}>
+              <span className={styles.linkTitle}>Админка</span>
+              <span className={ui.muted}>›</span>
+            </button>
           )}
-        </div>
-      </section>
+        </nav>
 
-      {user.parentConsentStatus === 'pending' && (
-        <section className={`${ui.panel} ${styles.pending}`}>
-          <span className={styles.pendingTitle}>Ждём согласия родителя</span>
-          <span className={ui.cardMeta}>
-            Попросили согласие у родителя: {user.parentEmail}. До подтверждения недоступны чаты, команды и брони —
-            каталог и курсы можно смотреть.
-          </span>
-          <button className={`${ui.ghost} ${ui.small}`} onClick={resendLetter}>
-            Отправить письмо ещё раз
-          </button>
-        </section>
-      )}
+        <button className={`${ui.danger} ${styles.logout}`} onClick={handleLogout}>
+          Выйти из аккаунта
+        </button>
+      </div>
 
-      <nav className={styles.links} aria-label="Разделы профиля">
-        <button className={`${ui.card} ${ui.cardLink} ${styles.link}`} onClick={() => router.push('/notifications')}>
-          <span className={styles.linkTitle}>Уведомления</span>
-          {notificationsUnread > 0 ? (
-            <span className={styles.unread}>{notificationsUnread}</span>
+      <div className={styles.main}>
+        <section className={`${styles.block} ${styles.bookings}`}>
+          <h2 className={ui.sectionTitle}>Мои брони</h2>
+          {bookings === null ? (
+            <div className="bigLoader" />
+          ) : bookings.length === 0 ? (
+            <div className={ui.empty}>Броней пока нет — оборудование можно взять в каталоге</div>
           ) : (
-            <span className={ui.muted}>›</span>
+            <div className={ui.list}>
+              {bookings.map((booking) => (
+                <BookingCard
+                  key={booking.id}
+                  booking={booking}
+                  showAuthor={booking.userId !== user.id}
+                  onCancel={canCancel(booking) ? cancel : undefined}
+                />
+              ))}
+            </div>
           )}
-        </button>
-        <button className={`${ui.card} ${ui.cardLink} ${styles.link}`} onClick={() => router.push('/chats')}>
-          <span className={styles.linkTitle}>Чаты</span>
-          {unread > 0 ? <span className={styles.unread}>{unread}</span> : <span className={ui.muted}>›</span>}
-        </button>
-        <button className={`${ui.card} ${ui.cardLink} ${styles.link}`} onClick={() => router.push('/teams')}>
-          <span className={styles.linkTitle}>Команды</span>
-          <span className={ui.muted}>{teams.length || '›'}</span>
-        </button>
-        <button className={`${ui.card} ${ui.cardLink} ${styles.link}`} onClick={() => router.push('/people')}>
-          <span className={styles.linkTitle}>Эксперты и обучающиеся</span>
-          <span className={ui.muted}>›</span>
-        </button>
-        <button className={`${ui.card} ${ui.cardLink} ${styles.link}`} onClick={() => router.push('/settings')}>
-          <span className={styles.linkTitle}>Настройки</span>
-          <span className={ui.muted}>›</span>
-        </button>
-        {user.role === 'admin' && (
-          <button className={`${ui.card} ${ui.cardLink} ${styles.link}`} onClick={() => router.push('/admin')}>
-            <span className={styles.linkTitle}>Админка</span>
-            <span className={ui.muted}>›</span>
-          </button>
-        )}
-      </nav>
-
-      <section className={`${styles.block} ${styles.bookings}`}>
-        <h2 className={ui.sectionTitle}>Мои брони</h2>
-        {bookings === null ? (
-          <div className="bigLoader" />
-        ) : bookings.length === 0 ? (
-          <div className={ui.empty}>Броней пока нет — оборудование можно взять в каталоге</div>
-        ) : (
-          <div className={ui.list}>
-            {bookings.map((booking) => (
-              <BookingCard
-                key={booking.id}
-                booking={booking}
-                showAuthor={booking.userId !== user.id}
-                onCancel={canCancel(booking) ? cancel : undefined}
-              />
-            ))}
-          </div>
-        )}
-      </section>
-
-      {consultations.length > 0 && (
-        <section className={`${styles.block} ${styles.consultations}`}>
-          <h2 className={ui.sectionTitle}>Консультации</h2>
-          <div className={ui.list}>
-            {consultations.map((item) => (
-              <div key={item.id} className={`${ui.card} ${ui.cardWrap}`}>
-                <div className={ui.cardBody}>
-                  <span className={ui.cardTitle}>{item.Specialist?.name}</span>
-                  <span className={ui.cardMeta}>
-                    {item.preferredDate
-                      ? new Date(item.preferredDate).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })
-                      : 'Дата не указана'}
-                    {item.preferredTime ? `, ${item.preferredTime}` : ''}
-                  </span>
-                </div>
-                <div className={`${ui.cardActions} ${styles.statusActions}`}>
-                  <span className={ui.badge}>{CONSULTATION_STATUS[item.status]}</span>
-                  {item.status === 'new' && (
-                    <button className={`${ui.ghost} ${ui.small}`} onClick={() => cancelConsultation(item)}>
-                      Отменить
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
         </section>
-      )}
 
-      <button className={`${ui.danger} ${styles.logout}`} onClick={handleLogout}>
-        Выйти из аккаунта
-      </button>
+        {consultations.length > 0 && (
+          <section className={`${styles.block} ${styles.consultations}`}>
+            <h2 className={ui.sectionTitle}>Консультации</h2>
+            <div className={ui.list}>
+              {consultations.map((item) => (
+                <div key={item.id} className={`${ui.card} ${ui.cardWrap}`}>
+                  <div className={ui.cardBody}>
+                    <span className={ui.cardTitle}>{item.Specialist?.name}</span>
+                    <span className={ui.cardMeta}>
+                      {item.preferredDate
+                        ? new Date(item.preferredDate).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })
+                        : 'Дата не указана'}
+                      {item.preferredTime ? `, ${item.preferredTime}` : ''}
+                    </span>
+                  </div>
+                  <div className={`${ui.cardActions} ${styles.statusActions}`}>
+                    <span className={ui.badge}>{CONSULTATION_STATUS[item.status]}</span>
+                    {item.status === 'new' && (
+                      <button className={`${ui.ghost} ${ui.small}`} onClick={() => cancelConsultation(item)}>
+                        Отменить
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
     </div>
   )
 }

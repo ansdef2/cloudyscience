@@ -29,6 +29,8 @@
   border-radius: var(--proto-radius-hero);
   background: var(--proto-surface);
   filter: drop-shadow(0 41px 37.55px rgba(86, 0, 128, 0.28));
+  /* filter создаёт свой слой: без z-index меню «Ещё» уходило под карточки ниже */
+  z-index: 2;
 }
 
 .heroGlow {

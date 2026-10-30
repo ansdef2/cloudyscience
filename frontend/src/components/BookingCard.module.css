@@ -16,6 +16,11 @@
   align-items: center;
 }
 
+/* На телефоне кнопки карточки растягиваются в ряд — статус остаётся по размеру текста */
+.head .actions > span {
+  flex: 0 0 auto;
+}
+
 .details {
   display: flex;
   flex-direction: column;
